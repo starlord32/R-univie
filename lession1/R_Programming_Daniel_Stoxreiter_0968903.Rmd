@@ -1,0 +1,905 @@
+---
+title: "Swirl course for R Programming"
+output:
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    
+    #install packes "flexdashboard" required!!!
+    #install.packages("flexdashboard")
+---
+
+# Content {.sidebar}
+
+**Content**
+
+* 1: Basic Building Blocks
+* 2: Workspace and Files
+* 3: Sequences of Numbers
+* 4: Vectors
+* 5: Missing Values          
+* 6: Subsetting Vectors
+* 7: Matrices and Data Frames
+* 8: Logic
+* 9: Functions 
+* 10: lapply and sapply       
+* 11: vapply and tapply
+* 12: Looking at Data
+* 13: Simulation
+* 14: Dates and Times
+* 15: Base Graphics 
+
+**Important note:**
+
+If you want to see the correct format intall the following package
+
+install.packages("flexdashboard")
+
+# 1
+
+### Basic Building Blocks
+
+In this course I learned about basic operators like *<-* to store something in a variable like a simple (+, -, /, (times) and ^) binary calculation.
+It also showed me how to get help like *?c* to learn more about vectors. Furthermore the course teached me about vectors and how to create them with the *c()* command.
+
+A vector can also be stored in a variable either alone or together with a calculation, another variable or even another vector.
+The course closed with explaining how R calculates and especially about the variable or vector length and how it recycles them if caclulations are done with variables or vectors in different length. 
+
+### List of commands:
+* <-
+* c()
+* ?c
+
+# 2
+
+### Workspace and Files
+
+In this course I learned about my my workspace and files. The idea was to navigate threw my explorer with the console.
+
+The command *getwd()* returns the path of the current working directory and the command *setwd()* allows me to change the working directory to another path.
+*ls()* lists all objects I have stored and *list.files()* returns a list of all files including directories of my working directory.
+
+The *args()* command allows me to view a functions arugments that can be used. Several more commands were introduced to create, manipulate and copy files. 
+
+### List of commands: 
+* ls()
+* list.files()
+* args()
+* getwd()
+* create.dir()
+* file.info()
+* file.path()
+* file.rename()
+* create.file()
+* file.exists()
+
+# 3
+
+### Sequences of Numbers
+
+The course about sequences of numbers introduced the operator *":"* and *seq()* as well as *rep()*.
+With *1:10* all numbers from 1 to 10 are returned. 
+**[1]  1  2  3  4  5  6  7  8  9 10**
+
+
+The same result can be achieved with *seq(1, 10)*.
+The function *rep()* allowes me to repeat sequences.
+Various examples with different approaches to the same problem were introduced.
+
+
+```{r}
+rep(1:10, 5)
+```
+
+### Additional usefull parameters are:
+* length =
+* times =
+* each =
+
+### List of commands:
+* seq()
+* rep()
+* :
+
+# 4
+
+### Vectors
+
+The vectors course extented my knowledge of how to create vectors that was introduced in the first course by adding new options to the vector command *c()*.
+Numeric vectors can provide true and false or NA statements when using logical operators like *<, >, <=, >=, !=*.
+As done before vectors can be store in variables and reused inside new vectors. 
+
+More function were introduced like 
+
+With paste it is also possible to convert numbers *1:10* into strings.
+
+### Example
+
+```{r echo=TRUE}
+my_char <- c("My name is")
+```
+
+```{r echo=TRUE}
+my_name <- c("Daniel Stoxreiter")
+```
+
+```{r echo=TRUE}
+paste(my_char, my_name, sep=" ")
+```
+
+### List of commands:
+* paste()
+* c()
+* logical operators *<, >, <=, >=, !=*
+* parameters for paste *collapse=""*, *sep=" "*
+
+# 5
+
+### Missing Values
+
+The course about missing values worked with several functions like vectors, variables and logical operators like the *== sign* as well as basic calculations.
+Newly introduced but not entirely explained was *rep* for replicating some output with a defined number. 
+
+Besides that the *rnorm()* function was used. According to the help it applies a standard distribution to any output.
+
+The key takeaway of the course is about missing numbers expressed by R with NA (not applicable). 
+If code returns NA it is important to investigate were this NA is comming from. 
+
+With *is.na()* it is possible to find out if a vector or variable contains NA. Newly introduced was also the function *sum()* to create a sum of results of TRUE = 1 and FALSE = 0. 
+
+Sligthly touched was NaN (not a number) by dividing 0 by 0 or substracting Inf and Inf.
+
+### Liste of commands:
+* rnorm()
+* == (equal to)
+* rep()
+* is.na()
+* sum()
+
+# 6
+
+### Subsetting Vectors
+
+Subsetting Vectors  was about working on data and extracting specifc values or names from any set of given data. Examples with logical vectors, vectors of positive and negative integers and then moved on to vectors with character strings.
+
+As a usefule new operator the square brackets *[ ]* were introduced for indexing. A predifined variable *x* included numbers and NAs. With *x[is.na(x)]* R would return only all NAs in the variable. 
+
+With *"!"* is not sign it is possible to extract the numbers like *x[!is.na(x)]* moving on to searching for values > 0 there were two ways to get to this result. The first stored the previous out in a variable y *y <- x[!is.na(x)]* and continue with *y[x > 0]* however the same result can be achieved with *x[!is.na(x) & x > 0]*.
+
+To be aware of the length of ony given data set the course introduced searching for specifc elements of x. Indexing and vectors two the trick with *x[c(3, 5, 7)]* or exclduing elemnts with minus like *x[c(-2, -8)]*. While the first code will only return element 3, 5 and 7 the second one will show all elements but 2 and 8. When asking for elements of a higher length or for 0 are will return nothing usable. 
+
+The 2nd part included vectors with character strings. The new vector *vect <- c(foo = 11, bar = 2, norf = NA)* will include a character string that holds a value. In this szenario three character strings with values were created and stored in a variable. WIth the *names(vect)* function it is possible to access the character strings of the variable "vect" only. Further on a second variable vect2 was created and character strings as well as positive numerics values were assigned to this variable seperatly.
+
+*vect2 <- c(11, 2, NA)* and *names(vect2) <- c("foo", "bar", "norf")*
+Variable "vect" and "vect" will store the same information. Checking this was done with the *identical(vect, vect2)* function which returned TRUE.
+
+### Examples:
+```{r echo=TRUE}
+vect <- c(foo = 11, bar = 2, norf = NA)
+```
+
+```{r echo=TRUE}
+vect2 <- c(11, 2, NA)
+```
+
+```{r echo=TRUE}
+names(vect2) <- c("foo", "bar", "norf")
+```
+
+```{r echo=TRUE}
+identical(vect, vect2)
+```
+
+### List of commands:
+* [ ]
+* is.na()
+* !is.na()
+* !is.na(x) **&** x > 0
+* c(1, 2, 3)
+* c(-2, -5)
+* names()
+* <-
+* identical()
+
+# 7
+
+### Matrices and Dataframes
+
+Matrices and dataframes introduced a more applicable and know data format. In this course numberic and character string vectors were tranformed to matrices and further more into data frames. 
+
+This frame can be read like coordinates like x and y or simply by remembering excel columns and rows. With the function *dim(my_vector) <- c(4, 5)* the previously created vector including number received a dimension with 4 rows and 5 columns. The numeric values in the variable were each assigned to a column and row.
+
+#### Example:
+
+```{r echo=TRUE}
+ my_vector <- c(1:20)
+```
+
+```{r echo=FALSE}
+ my_vector
+```
+
+```{r echo=TRUE}
+ dim(my_vector) <- c(4, 5)
+```
+
+```{r echo=FALSE}
+ my_vector
+```
+
+```{r echo=TRUE}
+ my_matrix <- matrix(data = 1:20, nrow = 4, ncol = 5)
+```
+
+```{r echo=FALSE}
+ my_matrix
+```
+
+### Continue:
+
+The next step assiged a character string vector to the matrix. 
+
+First I created a variable that holds this strings 
+
+```{r echo=TRUE}
+ patients <- c("Bill", "Gina", "Kelly", "Sean")
+```
+
+With cbind() the result looks as follows:
+
+```{r echo=TRUE}
+ cbind(patients, my_matrix)
+```
+
+However, the numeric values are transformed into charcter strings which was not the final goal. This is called an implicit coercion. 
+Since a matric can only contain one set of elements either numeric or strings this coercion was unavoidable. 
+
+To solve the problem the *data.frame()* fuction was introducted. 
+
+#### Example:
+
+```{r echo=TRUE}
+ patients <- c("Bill", "Gina", "Kelly", "Sean")
+```
+
+```{r echo=TRUE}
+ my_data <- data.frame(patients, my_matrix)
+```
+
+Will create a data frame with the two predfined variables and as usual in this course is assiged to a new variable called my_data.
+
+At last a new functions was introduced *colnames()*.
+After creating a new variable holding a character string *cnames <- c("patient", "age", "weight", "bp", "rating", "test")* this strings were assigned to the data frame as follows:
+
+```{r echo=FALSE}
+ cnames <- c("patient", "age", "weight", "bp", "rating", "test")
+```
+
+```{r echo=TRUE}
+ colnames(my_data) <- cnames
+```
+
+#### Result:
+
+```{r echo=FALSE}
+ my_data
+```
+
+### List of commands:
+* c()
+* dim()
+* matrix(data = , nrwo = , ncol =)
+* cbind()
+* data.frame()
+* colnames()
+
+# 8
+
+### Logic
+
+There was already an introduction for logical operators that return a boolean. However, this course discuss them in depth. 
+Simple logical operators are *==, !=, <, <=, >, >=*.
+Comparing two or more elements will result in either TRUE or FALSE.
+
+* 1: 9 >= 10
+* 2: 6 < 8
+* 3: 7 == 7
+* 4: 0 > -36
+
+In the above case number 1 is FALSE.
+
+The *"!"* will negate operations.
+Like *!TRUE = "FALSE"*.
+
+The OR operator is expressed with *"|" and "||"* and the AND operator with *& or &&*.
+In both scenarious the single operator will only compare one result left to one on the right even though the right side could contain more elements.
+
+While the double sign will compare all the elements. 
+In case of the AND signs the left side operator determines the outcome. *TRUE || FALSE & FALSE* would return TRUE.
+
+### Example:
+
+```{r echo=TRUE}
+ TRUE || FALSE & FALSE
+```
+
+
+### List of commands:
+
+* isTRUE() if an argument is TRUE it returns TRUE if not it returns FALSE.
+
+* xor() needs exclusivity which means that only one of the arguments can be TRUE while the other must be false in order to retieve a TRUE statement from the function.
+
+* sample() shuffles arguments of the function randomly.
+
+* which() logical vectors are transformed into arguments and the indices of the elements are returned
+
+* any() returns TRUE of any element is true
+
+* all() retursn TRUE of all elements are true
+
+* | and ||
+* & and &&
+* !
+
+# 9
+
+### Functions
+
+The course introduced functions and how to create them. At first the function Sys.Date() was introduced which returns today's date.
+However the part about functions was quiete tricky. The following functions were trained.
+
+### Examples:
+
+
+```{r echo=FALSE}
+ my_vectors33 <- c(1:20)
+```
+
+```{r echo=TRUE}
+ my_mean <- function(my_vector33) {
+  sum(my_vector33) / length(my_vector33)
+}
+```
+
+```{r}
+ my_mean(my_vectors33)
+```
+
+This function creates a sum and divides it by the length of a vector.
+It basically does what the function *median()* will do when applied to a numeric vector. 
+
+```{r echo=TRUE}
+ telegram <- function(...){
+  paste("START", ..., "STOP")
+}
+```
+
+```{r echo=TRUE}
+ telegram("The middle of the output")
+```
+In this function the ellipsis was introduced which are the three dots as arguments of the function.
+The three dots are a placeholder for any other element we want to put in. 
+
+```{r echo=TRUE}
+ evaluate <- function(func, dat){
+  func(dat)
+}
+```
+This next function disclosed an important feature to function. 
+Functions can store arguments that are in itself functions. 
+*"func* is an argument but also a function.
+
+### Examples:
+
+```{r echo=TRUE}
+mad_libs <- function(...){
+  args <- list(...)
+  place <- args[["place"]]
+  adjective <- args[["adjective"]]
+  noun <- args[["noun"]]
+  paste("News from", place, "today where", adjective, "students took to the streets in protest of the new", noun, "being installed on campus.")
+}
+```
+
+```{r}
+ mad_libs(place = "Vienna", adjective = "thousands of", noun = "surveillance cameras")
+```
+
+The mad_libs function uses the ellipsis for more than one element we want to use it with.
+At first the ellipsis is described as a list called args.
+
+Each list element of args is unpacked with the double square brackets [ [ ] ] ans assigned to a variable.
+The paste() function in the end adds static alements with character strings and the variables and will print them without the quotation marks in one sentence.
+
+```{r}
+ "%p%" <- function(one, two){ # Remember to add arguments!
+  paste(one, two)
+}
+```
+
+```{r echo=TRUE}
+ "hallo" %p% "world"
+```
+
+The last function was about creating my own binary operators like (*, +, -, / ).
+Binary operators are named like variables but within quotation marks and percent signs. Expl. "%p%"
+This function contains two arguments one and two and a paste function to print ony two elements as one.
+
+# 10
+
+### lapply and sapply
+
+The course about lappyl and sapply introduced the a loop function. This allows me to apply a specific function on each element of a dataset. 
+Instead of calling each element of a dataset seperatly this function will automatically do the same. 
+
+lapply() allways returns a list 
+sapply() returns a matrix if length > 1 or else if length = 1 it returns vector
+
+sapply is the simplified version of lapply
+
+* flag_colors <- flags[, 11:17] 
+
+The variable flags contains a dataset in a data frame. 
+The above code will retrieve all rows of a list but only column 11 to 17.
+The comma before the sequence defines all rows.
+
+### Example:
+
+* lapply(unique_vals, function(elem) elem[2])
+
+The loop searchs through all elements in the dataset unique_vals and the function makes sure that only element two is returned.
+
+### List of commands:
+
+* head(flags) Provides the head of the dataset flags.
+
+* class() : Informs me about the forma of the data set e.g. a data.frame.
+
+* range() : Returns th minimum and maximum of its first argument.
+
+* unique() : Returns a vector with all diplicate elements removed.
+
+* lapply() : Loop function
+
+* sapply() : Simple loop function
+
+# 11
+
+### vapply and tapply
+
+The course introduced two new functions. The *vapply* function is also a loop function like *sapply* but it requries more specific inputs to return a list or a vector. 
+In *vapply* it is necessary to specifiy the outcome more explicit. The course also uses the flags dataset. 
+
+```{r echo=TRUE}
+ # vapply(flags, class, character(1))
+```
+This code will return the same result as *sapply*.
+The arguments of the function specify how the result must look like. 
+This function might be faster than *sapply* however it takes longer to type.
+
+```{r echo=TRUE}
+ #tapply(flags$animate, flags$landmass, mean)
+```
+Applies the *mean()* function to the *animate variable* of the *flags dataset* seperatly for each of the six *landmass groups*.
+Landmass groups 1 to 6 and 39 animated flags. It returns the proportion of animated flags of each of the landmass groups.
+
+```{r}
+  #tapply(flags$population, flags$landmass, summary)
+```
+Returns a summary of all the landmass groups and the minimum up to the maximum population. 
+
+```{r echo=TRUE}
+#$`1`
+#  Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+#  0.00    0.00    0.00   12.29    4.50  231.00 
+
+#$`2`
+#  Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+#  0.00    1.00    6.00   15.71   15.00  119.00 
+
+#$`3`
+#  Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+#  0.00    0.00    8.00   13.86   16.00   61.00 
+
+#$`4`
+#  Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+# 0.000   1.000   5.000   8.788   9.750  56.000 
+
+#$`5`
+#  Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+#  0.00    2.00   10.00   69.18   39.00 1008.00 
+#$`6`
+#  Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+#  0.00    0.00    0.00   11.30    1.25  157.00 
+```
+
+### List of commands:
+
+* vapply()
+* tapply()
+* mean()
+
+# 12
+
+### Looking at Data
+
+This course focuses on datasets and teached me about how to retrieve information about datasets.
+
+### Examples: 
+
+**head(plants, 10)**
+
+```{r echo=TRUE}
+#                  Scientific_Name          Duration Active_Growth_Period Foliage_Color pH_Min pH_Max Precip_Min Precip_Max Shade_Tolerance Temp_Min_F
+#1                        Abelmoschus              <NA>                 <NA>          <NA>     NA     NA         NA         NA            <NA>         NA
+#2             Abelmoschus esculentus Annual, Perennial                 <NA>          <NA>     NA     NA         NA         NA            <NA>         NA
+#3                              Abies              <NA>                 <NA>          <NA>     NA     NA         NA         NA            <NA>         NA
+#4                     Abies balsamea         Perennial    Spring and Summer         Green      4    6.0         13         60        Tolerant        -43
+#5       Abies balsamea var. balsamea         Perennial                 <NA>          <NA>     NA     NA         NA         NA            <NA>         NA
+#6                           Abutilon              <NA>                 <NA>          <NA>     NA     NA         NA         NA            <NA>         NA
+#7               Abutilon theophrasti            Annual                 <NA>          <NA>     NA     NA         NA         NA            <NA>         NA
+#8                             Acacia              <NA>                 <NA>          <NA>     NA     NA         NA         NA            <NA>         NA
+#9                  Acacia constricta         Perennial    Spring and Summer         Green      7    8.5          4         20      Intolerant        -13
+#10 Acacia constricta var. constricta         Perennial                 <NA>          <NA>     NA     NA         NA         NA            <NA>         NA
+```
+
+**tail(plants, 15) returns the last 15 rows**
+
+```{r echo=TRUE}
+#summary(plants) returns a summary of all the data in the rows 
+#                  Scientific_Name              Duration              Active_Growth_Period      Foliage_Color      pH_Min          pH_Max         Precip_Min      Precip_Max    
+# Abelmoschus                 :   1   Perennial        :3031   Spring and Summer   : 447      Dark Green  :  82   Min.   :3.000   Min.   : 5.100   Min.   : 4.00   Min.   : 16.00 # 
+# Abelmoschus esculentus      :   1   Annual           : 682   Spring              : 144      Gray-Green  :  25   1st Qu.:4.500   1st Qu.: 7.000   1st Qu.:16.75   1st Qu.: 55.00 # 
+# Abies                       :   1   Annual, Perennial: 179   Spring, Summer, Fall:  95      Green       : 692   Median :5.000   Median : 7.300   Median :28.00   Median : 60.00 # 
+# Abies balsamea              :   1   Annual, Biennial :  95   Summer              :  92      Red         :   4   Mean   :4.997   Mean   : 7.344   Mean   :25.57   Mean   : 58.73 # 
+# Abies balsamea var. balsamea:   1   Biennial         :  57   Summer and Fall     :  24      White-Gray  :   9   3rd Qu.:5.500   3rd Qu.: 7.800   3rd Qu.:32.00   3rd Qu.: 60.00 # 
+# Abutilon                    :   1   (Other)          :  92   (Other)             :  30      Yellow-Green:  20   Max.   :7.000   Max.   :10.000   Max.   :60.00   Max.   :200.00 # 
+# (Other)                     :5160   NA's             :1030   NA's                :4334      NA's        :4334   NA's   :4327    NA's   :4327     NA's   :4338    NA's   :4338
+# 
+# Shade_Tolerance   Temp_Min_F    
+# Intermediate: 242   Min.   :-79.00  
+# Intolerant  : 349   1st Qu.:-38.00  
+# Tolerant    : 246   Median :-33.00  
+# NA's        :4329   Mean   :-22.53  
+#                     3rd Qu.:-18.00  
+#                     Max.   : 52.00  
+#                     NA's   :4328 
+```
+
+The *summary()* function returns different outputs depending on the data. (Character strings or numeric input)
+Categorial variables (factors variables): for character strings.
+
+Since only the head of the dataset is displayed R returns only the elements with the highest value and displays everything else as *'others'*.
+
+**table(plants$Active_Growth_Period)** 
+```{r echo=TRUE}
+#Fall, Winter and Spring                  Spring         Spring and Fall       Spring and Summer    Spring, Summer, Fall                  Summer         Summer and Fall 
+#                     15                     144                      10                     447                      95                      92                      24 
+#             Year Round 
+#                      5 
+```
+Returns only the variable (column Active_Grwoth_Period)
+
+**str(plants)**
+```{r echo=TRUE}
+
+#'data.frame':	5166 obs. of  10 variables:
+# $ Scientific_Name     : Factor w/ 5166 levels "Abelmoschus",..: 1 2 3 4 5 6 7 8 9 10 ...
+# $ Duration            : Factor w/ 8 levels "Annual","Annual, Biennial",..: NA 4 NA 7 7 NA 1 NA 7 7 ...
+# $ Active_Growth_Period: Factor w/ 8 levels "Fall, Winter and Spring",..: NA NA NA 4 NA NA NA NA 4 NA ...
+# $ Foliage_Color       : Factor w/ 6 levels "Dark Green","Gray-Green",..: NA NA NA 3 NA NA NA NA 3 NA ...
+# $ pH_Min              : num  NA NA NA 4 NA NA NA NA 7 NA ...
+# $ pH_Max              : num  NA NA NA 6 NA NA NA NA 8.5 NA ...
+# $ Precip_Min          : int  NA NA NA 13 NA NA NA NA 4 NA ...
+# $ Precip_Max          : int  NA NA NA 60 NA NA NA NA 20 NA ...
+# $ Shade_Tolerance     : Factor w/ 3 levels "Intermediate",..: NA NA NA 3 NA NA NA NA 2 NA ...
+# $ Temp_Min_F          : int  NA NA NA -43 NA NA NA NA -13 NA ...
+```
+This function provides as an overview of everything we need to know and a preview of the data in the rows. 
+
+### List of commands
+
+* class(plants) returns the class of the dataset e.g. data.frame
+* dim(plants) returns rows and columns(variables)
+* nrow(plants) returns rows only
+* ncol(plants) returns columns(variables) only
+* object.size(plants) returns the size in bytes
+* names(plants) returns a character vector of columns (variables) names.
+* head(plants) returns a preview of the top of the dataset. (first 6)
+* head(plants, 10) returns the first 10 rows. The second argument defines the number of rows.
+* summary()
+* str()
+
+# 13
+
+### Simulation
+
+The simulation course works with various explames of number and string distribution functions of R. 
+
+### Examples
+
+```{r echo=TRUE}
+ sample(1:6, 4, replace = TRUE)
+```
+Takes the input variables and returns a random sample of the output. 
+In this scenarion it takes 4 numbers between 1 and 6. The *replace* variable plus the number *4* defines this and applies it to the *sequence 1:6*.
+
+```{r echo=TRUE}
+ sample(1:20, 10)
+```
+Without the replace function each number is only allowed to appear once. 
+
+```{r echo=TRUE}
+ LETTERS
+```
+Returns all 26 characters of the english alphabet. 
+
+```{r echo=TRUE}
+ sample(LETTERS)
+```
+
+```{r echo=TRUE}
+ flips <- sample(c(0, 1), 100, replace = TRUE, prob = c(0.3, 0.7))
+```
+Simulates coin flipping were 0 is tales and 1 is heads. It makes 100 flips and the probability of tails is 0.3 while the probability of heads is 0.7.
+The output is stored in a variable called flips. 
+
+```{r echo=TRUE}
+ sum(flips)
+```
+Verifies if the calculation is right only 70 heads should appear. 
+
+The *rbinom()* function stands for **binomial random variable**.
+Density, distribution and quantile are also available. 
+
+```{r echo=TRUE}
+ rbinom(1, size = 100, prob = 0.7)
+```
+Will provide random distribution probability 0.7 of 1 appearing out of 100 trials. 
+
+```{r}
+ flips2 <- rbinom(100, size = 1, prob = 0.7) 
+```
+Will provide the same as above but also notes the 0s. 
+
+**Standard normal distribution:**
+```{r echo=TRUE}
+ rnorm(10)
+```
+
+```{r echo=TRUE}
+ rnorm(10, mean = 100, sd = 25)
+```
+
+**Poisson distribution:**
+```{r echo=TRUE}
+ rpois(5, 10)
+```
+
+```{r echo=TRUE}
+ my_pois <- replicate(100, rpois(5, 10))
+```
+Replicates the *rpois* distribution 100 times.
+
+```{r echo=TRUE}
+ my_pois
+```
+
+```{r echo=TRUE}
+ cm <- colMeans(my_pois)
+```
+Finds all the means of *my_pois*.
+
+```{r echo=TRUE}
+ #hist(cm)
+```
+Creates a historgram of the distribution of the mean of each column. 
+
+**More distributions:**
+
+exponential:
+
+* rexp()
+
+chi-squared:
+
+* rchisq()
+
+gamma:
+
+* rgamma()
+
+### List of commands:
+
+* sample()
+* LETTERS
+* sum()
+* rbinom()
+* rnorm()
+* rpois()
+* hist()
+
+# 14
+
+### Dates and Times
+
+Dates are represented with the class "Date" and time with "POSIXct" and "POSIXlt" classes. 
+Dates returns the number of dates since 1970-01-01.
+Time returns the number of seconds, minitues, hours since 1970-01-01
+
+### Examples:
+
+```{r echo=TRUE}
+ d1 <- Sys.Date()
+```
+
+```{r echo=TRUE}
+ class(d1)
+```
+
+```{r echo=TRUE}
+ unclass(d1)
+```
+Provides the number of days since 1970-01-01.
+
+```{r echo=TRUE}
+ d2 <- as.Date("1969-01-01")
+```
+Provides a date before 1970-01-01. 
+The output is a negative value of -365 since it is one year before 1970-01-01.
+
+```{r echo=TRUE}
+ t1 <- Sys.time()
+```
+Stores the exact date and time in t1.
+
+```{r echo=TRUE}
+ t2 <- as.POSIXlt(Sys.time())
+```
+
+```{r echo=TRUE}
+ unclass(t2)
+```
+
+```{r echo=TRUE}
+ str(unclass(t2))
+```
+Structures the data of unclassed t2.
+
+To access specifc columns (variables) in a dataset the **$** is needed and the column (variable) name:
+```{r echo=TRUE}
+ t2$min
+```
+
+```{r echo=TRUE}
+ t4 <- strptime(t1, "%B %d, %Y %H:%M")
+```
+The *strptime()* function converts character vectors to POSIXlt and does not need a particular format like (YYYY-MM-DD).
+
+```{r echo=TRUE}
+ Sys.time() > t1
+```
+will show TRUE since some time has passed since we stored the system time in t1.
+
+```{r echo=TRUE}
+ Sys.time() - t1
+```
+Will show how much time has passed by substracting the two.
+
+```{r echo=TRUE}
+ difftime(Sys.time(), t1, units = "days")
+```
+Will also show the difference of current system time and the one created before in days. 
+
+**More functions:**
+
+* weekdays()
+* months()
+* quarters()
+
+### List of commands:
+
+* Sys.Date()
+* class()
+* unclass()
+* as.Date()
+* Sys.time()
+* as.POSIXlt()
+* str()
+* strptime()
+* difftime()
+* weekdays()
+* months()
+* quarters()
+
+# 15
+
+### Base Graphics
+
+R has several graphical expressions included. 
+In this course the following base graphics are introduced:
+
+* cars()
+* plot()
+* boxplot()
+* hist()
+
+More graphics are:
+
+* lattice()
+* ggplot2()
+* ggvis()
+
+Additional courses can be found on [Variance Explained](http://varianceexplained.org/r/teach_ggplot2_to_beginners/)
+
+* data(cars)
+Will load the cars data frame. 
+
+* head(cars)
+* plot(cars) : scatterplot
+Since there are only two columns (variables) plot uses this to variabls as axis names. 
+
+### Examples:
+
+```{r echo=TRUE}
+ #plot(x = cars$speed, y = cars$dist)
+```
+Preferred example since it explicitly describes the output data. 
+
+```{r echo=TRUE}
+ #plot(cars$speed, cars$dist)
+```
+Will work two since there are only two variables in the data. 
+
+```{r echo=TRUE}
+ #plot(x = cars$speed, cars$dist, xlabel = "Speed")
+```
+In this case the label of the x acis is set to Speed. 
+
+```{r echo=TRUE}
+ #plot(x = cars$speed, cars$dist, xlab="Speed", ylab = "Stopping Distance")
+```
+In this case both lables are defined.
+
+```{r echo=TRUE}
+ #plot(cars, main = "My Plot")
+```
+Adds a title to the graph with main.
+
+```{r echo=TRUE}
+ #plot(cars, sub = "My Plot Subtitle")
+```
+*Sub* stands for subtitle. 
+
+* par() to find more arguments for plot. 
+
+```{r echo=TRUE}
+ #plot(cars, col = 2)
+```
+Sets the color to red. 
+
+```{r echo=TRUE}
+ #plot(cars, xlim = c(10, 15))
+```
+Limits the x-axis to 10-15.
+
+```{r echo=TRUE}
+ #plot(cars, pch = 2)
+```
+Triangle output. 
+
+* boxplot()
+The dilte *~* allowes to explore the relations ship between two variables. 
+
+```{r echo=TRUE}
+ #boxplot(formula = mpg ~ cyl, data = mtcars)
+```
+Provides a graph with the relationship between mpg and cyl of the dataset mtcars.
+
+```{r echo=TRUE}
+ #hist(mtcars$mpg)
+```
+Creates a histogram of the dataset cars of one varable mpg. 
+
+Info for more base elements for graphs: 
+[ling.upeen.edu](http://www.ling.upenn.edu/~joseff/rstudy/week4.html)

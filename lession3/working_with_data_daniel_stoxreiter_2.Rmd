@@ -1,0 +1,173 @@
+---
+title: 'Lession 3: Manipulating Data by Daniel Stoxreiter'
+---
+
+## Converting data from PNG to Excel
+I started the homework with taking pictures from the datasets in question.
+To convert the data I used OCR Engine (https://www.onlineocr.net/) and converted it to Excel. 
+
+## Regular Expressions using Atom
+I copied the content from the excel sheet to Atom and applied the following regular expressions:
+
+```{r}
+#* Step One: 
+#Find: (\d+), Replace: $1 (removes the comma of Size)
+
+#* Step Two: 
+#Find: \.$ Replace: empty (removes the dot of Points for integer values)
+
+#* Step Three: 
+#Find: \s Replace: , (removes all whitespaces and replaces them with comma)
+
+#* Step Four:
+#Find: (\d+,BCE) Replace: -$1 (will add a minus at the beginning of the line for all rows with BCE)
+
+#* Step Five:
+#Find: $ Replace: ,East (will add a new obseveation "East", same for "West")
+```
+
+## Manual adjastements:
+All rows with multiple city names were manually adjusted and copied into a seperate row.
+I tried some code examples with tidyr but I could not achieve the desirable results.
+
+## Script examples for data plotting
+
+### War Making Capacity East vs. West
+
+```{r }
+library(readr)
+settlementSorted <- read_csv("~/R_course/lession3/settlementSorted.csv")
+
+#creates variables east and west to create two data sets
+east <- settlementSorted[settlementSorted$Region == "East", ]
+west <- settlementSorted[settlementSorted$Region == "West", ]
+plot_colors <- c("blue","red")
+
+#plots east against west via date and points
+plot(x = east$Date, y = east$Points, type ="o", col = plot_colors[1], xlab="Year", ylab="War making capacity", main="War of Cities")
+lines(x = west$Date, y = west$Points, type = "o", col = plot_colors[2])
+legend(-4000, 250, c("east","west"), cex=0.9, col = plot_colors, pch=21:22, lty=1:2)
+```
+
+
+```{r}
+#creates variable to seperate BCE and CE to allow better data comparison
+westBCE <- west[west$`BCE-CE` == "BCE", ]
+eastBCE <- east[east$`BCE-CE` == "BCE", ]
+
+#plots east against west in date in points for BCE dates only
+plot(x = eastBCE$Date, y = eastBCE$Points, type ="o", col = plot_colors[1], xlab="Year", ylab="War making capacity", main="War of Cities")
+lines(x = westBCE$Date, y = westBCE$Points, type = "o", col = plot_colors[2])
+legend(-4000, 4, c("east","west"), cex=0.9, col = plot_colors, pch=21:22, lty=1:2)
+```
+
+```{r}
+#creates variables for CE dates
+westCE <- west[west$`BCE-CE` == "CE", ]
+eastCE <- east[east$`BCE-CE` == "CE", ]
+
+#plots east against west in date and points between date 0 and 2000
+plot(x = eastCE$Date, y = eastCE$Points / 1000, type ="o", col = plot_colors[1], xlab="Year", ylab="War making capacity", main="War of Cities")
+lines(x = westCE$Date, y = westCE$Points / 1000, type = "o", col = plot_colors[2])
+legend(100, 0.25, c("east","west"), cex=0.9, col = plot_colors, pch=21:22, lty=1:2)
+```
+
+```{r}
+#creates variables to seperate dates between 0 and 1700 from dates between 1700 and 2000
+westEarlyCE <- westCE[westCE$Date < 1700, ]
+westLateCE <- westCE[westCE$Date > 1700, ]
+eastEarlyCE <- eastCE[eastCE$Date < 1700, ]
+eastLateCE <- eastCE[eastCE$Date > 1700, ]
+
+#plots east against west in date and points for dates > 0 and < 1700
+plot(x = eastEarlyCE$Date, y = eastEarlyCE$Points, type ="o", col = plot_colors[1], xlab="Year", ylab="War making capacity", main="War of Cities")
+lines(x = westEarlyCE$Date, y = westEarlyCE$Points, type = "o", col = plot_colors[2])
+legend(100, 6, c("east","west"), cex=0.9, col = plot_colors, pch=21:22, lty=1:2)
+```
+
+```{r}
+
+#plots east against west in date and Points for dates > 1700
+plot(x = eastLateCE$Date, y = eastLateCE$Points, type ="o", col = plot_colors[1], xlab="Year", ylab="War making capacity", main="War of Cities")
+lines(x = westLateCE$Date, y = westLateCE$Points, type = "o", col = plot_colors[2])
+legend(1800, 250, c("east","west"), cex=0.9, col = plot_colors, pch=21:22, lty=1:2)
+```
+
+```{r}
+#plots east against west in date in Points for BCE dates only
+plot(x = eastBCE$Date, y = eastBCE$Points, type ="o", col = plot_colors[1], xlab="Year", ylab="War making capacity", main="War of Cities")
+lines(x = westBCE$Date, y = westBCE$Points, type = "o", col = plot_colors[2])
+legend(-4000, 4, c("east","west"), cex=0.9, col = plot_colors, pch=21:22, lty=1:2)
+```
+
+### Settlements of East and West
+
+```{r}
+#plots east against west in date and size for CE dates only
+plot(x = eastCE$Date, y = eastCE$Size / 1000, type ="o", col = plot_colors[1], xlab="Year", ylab="Settlement Size", main="Biggest Settlements")
+lines(x = westCE$Date, y = westCE$Size / 1000, type = "o", col = plot_colors[2])
+legend(100, 25000, c("east","west"), cex=0.9, col = plot_colors, pch=21:22, lty=1:2)
+```
+
+```{r}
+#creates variables to seperate dates between 0 and 1700
+westEarlyCE <- westCE[westCE$Date < 1700, ]
+eastEarlyCE <- eastCE[eastCE$Date < 1700, ]
+
+#plots east against west in date and size for dates > 0 and < 1700
+plot(x = eastEarlyCE$Date, y = eastEarlyCE$Size / 1000, type ="o", col = plot_colors[1], xlab="Year", ylab="Settlement Size", main="Biggest Settlements")
+lines(x = westEarlyCE$Date, y = westEarlyCE$Size / 1000, type = "o", col = plot_colors[2])
+legend(100, 700, c("east","west"), cex=0.9, col = plot_colors, pch=21:22, lty=1:2)
+```
+
+```{r}
+#creates variables to seperate dates between 1700 and 2000
+westLateCE <- westCE[westCE$Date > 1700, ]
+eastLateCE <- eastCE[eastCE$Date > 1700, ]
+#plots east against west in date and size for dates > 1700
+plot(x = eastLateCE$Date, y = eastLateCE$Size / 1000, type ="o", col = plot_colors[1], xlab="Year", ylab="Settlement Size", main="Biggest Settlements")
+lines(x = westLateCE$Date, y = westLateCE$Size / 1000, type = "o", plot_colors[2])
+legend(1800, 25000, c("east","west"), cex=0.9, col = plot_colors, pch=21:22, lty=1:2)
+```
+
+
+
+```{r}
+east <- settlementSorted[settlementSorted$Region == "East", ]
+west <- settlementSorted[settlementSorted$Region == "West", ]
+
+plot(x = east$Date, y = east$Size / 1000, type ="o", col = plot_colors[1], xlab="Year", ylab="Settlement Size", main="Biggest Settlements")
+lines(x = west$Date, y = west$Size / 1000, type = "o", col = plot_colors[2])
+legend(-4000, 25000, c("east","west"), cex=0.9, col = plot_colors, pch=21:22, lty=1:2)
+```
+
+## Trying to find the biggest settlements if the War Making Capacity of the East or West was greater
+I had problems to get to the right solution. I tried various examples but the outcome is not very satisfying.
+
+
+```{r}
+#creates variables east and west to create two data sets
+east <- settlementSorted[settlementSorted$Region == "East", ]
+west <- settlementSorted[settlementSorted$Region == "West", ]
+
+eastGreatSettlement <- settlementSorted$Settlement[east$Points > west$Points & east$Size > west$Size]
+
+westGreatSettlement <- settlementSorted$Settlement[east$Points < west$Points & east$Size < west$Size]
+
+eastGreatSettlement
+
+westGreatSettlement
+
+```
+
+```{r}
+#eastGreatSettlement <- east$Settlement[(east$Points > west$Points) & (east$Size > west$Size)]
+```
+
+```{r}
+#eastGreatSettlement <- east$Points > west$Points & east$Size > west$Size
+#westGreatSettlement <- east$Points < west$Points & east$Size < west$Size
+
+#eastGreatSettlement
+```
+
