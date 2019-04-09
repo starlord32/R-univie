@@ -1,0 +1,264 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+As may often be the case, particularly with larger datasets, we are only interested in some of the variables. Use select(cran,
+| ip_id, package, country) to select only the ip_id, package, and country variables from the cran dataset.
+
+```{r}
+select(cran, ip_id, package, country)
+```
+# A tibble: 225,468 x 3
+   ip_id package      country
+   <int> <chr>        <chr>  
+ 1     1 htmltools    US     
+ 2     2 tseries      US     
+ 3     3 party        US     
+ 4     3 Hmisc        US     
+ 5     4 digest       CA     
+ 6     3 randomForest US     
+ 7     3 plyr         US     
+ 8     5 whisker      US     
+ 9     6 Rcpp         CN     
+10     7 hflights     US     
+# ... with 225,458 more rows
+
+| Excellent job! 
+
+Instead of specifying the columns we want to keep, we can also specify the columns we want to throw away. To see how this
+| works, do select(cran, -time) to omit the time column.
+
+```{r}
+select(cran, -time)
+```
+
+
+```{r}
+select(cran, -(X:size))
+```
+# A tibble: 225,468 x 7
+   r_version r_arch r_os      package      version country ip_id
+   <chr>     <chr>  <chr>     <chr>        <chr>   <chr>   <int>
+ 1 3.1.0     x86_64 mingw32   htmltools    0.2.4   US          1
+ 2 3.1.0     x86_64 mingw32   tseries      0.10-32 US          2
+ 3 3.1.0     x86_64 linux-gnu party        1.0-15  US          3
+ 4 3.1.0     x86_64 linux-gnu Hmisc        3.14-4  US          3
+ 5 3.0.2     x86_64 linux-gnu digest       0.6.4   CA          4
+ 6 3.1.0     x86_64 linux-gnu randomForest 4.6-7   US          3
+ 7 3.1.0     x86_64 linux-gnu plyr         1.8.1   US          3
+ 8 3.0.2     x86_64 linux-gnu whisker      0.3-2   US          5
+ 9 NA        NA     NA        Rcpp         0.10.4  CN          6
+10 3.0.2     x86_64 linux-gnu hflights     0.1     US          7
+# ... with 225,458 more rows
+
+| Great job!
+
+Use filter(cran, package == "swirl") to select all rows for which the package variable is equal to "swirl". Be sure to use two
+| equals signs side-by-side!
+
+```{r}
+filter(cran, package == "swirl")
+```
+
+# A tibble: 820 x 11
+       X date       time       size r_version r_arch r_os         package version country ip_id
+   <int> <chr>      <chr>     <int> <chr>     <chr>  <chr>        <chr>   <chr>   <chr>   <int>
+ 1    27 2014-07-08 00:17:16 105350 3.0.2     x86_64 mingw32      swirl   2.2.9   US         20
+ 2   156 2014-07-08 00:22:53  41261 3.1.0     x86_64 linux-gnu    swirl   2.2.9   US         66
+ 3   358 2014-07-08 00:13:42 105335 2.15.2    x86_64 mingw32      swirl   2.2.9   CA        115
+ 4   593 2014-07-08 00:59:45 105465 3.1.0     x86_64 darwin13.1.0 swirl   2.2.9   MX        162
+ 5   831 2014-07-08 00:55:27 105335 3.0.3     x86_64 mingw32      swirl   2.2.9   US         57
+ 6   997 2014-07-08 00:33:06  41261 3.1.0     x86_64 mingw32      swirl   2.2.9   US         70
+ 7  1023 2014-07-08 00:35:36 106393 3.1.0     x86_64 mingw32      swirl   2.2.9   BR        248
+ 8  1144 2014-07-08 00:00:39 106534 3.0.2     x86_64 linux-gnu    swirl   2.2.9   US        261
+ 9  1402 2014-07-08 00:41:41  41261 3.1.0     i386   mingw32      swirl   2.2.9   US        234
+10  1424 2014-07-08 00:44:49 106393 3.1.0     x86_64 linux-gnu    swirl   2.2.9   US        301
+# ... with 810 more rows
+
+| You're the best!
+
+Again, note that filter() recognizes 'package' as a column of cran, without you having to explicitly specify cran$package.
+
+...
+
+  |=============================================================                                                          |  52%
+| The == operator asks whether the thing on the left is equal to the thing on the right. If yes, then it returns TRUE. If no,
+| then FALSE. In this case, package is an entire vector (column) of values, so package == "swirl" returns a vector of TRUEs and
+| FALSEs. filter() then returns only the rows of cran corresponding to the TRUEs.
+
+...
+
+  |===============================================================                                                        |  53%
+| You can specify as many conditions as you want, separated by commas. For example filter(cran, r_version == "3.1.1", country ==
+| "US") will return all rows of cran corresponding to downloads from users in the US running R version 3.1.1. Try it out.
+```{r}
+filter(cran, r_version == "3.1.1", country == "US")
+```
+
+# A tibble: 1,588 x 11
+       X date       time        size r_version r_arch r_os         package      version country ip_id
+   <int> <chr>      <chr>      <int> <chr>     <chr>  <chr>        <chr>        <chr>   <chr>   <int>
+ 1  2216 2014-07-08 00:48:58  385112 3.1.1     x86_64 darwin13.1.0 colorspace   1.2-4   US        191
+ 2 17332 2014-07-08 03:39:57  197459 3.1.1     x86_64 darwin13.1.0 httr         0.3     US       1704
+ 3 17465 2014-07-08 03:25:38   23259 3.1.1     x86_64 darwin13.1.0 snow         0.3-13  US         62
+ 4 18844 2014-07-08 03:59:17  190594 3.1.1     x86_64 darwin13.1.0 maxLik       1.2-0   US       1533
+ 5 30182 2014-07-08 04:13:15   77683 3.1.1     i386   mingw32      randomForest 4.6-7   US        646
+ 6 30193 2014-07-08 04:06:26 2351969 3.1.1     i386   mingw32      ggplot2      1.0.0   US          8
+ 7 30195 2014-07-08 04:07:09  299080 3.1.1     i386   mingw32      fExtremes    3010.81 US       2010
+ 8 30217 2014-07-08 04:32:04  568036 3.1.1     i386   mingw32      rJava        0.9-6   US         98
+ 9 30245 2014-07-08 04:10:41  526858 3.1.1     i386   mingw32      LPCM         0.44-8  US          8
+10 30354 2014-07-08 04:32:51 1763717 3.1.1     i386   mingw32      mgcv         1.8-1   US       2122
+# ... with 1,578 more rows
+
+| Nice work!
+
+
+| The conditions passed to filter() can make use of any of the standard comparison operators. Pull up the relevant documentation
+| with ?Comparison (that's an uppercase C).
+
+Our last two calls to filter() requested all rows for which some condition AND another condition were TRUE. We can also
+| request rows for which EITHER one condition OR another condition are TRUE. For example, filter(cran, country == "US" | country
+| == "IN") will gives us all rows for which the country variable equals either "US" or "IN". Give it a go.
+
+```{r}
+filter(cran, country == "US" | country == "IN")
+```
+
+| This is a tricky one. filter(cran, size > 100500, r_os == "linux-gnu") will give us all rows for which size is strictly
+| greater than 100500 and r_os is "linux-gnu".
+```{r}
+filter(cran, size > 100500, r_os == "linux-gnu")
+```
+
+| Okay, ready to put all of this together? Use filter() to return all rows of cran for which r_version is NOT NA. Hint: You will
+| need to use !is.na() as part of your second argument to filter().
+```{r}
+filter(cran, !is.na(r_version))
+```
+
+| Sometimes we want to order the rows of a dataset according to the values of a particular variable. This is the job of
+| arrange().
+
+...
+
+  |=====================================================================================                                  |  72%
+| To see how arrange() works, let's first take a subset of cran. select() all columns from size through ip_id and store the
+| result in cran2.
+```{r}
+cran2 <- select(cran, size:ip_id)
+```
+
+| Now, to order the ROWS of cran2 so that ip_id is in ascending order (from small to large), type arrange(cran2, ip_id). You may
+| want to make your console wide enough so that you can see ip_id, which is the last column.
+```{r}
+arrange(cran2, ip_id)
+```
+
+| Nice work!
+
+  |=========================================================================================                              |  75%
+| To do the same, but in descending order, change the second argument to desc(ip_id), where desc() stands for 'descending'. Go
+| ahead.
+```{r}
+arrange(cran2, desc(ip_id))
+```
+
+| We can also arrange the data according to the values of multiple variables. For example, arrange(cran2, package, ip_id) will
+| first arrange by package names (ascending alphabetically), then by ip_id. This means that if there are multiple rows with the
+| same value for package, they will be sorted by ip_id (ascending numerically). Try arrange(cran2, package, ip_id) now.
+```{r}
+arrange(cran2, package, ip_id)
+```
+
+| Arrange cran2 by the following three variables, in this order: country (ascending), r_version (descending), and ip_id
+| (ascending).
+```{r}
+arrange(cran2, country, desc(r_version), ip_id)
+```
+
+| To illustrate the next major function in dplyr, let's take another subset of our original data. Use select() to grab 3 columns
+| from cran -- ip_id, package, and size (in that order) -- and store the result in a new variable called cran3.
+```{r}
+cran3 <- select(cran, ip_id, package, size)
+```
+
+It's common to create a new variable based on the value of one or more variables already in a dataset. The mutate() function
+| does exactly this.
+
+...
+
+  |=====================================================================================================                  |  85%
+| The size variable represents the download size in bytes, which are units of computer memory. These days, megabytes (MB) are a
+| more common unit of measurement. One megabyte is equal to 2^20 bytes. That's 2 to the power of 20, which is approximately one
+| million bytes!
+
+...
+
+  |=======================================================================================================                |  87%
+| We want to add a column called size_mb that contains the download size in megabytes. Here's the code to do it:
+
+```{r}
+mutate(cran3, size_mb = size / 2^20)
+```
+
+> mutate(cran3, size_mb = size / 2^20)
+# A tibble: 225,468 x 4
+   ip_id package         size size_mb
+   <int> <chr>          <int>   <dbl>
+ 1     1 htmltools      80589 0.0769 
+ 2     2 tseries       321767 0.307  
+ 3     3 party         748063 0.713  
+ 4     3 Hmisc         606104 0.578  
+ 5     4 digest         79825 0.0761 
+ 6     3 randomForest   77681 0.0741 
+ 7     3 plyr          393754 0.376  
+ 8     5 whisker        28216 0.0269 
+ 9     6 Rcpp            5928 0.00565
+10     7 hflights     2206029 2.10   
+# ... with 225,458 more rows
+
+| Perseverance, that's the answer.
+
+| One very nice feature of mutate() is that you can use the value computed for your second column (size_mb) to create a third
+| column, all in the same line of code. To see this in action, repeat the exact same command as above, except add a third
+| argument creating a column that is named size_gb and equal to size_mb / 2^10.
+```{r}
+mutate(cran3, size_mb = size / 2^20, size_gb = size_mb / 2^10)
+```
+# A tibble: 225,468 x 5
+   ip_id package         size size_mb    size_gb
+   <int> <chr>          <int>   <dbl>      <dbl>
+ 1     1 htmltools      80589 0.0769  0.0000751 
+ 2     2 tseries       321767 0.307   0.000300  
+ 3     3 party         748063 0.713   0.000697  
+ 4     3 Hmisc         606104 0.578   0.000564  
+ 5     4 digest         79825 0.0761  0.0000743 
+ 6     3 randomForest   77681 0.0741  0.0000723 
+ 7     3 plyr          393754 0.376   0.000367  
+ 8     5 whisker        28216 0.0269  0.0000263 
+ 9     6 Rcpp            5928 0.00565 0.00000552
+10     7 hflights     2206029 2.10    0.00205   
+# ... with 225,458 more rows
+
+| All that practice is paying off!
+
+Let's try one more for practice. Pretend we discovered a glitch in the system that provided the original values for the size
+| variable. All of the values in cran3 are 1000 bytes less than they should be. Using cran3, create just one new column called
+```{r}
+mutate(cran3, correct_size = size + 1000)
+```
+
+ The last of the five core dplyr verbs, summarize(), collapses the dataset to a single row. Let's say we're interested in
+| knowing the average download size. summarize(cran, avg_bytes = mean(size)) will yield the mean value of the size variable.
+| Here we've chosen to label the result 'avg_bytes', but we could have named it anything. Give it a try.
+```{r}
+summarize(cran, avg_bytes = mean(size))
+```
+# A tibble: 1 x 1
+  avg_bytes
+      <dbl>
+1   844086.
+
+| Excellent job!
+
