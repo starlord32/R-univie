@@ -1,0 +1,102 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+So the first principle was to show some comparison, the second was to show a mechanism, so what will the third principle say to show?
+Third principle: Multivariate data
+-What is multivariate data you might ask? In technical (scientific) literature this term means more than 2 variables. Two-variable plots are what you saw in high school algebra.
+Remember those x,y plots when you were learning about slopes and intercepts and equations of lines? They're valuable, but usually questions are more complicated and require more
+variables.
+
+-The fourth principle of analytic graphing involves integrating evidence. This means not limiting yourself to one form of expression. You can use words, numbers, images as well
+as diagrams. Graphics should make use of many modes of data presentation. Remember, "Don't let the tool drive the analysis!"
+
+-The fifth principle of graphing involves describing and documenting the evidence with sources and appropriate labels and scales. Credibility is important so the data graphics
+should tell a complete story. Also, using R, you want to preserve any code you use to generate your data and graphics so that the research can be replicated if necessary. This
+allows for easy verification or finding bugs in your analysis.
+
+-The sixth and final principle of analytic graphing is maybe the most important. Content is king! If you don't have something interesting to report, your graphs won't save you.
+Analytical presentations ultimately stand or fall depending on the quality, relevance, and integrity of their content.
+
+-The sixth and final principle of analytic graphing is maybe the most important. Content is king! If you don't have something interesting to report, your graphs won't save you. Analytical presentations ultimately stand or fall depending on the quality, relevance, and integrity of their content.
+
+```{r}
+#how to start exploring data
+#show data head
+head()
+#show dimension of the data
+dim()
+#create a summary of the data of one column
+summary(pollution$pm25)
+#show the quantile of a variable if it is a data frame
+quantile(ppm)
+#creating a bloxplot
+boxplot(ppm, col = "blue")
+#Note that boxplot is part of R's base plotting package. A nice feature that this package provides is its ability to overlay features. That is, you can add to (annotate) an
+#existing plot.
+abline(h = 12)
+#shows the data in a histogram
+hist(ppm, col = "green")
+#shows the density of tick marks)
+rug(ppm)
+#shows the the number of buckets to split the data into
+hist(ppm, col = "green", breaks = 100)
+#See how rug works with the existing plot? It automatically adjusted its pocket size to that of the last plot plotted.
+rug(ppm)
+#data in histogram
+hist(ppm, col = "green")
+#adding lines
+abline(v = 12, lwd = 2)
+#adding lines more appropriatly
+abline(v = median(ppm), col = "magenta", lwd = 4)
+#provides the names of a dataset
+names(pollution)
+#crate a table for the variable region of the pollution dataset
+```
+
+# Two dimensional graphs include scatterplots and one dimensional with lattice and ggplot2
+Some graphs have more than two-dimensions. These include overlayed or multiple two-dimensional plots and spinning plots. Some three-dimensional plots are tricky to understand so
+have limited applications. We'll see some examples now of more complicated graphs, in particular, we'll show two graphs together.
+
+```{r}
+#We use the R formula y ~ x to show that y (in this case pm25) depends on x (region). Since both come from the same data frame (pollution) we can specify a data argument set
+#equal to pollution. By doing this, we don't have to type pollution$pm25 (or ppm) and pollution$region. We can just specify the formula pm25~region. Call boxplot now with this
+#formula as its argument, data equal to pollution, and col equal to "red".
+boxplot(pm25~region, data = pollution, col = "red")
+```
+
+```{r}
+#So we set up the plot window for two rows and one column with the mfrow argument.
+#The mar argument set up the margins.
+par(mfrow = c(2,1), mar = c(4,4,2,1))
+```
+
+# Subsetting data
+
+```{r}
+east <- subset(pollution, region == "east")
+#creating a plot
+hist(east$pm25, col = "green")
+#creating a histogram with subsetting in one codeline
+hist(subset(pollution, region == "west")$pm25, col = "green")
+```
+
+Creating a plot using "with"
+
+```{r}
+with(pollution, plot(latitude, pm25))
+#another way to plot
+plot(pollution$latitude, ppm, col = pollution$region)
+#As before, use abline to add a horizontal line at 12. Use two additional arguments, lwd equal to 2 and lty also equal to 2.
+abline(h = 12, lwd = 2, lty = 2)
+```
+
+# Plotting next to each other
+
+```{r}
+par(mfrow = c(1, 2), mar = c(5, 4, 2, 1))
+plot(east$latitude, east$pm25, main = "East")
+plot(west$latitude, west$pm25, main = "West")
+```
+
