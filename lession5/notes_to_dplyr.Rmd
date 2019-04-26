@@ -9,7 +9,7 @@ As may often be the case, particularly with larger datasets, we are only interes
 ```{r}
 select(cran, ip_id, package, country)
 ```
-# A tibble: 225,468 x 3
+ A tibble: 225,468 x 3
    ip_id package      country
    <int> <chr>        <chr>  
  1     1 htmltools    US     
@@ -22,7 +22,7 @@ select(cran, ip_id, package, country)
  8     5 whisker      US     
  9     6 Rcpp         CN     
 10     7 hflights     US     
-# ... with 225,458 more rows
+... with 225,458 more rows
 
 | Excellent job! 
 
@@ -37,7 +37,7 @@ select(cran, -time)
 ```{r}
 select(cran, -(X:size))
 ```
-# A tibble: 225,468 x 7
+A tibble: 225,468 x 7
    r_version r_arch r_os      package      version country ip_id
    <chr>     <chr>  <chr>     <chr>        <chr>   <chr>   <int>
  1 3.1.0     x86_64 mingw32   htmltools    0.2.4   US          1
@@ -50,7 +50,7 @@ select(cran, -(X:size))
  8 3.0.2     x86_64 linux-gnu whisker      0.3-2   US          5
  9 NA        NA     NA        Rcpp         0.10.4  CN          6
 10 3.0.2     x86_64 linux-gnu hflights     0.1     US          7
-# ... with 225,458 more rows
+... with 225,458 more rows
 
 | Great job!
 
@@ -61,7 +61,7 @@ Use filter(cran, package == "swirl") to select all rows for which the package va
 filter(cran, package == "swirl")
 ```
 
-# A tibble: 820 x 11
+A tibble: 820 x 11
        X date       time       size r_version r_arch r_os         package version country ip_id
    <int> <chr>      <chr>     <int> <chr>     <chr>  <chr>        <chr>   <chr>   <chr>   <int>
  1    27 2014-07-08 00:17:16 105350 3.0.2     x86_64 mingw32      swirl   2.2.9   US         20
@@ -74,7 +74,7 @@ filter(cran, package == "swirl")
  8  1144 2014-07-08 00:00:39 106534 3.0.2     x86_64 linux-gnu    swirl   2.2.9   US        261
  9  1402 2014-07-08 00:41:41  41261 3.1.0     i386   mingw32      swirl   2.2.9   US        234
 10  1424 2014-07-08 00:44:49 106393 3.1.0     x86_64 linux-gnu    swirl   2.2.9   US        301
-# ... with 810 more rows
+... with 810 more rows
 
 | You're the best!
 
@@ -96,7 +96,7 @@ Again, note that filter() recognizes 'package' as a column of cran, without you 
 filter(cran, r_version == "3.1.1", country == "US")
 ```
 
-# A tibble: 1,588 x 11
+A tibble: 1,588 x 11
        X date       time        size r_version r_arch r_os         package      version country ip_id
    <int> <chr>      <chr>      <int> <chr>     <chr>  <chr>        <chr>        <chr>   <chr>   <int>
  1  2216 2014-07-08 00:48:58  385112 3.1.1     x86_64 darwin13.1.0 colorspace   1.2-4   US        191
@@ -109,7 +109,7 @@ filter(cran, r_version == "3.1.1", country == "US")
  8 30217 2014-07-08 04:32:04  568036 3.1.1     i386   mingw32      rJava        0.9-6   US         98
  9 30245 2014-07-08 04:10:41  526858 3.1.1     i386   mingw32      LPCM         0.44-8  US          8
 10 30354 2014-07-08 04:32:51 1763717 3.1.1     i386   mingw32      mgcv         1.8-1   US       2122
-# ... with 1,578 more rows
+... with 1,578 more rows
 
 | Nice work!
 
@@ -202,8 +202,7 @@ It's common to create a new variable based on the value of one or more variables
 mutate(cran3, size_mb = size / 2^20)
 ```
 
-> mutate(cran3, size_mb = size / 2^20)
-# A tibble: 225,468 x 4
+ A tibble: 225,468 x 4
    ip_id package         size size_mb
    <int> <chr>          <int>   <dbl>
  1     1 htmltools      80589 0.0769 
@@ -216,7 +215,7 @@ mutate(cran3, size_mb = size / 2^20)
  8     5 whisker        28216 0.0269 
  9     6 Rcpp            5928 0.00565
 10     7 hflights     2206029 2.10   
-# ... with 225,458 more rows
+ ... with 225,458 more rows
 
 | Perseverance, that's the answer.
 
@@ -226,7 +225,7 @@ mutate(cran3, size_mb = size / 2^20)
 ```{r}
 mutate(cran3, size_mb = size / 2^20, size_gb = size_mb / 2^10)
 ```
-# A tibble: 225,468 x 5
+A tibble: 225,468 x 5
    ip_id package         size size_mb    size_gb
    <int> <chr>          <int>   <dbl>      <dbl>
  1     1 htmltools      80589 0.0769  0.0000751 
@@ -239,7 +238,7 @@ mutate(cran3, size_mb = size / 2^20, size_gb = size_mb / 2^10)
  8     5 whisker        28216 0.0269  0.0000263 
  9     6 Rcpp            5928 0.00565 0.00000552
 10     7 hflights     2206029 2.10    0.00205   
-# ... with 225,458 more rows
+... with 225,458 more rows
 
 | All that practice is paying off!
 
@@ -255,10 +254,11 @@ mutate(cran3, correct_size = size + 1000)
 ```{r}
 summarize(cran, avg_bytes = mean(size))
 ```
-# A tibble: 1 x 1
+A tibble: 1 x 1
   avg_bytes
       <dbl>
 1   844086.
 
 | Excellent job!
+
 

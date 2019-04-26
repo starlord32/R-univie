@@ -1,0 +1,238 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# Graphic devices in R
+
+Plotting works via sending it to different devices. Windows, Linux and Max have different ones to call. 
+See ?Devices to find out which ones are available on this computer. 
+
+with command can call a dataset like faithful and direct it to a plot command with x and y arguemtns. 
+
+```{r}
+with(faithful, plot(eruptions, waiting))
+title(main = "Old Faithful Geyser data")
+```
+
+Simple, right?  Now run the command dev.cur(). This will show you the current plotting device, the screen.
+```{r}
+dev.cur()
+```
+RStudioGD 
+        2 
+
+In case the device is switched to eg. pdf, png, are another other this command will show the device and number. dev.off() will close and revert back to default. 
+
+The second way to create a plot is to send it to a file device. Depending on the type of plot you're making, you explicitly launch a graphics device,
+e.g., a pdf file. Type the command pdf(file="myplot.pdf") to launch the file device. This will create the pdf file myplot.pdf in your working directory.
+```{r}
+pdf(file="myplot.pdf")
+with(faithful, plot(eruptions, waiting))
+title(main = "Old Faithful Geyser data")
+dev.off
+```
+
+here are two basic types of file devices, vector and bitmap devices. These use different formats and have different characteristics. Vector formats
+| are good for line drawings and plots with solid colors using a modest number of points, while bitmap formats are good for plots with a large number of
+| points, natural scenes or web-based plots.
+
+| We'll mention 4 specific vector formats. The first is pdf, which we've just used in our example. This is useful for line-type graphics and papers. It
+| resizes well, is usually portable, but it is not efficient if a plot has many objects/points.
+
+| The second is svg which is XML-based, scalable vector graphics. This supports animation and interactivity and is potentially useful for web-based
+| plots.
+                                                     
+| The last two vector formats are win.metafile, a Windows-only metafile format, and postscript (ps), an older format which also resizes well, is usually
+| portable, and can be used to create encapsulated postscript files. Unfortunately, Windows systems often don't have a postscript viewer.
+
+| We'll also mention 4 different bitmap formats. The first is png (Portable Network Graphics) which is good for line drawings or images with solid
+| colors. It uses lossless compression (like the old GIF format), and most web browsers can read this format natively. In addition, png is good for plots
+| with many points, but it does not resize well.
+
+| The device is back to what it was when you started. As you might have guessed, every open graphics device is assigned an integer greater than or equal
+| to 2. You can change the active graphics device with dev.set(<integer>) where <integer> is the number associated with the graphics device you want to
+| switch to.
+
+| You can also copy a plot from one device to another. This can save you some time but beware! Copying a plot is not an exact operation, so the result
+| may not be identical to the original. R provides some functions to help you do this. The function dev.copy copies a plot from one device to another,
+| and dev.copy2pdf specifically copies a plot to a PDF file.
+
+ Now run dev.copy with the 2 arguments. The first is png, and the second is file set equal to "geyserplot.png". This will copy your screen plot to a png
+| file in your working directory which you can view AFTER you close the device.
+
+```{r}
+dev.copy(png, file = "geyserplot.png")
+```
+png 
+  4
+  
+# Plotting Systems
+  
+```{r}
+# Lattice
+xyplot(Life.Exp ~ Income | region, data = state, layout = c(4,1))
+
+```
+
+```{r}
+# Base (plot, hist, boxplot, barplot)
+with(cars, plot(speed, dist))
+text(mean(cars$speed), max(cars$dist), "SWIRL rules!")
+```
+
+```{r}
+# ggplot2
+qplot(displ, hwy, data = mpg)
+```
+
+```{r}
+#boxplot
+boxplot(Ozone~Month, airquality, xlab = "Month", ylab = "Ozone (ppb)", col.axis = "blue", col.lab = "red", main = "Ozone wath ever the f***")
+```
+
+```{r}
+# histogram
+hist(airquality$Ozone)
+```
+
+```{r}
+# Scatterplot
+with(airquality, plot(Wind, Ozone), main = "Ozone...")
+```
+
+length with the argument par() now.
+
+[1] 72
+```{r}
+length(par())
+```
+
+| That's correct!
+| So there are a boatload (72) of parameters that par() gives you access to. Run the R function names with par() as
+| its argument to see what these parameters are.
+
+```{r}
+ names(par())
+```
+ [1] "xlog"      "ylog"      "adj"       "ann"       "ask"       "bg"        "bty"       "cex"       "cex.axis" 
+[10] "cex.lab"   "cex.main"  "cex.sub"   "cin"       "col"       "col.axis"  "col.lab"   "col.main"  "col.sub"  
+[19] "cra"       "crt"       "csi"       "cxy"       "din"       "err"       "family"    "fg"        "fig"      
+[28] "fin"       "font"      "font.axis" "font.lab"  "font.main" "font.sub"  "lab"       "las"       "lend"     
+[37] "lheight"   "ljoin"     "lmitre"    "lty"       "lwd"       "mai"       "mar"       "mex"       "mfcol"    
+[46] "mfg"       "mfrow"     "mgp"       "mkh"       "new"       "oma"       "omd"       "omi"       "page"     
+[55] "pch"       "pin"       "plt"       "ps"        "pty"       "smo"       "srt"       "tck"       "tcl"      
+[64] "usr"       "xaxp"      "xaxs"      "xaxt"      "xpd"       "yaxp"      "yaxs"      "yaxt"      "ylbias"   
+
+```{r}
+plot(airquality$Wind, airquality$Ozone, type = "n")
+points(notmay$Wind,notmay$Ozone,col="red",pch=18)
+points(notmay$Wind,notmay$Ozone,col="red",pch=8)
+legend("topright", pch=c(17,8), col=c("blue", "red"), legend=c("May", "Other Months"))
+abline(v=median(airmiles$Wind), lty=2,lwd=2)
+```
+
+```{r}
+# plot window for two plots side by side
+par(mfrow=c(1,2))
+plot(airquality$Wind, airquality$Ozone, main = "Ozone and Wind")
+plot(airquality$Ozone, airquality$Solar.R, main = "Ozone and Solar Radiation")
+```
+
+```{r}
+# setting up the plot window
+par(mfrow = c(1,3), mar = c(4,4,2,1), oma = c(0,0,2,0))
+plot(airquality$Wind, airquality$Ozone, main = "Ozone and Wind")
+plot(airquality$Solar.R, airquality$Ozone, main = "Ozone and Solar Radiation")
+plot(airquality$Temp, airquality$Ozone, main = "Ozone and Temperature")
+# main title
+mtext("Ozone and Weather in New York City", outer = TRUE)
+```
+
+# Lattice Plotting System
+
+Plotting systems: scatterplot xyplot(), box-and-whiskers plot bwplot(), boxplots, histogram and other like stripplot, dotplot, splom and levelplot. 
+
+| Here's an example of typical lattice plot call, xyplot(y ~ x | f * g, data). The f and g represent the optional conditioning
+| variables. The * represents interaction between them. Remember when we said that lattice is good for plotting multivariate data?
+| That's where these conditioning variables come into play.
+
+```{r}
+# Example of a lattice basic plot 
+xyplot(Ozone~Wind, data = airquality, pch = 8, col = "red", main = "Big Apple Data")
+```
+
+```{r}
+# latticle plot with a layout that devides it into months
+# Since Month is a named column of the airquality dataframe we had to tell R to treat it as a factor.
+xyplot(Ozone~Wind | as.factor(Month), data = airquality, layout = c(5,1))
+#xyplot(Ozone~Wind | Month, layout = c(5,1), data = airquality) example less informative ?
+```
+
+```{r}
+#simple plot stored in p
+p <- xyplot(Ozone~Wind, data = airquality)
+# returns all function of the plot
+names(p)
+# returns the formular double square brackets are important and quotes
+p[["formula"]]
+```
+
+```{r}
+# lattice plot
+xyplot(price~carat | color*cut, data = diamonds, strip = FALSE, pch = 20, xlab = myxlab, ylab = myylab, main = mymain)
+```
+
+# Working with Colors
+```{r}
+# package grDevices
+library(grDevices)
+# function colors() to contains all available 657 colors
+colors() to call all colors. 
+# preview of 10 colors
+sample(colors(), 10)
+#The first, colorRamp, takes a palette of colors (the arguments) and returns a function that takes values between 0 and 1 as
+# arguments. The 0 and 1 correspond to the extremes of the color palette. Arguments between 0 and 1 return blends of these extremes.
+colorRamp()
+# assigning some colors
+pal <- colorRamp(c("red", "blue"))
+#calling pal with 0
+pal(0)
+# You see the vector (0,0,255) which represents the highest intensity of blue. What vector do you think the call pal(.5) will return?
+# (127.5,0,127.5) since it can only take 0 or 1 the call to .5 return the half of the color
+
+# The argument you pass to the returned function specifies the number of colors you want returned. Each element of the returned vector
+# is a 24 bit number, represented as 6 hexadecimal characters, which range from 0 to F. This set of 6 hex characters represents the
+# intensities of red, green, and blue, 2 characters for each color.
+p1 <- colorRampPalette(c("red", "blue"))
+p1(2)
+p2 <- colorRampPalette(c("red", "yellow"))
+# function to check out
+color.scale()
+# showMe contains the color.scale function 
+showMe(p1(20))
+#We mentioned before that colorRamp (and colorRampPalette) could return a 3 or 4 long vector of colors. We saw 3-long vectors
+# returned indicating red, green, and blue intensities. What would the 4th entry be?
+p3 <- colorRampPalette(c("blue", "green"), alpha = .5)
+# simple scattlerplot with assigned rgb colors
+plot(x, y, pch = 19, col = rgb(0,.5,.5))
+# 4th rgb argument is call to alpha
+plot(x, y, pch = 19, col = rgb(0,.5,.5,.3))
+```
+
+```{r}
+library(RColorBrewer)
+#Our last topic for this lesson is the RColorBrewer Package, available on CRAN, that contains interesting and useful color palettes,
+# of which there are 3 types, sequential, divergent, and qualitative. Which one you would choose to use depends on your data.
+
+cols <- brewer.pal(3, "BuGn")
+pal <- colorRampPalette(cols)
+showMe(pal(20))
+# provedes a plot with density
+image(volcano, col = pal(20))
+# different color package
+image(volcano, col = p1(20))
+
+# alpha of the rgb() function retruns density
+```
+

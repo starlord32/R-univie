@@ -1733,7 +1733,7 @@ $(document).ready(function () {
 </style>
 <script>
 $(document).ready(function () {
-  window.initializeSourceEmbed("notes_to_dplyr.Rmd");
+  window.initializeSourceEmbed("notes_to_data_analysis.Rmd");
   window.initializeCodeFolding("show" === "show");
 });
 </script>
@@ -1762,210 +1762,287 @@ $(document).ready(function () {
 
 
 <!-- rnb-text-begin -->
-<p>As may often be the case, particularly with larger datasets, we are only interested in some of the variables. Use select(cran, | ip_id, package, country) to select only the ip_id, package, and country variables from the cran dataset.</p>
+<div id="graphic-devices-in-r" class="section level1">
+<h1>Graphic devices in R</h1>
+<p>Plotting works via sending it to different devices. Windows, Linux and Max have different ones to call. See ?Devices to find out which ones are available on this computer.</p>
+<p>with command can call a dataset like faithful and direct it to a plot command with x and y arguemtns.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2VsZWN0KGNyYW4sIGlwX2lkLCBwYWNrYWdlLCBjb3VudHJ5KVxuYGBgIn0= -->
-<pre class="r"><code>select(cran, ip_id, package, country)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud2l0aChmYWl0aGZ1bCwgcGxvdChlcnVwdGlvbnMsIHdhaXRpbmcpKVxudGl0bGUobWFpbiA9IFwiT2xkIEZhaXRoZnVsIEdleXNlciBkYXRhXCIpXG5gYGAifQ== -->
+<pre class="r"><code>with(faithful, plot(eruptions, waiting))
+title(main = &quot;Old Faithful Geyser data&quot;)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>A tibble: 225,468 x 3 ip_id package country <int> <chr> <chr><br />
-1 1 htmltools US<br />
-2 2 tseries US<br />
-3 3 party US<br />
-4 3 Hmisc US<br />
-5 4 digest CA<br />
-6 3 randomForest US<br />
-7 3 plyr US<br />
-8 5 whisker US<br />
-9 6 Rcpp CN<br />
-10 7 hflights US<br />
-… with 225,458 more rows</p>
-<div class="line-block">Excellent job!</div>
-<p>Instead of specifying the columns we want to keep, we can also specify the columns we want to throw away. To see how this | works, do select(cran, -time) to omit the time column.</p>
+<p>Simple, right? Now run the command dev.cur(). This will show you the current plotting device, the screen.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2VsZWN0KGNyYW4sIC10aW1lKVxuYGBgIn0= -->
-<pre class="r"><code>select(cran, -time)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGV2LmN1cigpXG5gYGAifQ== -->
+<pre class="r"><code>dev.cur()</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>RStudioGD 2</p>
+<p>In case the device is switched to eg. pdf, png, are another other this command will show the device and number. dev.off() will close and revert back to default.</p>
+<p>The second way to create a plot is to send it to a file device. Depending on the type of plot you’re making, you explicitly launch a graphics device, e.g., a pdf file. Type the command pdf(file=“myplot.pdf”) to launch the file device. This will create the pdf file myplot.pdf in your working directory.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucGRmKGZpbGU9XCJteXBsb3QucGRmXCIpXG53aXRoKGZhaXRoZnVsLCBwbG90KGVydXB0aW9ucywgd2FpdGluZykpXG50aXRsZShtYWluID0gXCJPbGQgRmFpdGhmdWwgR2V5c2VyIGRhdGFcIilcbmRldi5vZmZcbmBgYCJ9 -->
+<pre class="r"><code>pdf(file=&quot;myplot.pdf&quot;)
+with(faithful, plot(eruptions, waiting))
+title(main = &quot;Old Faithful Geyser data&quot;)
+dev.off</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>here are two basic types of file devices, vector and bitmap devices. These use different formats and have different characteristics. Vector formats | are good for line drawings and plots with solid colors using a modest number of points, while bitmap formats are good for plots with a large number of | points, natural scenes or web-based plots.</p>
+<div class="line-block">We’ll mention 4 specific vector formats. The first is pdf, which we’ve just used in our example. This is useful for line-type graphics and papers. It<br />
+resizes well, is usually portable, but it is not efficient if a plot has many objects/points.</div>
+<div class="line-block">The second is svg which is XML-based, scalable vector graphics. This supports animation and interactivity and is potentially useful for web-based<br />
+plots.<br />
+The last two vector formats are win.metafile, a Windows-only metafile format, and postscript (ps), an older format which also resizes well, is usually<br />
+portable, and can be used to create encapsulated postscript files. Unfortunately, Windows systems often don’t have a postscript viewer.</div>
+<div class="line-block">We’ll also mention 4 different bitmap formats. The first is png (Portable Network Graphics) which is good for line drawings or images with solid<br />
+colors. It uses lossless compression (like the old GIF format), and most web browsers can read this format natively. In addition, png is good for plots<br />
+with many points, but it does not resize well.</div>
+<div class="line-block">The device is back to what it was when you started. As you might have guessed, every open graphics device is assigned an integer greater than or equal<br />
+to 2. You can change the active graphics device with dev.set(<integer>) where <integer> is the number associated with the graphics device you want to<br />
+switch to.</div>
+<div class="line-block">You can also copy a plot from one device to another. This can save you some time but beware! Copying a plot is not an exact operation, so the result<br />
+may not be identical to the original. R provides some functions to help you do this. The function dev.copy copies a plot from one device to another,<br />
+and dev.copy2pdf specifically copies a plot to a PDF file.</div>
+<p>Now run dev.copy with the 2 arguments. The first is png, and the second is file set equal to “geyserplot.png”. This will copy your screen plot to a png | file in your working directory which you can view AFTER you close the device.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGV2LmNvcHkocG5nLCBmaWxlID0gXCJnZXlzZXJwbG90LnBuZ1wiKVxuYGBgIn0= -->
+<pre class="r"><code>dev.copy(png, file = &quot;geyserplot.png&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>png 4</p>
+</div>
+<div id="plotting-systems" class="section level1">
+<h1>Plotting Systems</h1>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBMYXR0aWNlXG54eXBsb3QoTGlmZS5FeHAgfiBJbmNvbWUgfCByZWdpb24sIGRhdGEgPSBzdGF0ZSwgbGF5b3V0ID0gYyg0LDEpKVxuXG5gYGAifQ== -->
+<pre class="r"><code># Lattice
+xyplot(Life.Exp ~ Income | region, data = state, layout = c(4,1))
+</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2VsZWN0KGNyYW4sIC0oWDpzaXplKSlcbmBgYCJ9 -->
-<pre class="r"><code>select(cran, -(X:size))</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBCYXNlIChwbG90LCBoaXN0LCBib3hwbG90LCBiYXJwbG90KVxud2l0aChjYXJzLCBwbG90KHNwZWVkLCBkaXN0KSlcbnRleHQobWVhbihjYXJzJHNwZWVkKSwgbWF4KGNhcnMkZGlzdCksIFwiU1dJUkwgcnVsZXMhXCIpXG5gYGAifQ== -->
+<pre class="r"><code># Base (plot, hist, boxplot, barplot)
+with(cars, plot(speed, dist))
+text(mean(cars$speed), max(cars$dist), &quot;SWIRL rules!&quot;)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>A tibble: 225,468 x 7 r_version r_arch r_os package version country ip_id <chr> <chr> <chr> <chr> <chr> <chr> <int> 1 3.1.0 x86_64 mingw32 htmltools 0.2.4 US 1 2 3.1.0 x86_64 mingw32 tseries 0.10-32 US 2 3 3.1.0 x86_64 linux-gnu party 1.0-15 US 3 4 3.1.0 x86_64 linux-gnu Hmisc 3.14-4 US 3 5 3.0.2 x86_64 linux-gnu digest 0.6.4 CA 4 6 3.1.0 x86_64 linux-gnu randomForest 4.6-7 US 3 7 3.1.0 x86_64 linux-gnu plyr 1.8.1 US 3 8 3.0.2 x86_64 linux-gnu whisker 0.3-2 US 5 9 NA NA NA Rcpp 0.10.4 CN 6 10 3.0.2 x86_64 linux-gnu hflights 0.1 US 7 … with 225,458 more rows</p>
-<div class="line-block">Great job!</div>
-<p>Use filter(cran, package == “swirl”) to select all rows for which the package variable is equal to “swirl”. Be sure to use two | equals signs side-by-side!</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZmlsdGVyKGNyYW4sIHBhY2thZ2UgPT0gXCJzd2lybFwiKVxuYGBgIn0= -->
-<pre class="r"><code>filter(cran, package == &quot;swirl&quot;)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBnZ3Bsb3QyXG5xcGxvdChkaXNwbCwgaHd5LCBkYXRhID0gbXBnKVxuYGBgIn0= -->
+<pre class="r"><code># ggplot2
+qplot(displ, hwy, data = mpg)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>A tibble: 820 x 11 X date time size r_version r_arch r_os package version country ip_id <int> <chr> <chr> <int> <chr> <chr> <chr> <chr> <chr> <chr> <int> 1 27 2014-07-08 00:17:16 105350 3.0.2 x86_64 mingw32 swirl 2.2.9 US 20 2 156 2014-07-08 00:22:53 41261 3.1.0 x86_64 linux-gnu swirl 2.2.9 US 66 3 358 2014-07-08 00:13:42 105335 2.15.2 x86_64 mingw32 swirl 2.2.9 CA 115 4 593 2014-07-08 00:59:45 105465 3.1.0 x86_64 darwin13.1.0 swirl 2.2.9 MX 162 5 831 2014-07-08 00:55:27 105335 3.0.3 x86_64 mingw32 swirl 2.2.9 US 57 6 997 2014-07-08 00:33:06 41261 3.1.0 x86_64 mingw32 swirl 2.2.9 US 70 7 1023 2014-07-08 00:35:36 106393 3.1.0 x86_64 mingw32 swirl 2.2.9 BR 248 8 1144 2014-07-08 00:00:39 106534 3.0.2 x86_64 linux-gnu swirl 2.2.9 US 261 9 1402 2014-07-08 00:41:41 41261 3.1.0 i386 mingw32 swirl 2.2.9 US 234 10 1424 2014-07-08 00:44:49 106393 3.1.0 x86_64 linux-gnu swirl 2.2.9 US 301 … with 810 more rows</p>
-<div class="line-block">You’re the best!</div>
-<p>Again, note that filter() recognizes ‘package’ as a column of cran, without you having to explicitly specify cran$package.</p>
-<p>…</p>
-<p>|============================================================= | 52% | The == operator asks whether the thing on the left is equal to the thing on the right. If yes, then it returns TRUE. If no, | then FALSE. In this case, package is an entire vector (column) of values, so package == “swirl” returns a vector of TRUEs and | FALSEs. filter() then returns only the rows of cran corresponding to the TRUEs.</p>
-<p>…</p>
-<p>|=============================================================== | 53% | You can specify as many conditions as you want, separated by commas. For example filter(cran, r_version == “3.1.1”, country == | “US”) will return all rows of cran corresponding to downloads from users in the US running R version 3.1.1. Try it out.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZmlsdGVyKGNyYW4sIHJfdmVyc2lvbiA9PSBcIjMuMS4xXCIsIGNvdW50cnkgPT0gXCJVU1wiKVxuYGBgIn0= -->
-<pre class="r"><code>filter(cran, r_version == &quot;3.1.1&quot;, country == &quot;US&quot;)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI2JveHBsb3RcbmJveHBsb3QoT3pvbmV+TW9udGgsIGFpcnF1YWxpdHksIHhsYWIgPSBcIk1vbnRoXCIsIHlsYWIgPSBcIk96b25lIChwcGIpXCIsIGNvbC5heGlzID0gXCJibHVlXCIsIGNvbC5sYWIgPSBcInJlZFwiLCBtYWluID0gXCJPem9uZSB3YXRoIGV2ZXIgdGhlIGYqKipcIilcbmBgYCJ9 -->
+<pre class="r"><code>#boxplot
+boxplot(Ozone~Month, airquality, xlab = &quot;Month&quot;, ylab = &quot;Ozone (ppb)&quot;, col.axis = &quot;blue&quot;, col.lab = &quot;red&quot;, main = &quot;Ozone wath ever the f***&quot;)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>A tibble: 1,588 x 11 X date time size r_version r_arch r_os package version country ip_id <int> <chr> <chr> <int> <chr> <chr> <chr> <chr> <chr> <chr> <int> 1 2216 2014-07-08 00:48:58 385112 3.1.1 x86_64 darwin13.1.0 colorspace 1.2-4 US 191 2 17332 2014-07-08 03:39:57 197459 3.1.1 x86_64 darwin13.1.0 httr 0.3 US 1704 3 17465 2014-07-08 03:25:38 23259 3.1.1 x86_64 darwin13.1.0 snow 0.3-13 US 62 4 18844 2014-07-08 03:59:17 190594 3.1.1 x86_64 darwin13.1.0 maxLik 1.2-0 US 1533 5 30182 2014-07-08 04:13:15 77683 3.1.1 i386 mingw32 randomForest 4.6-7 US 646 6 30193 2014-07-08 04:06:26 2351969 3.1.1 i386 mingw32 ggplot2 1.0.0 US 8 7 30195 2014-07-08 04:07:09 299080 3.1.1 i386 mingw32 fExtremes 3010.81 US 2010 8 30217 2014-07-08 04:32:04 568036 3.1.1 i386 mingw32 rJava 0.9-6 US 98 9 30245 2014-07-08 04:10:41 526858 3.1.1 i386 mingw32 LPCM 0.44-8 US 8 10 30354 2014-07-08 04:32:51 1763717 3.1.1 i386 mingw32 mgcv 1.8-1 US 2122 … with 1,578 more rows</p>
-<div class="line-block">Nice work!</div>
-<div class="line-block">The conditions passed to filter() can make use of any of the standard comparison operators. Pull up the relevant documentation<br />
-with ?Comparison (that’s an uppercase C).</div>
-<p>Our last two calls to filter() requested all rows for which some condition AND another condition were TRUE. We can also | request rows for which EITHER one condition OR another condition are TRUE. For example, filter(cran, country == “US” | country | == “IN”) will gives us all rows for which the country variable equals either “US” or “IN”. Give it a go.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZmlsdGVyKGNyYW4sIGNvdW50cnkgPT0gXCJVU1wiIHwgY291bnRyeSA9PSBcIklOXCIpXG5gYGAifQ== -->
-<pre class="r"><code>filter(cran, country == &quot;US&quot; | country == &quot;IN&quot;)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBoaXN0b2dyYW1cbmhpc3QoYWlycXVhbGl0eSRPem9uZSlcbmBgYCJ9 -->
+<pre class="r"><code># histogram
+hist(airquality$Ozone)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<div class="line-block">This is a tricky one. filter(cran, size &gt; 100500, r_os == “linux-gnu”) will give us all rows for which size is strictly<br />
-greater than 100500 and r_os is “linux-gnu”.</div>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZmlsdGVyKGNyYW4sIHNpemUgPiAxMDA1MDAsIHJfb3MgPT0gXCJsaW51eC1nbnVcIilcbmBgYCJ9 -->
-<pre class="r"><code>filter(cran, size &gt; 100500, r_os == &quot;linux-gnu&quot;)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBTY2F0dGVycGxvdFxud2l0aChhaXJxdWFsaXR5LCBwbG90KFdpbmQsIE96b25lKSwgbWFpbiA9IFwiT3pvbmUuLi5cIilcbmBgYCJ9 -->
+<pre class="r"><code># Scatterplot
+with(airquality, plot(Wind, Ozone), main = &quot;Ozone...&quot;)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<div class="line-block">Okay, ready to put all of this together? Use filter() to return all rows of cran for which r_version is NOT NA. Hint: You will<br />
-need to use !is.na() as part of your second argument to filter().</div>
+<p>length with the argument par() now.</p>
+<p>[1] 72</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZmlsdGVyKGNyYW4sICFpcy5uYShyX3ZlcnNpb24pKVxuYGBgIn0= -->
-<pre class="r"><code>filter(cran, !is.na(r_version))</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGVuZ3RoKHBhcigpKVxuYGBgIn0= -->
+<pre class="r"><code>length(par())</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<div class="line-block">Sometimes we want to order the rows of a dataset according to the values of a particular variable. This is the job of<br />
-arrange().</div>
-<p>…</p>
-<p>|===================================================================================== | 72% | To see how arrange() works, let’s first take a subset of cran. select() all columns from size through ip_id and store the | result in cran2.</p>
+<div class="line-block">That’s correct!<br />
+So there are a boatload (72) of parameters that par() gives you access to. Run the R function names with par() as<br />
+its argument to see what these parameters are.</div>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY3JhbjIgPC0gc2VsZWN0KGNyYW4sIHNpemU6aXBfaWQpXG5gYGAifQ== -->
-<pre class="r"><code>cran2 &lt;- select(cran, size:ip_id)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIG5hbWVzKHBhcigpKVxuYGBgIn0= -->
+<pre class="r"><code> names(par())</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<div class="line-block">Now, to order the ROWS of cran2 so that ip_id is in ascending order (from small to large), type arrange(cran2, ip_id). You may<br />
-want to make your console wide enough so that you can see ip_id, which is the last column.</div>
+<p>[1] “xlog” “ylog” “adj” “ann” “ask” “bg” “bty” “cex” “cex.axis” [10] “cex.lab” “cex.main” “cex.sub” “cin” “col” “col.axis” “col.lab” “col.main” “col.sub”<br />
+[19] “cra” “crt” “csi” “cxy” “din” “err” “family” “fg” “fig”<br />
+[28] “fin” “font” “font.axis” “font.lab” “font.main” “font.sub” “lab” “las” “lend”<br />
+[37] “lheight” “ljoin” “lmitre” “lty” “lwd” “mai” “mar” “mex” “mfcol”<br />
+[46] “mfg” “mfrow” “mgp” “mkh” “new” “oma” “omd” “omi” “page”<br />
+[55] “pch” “pin” “plt” “ps” “pty” “smo” “srt” “tck” “tcl”<br />
+[64] “usr” “xaxp” “xaxs” “xaxt” “xpd” “yaxp” “yaxs” “yaxt” “ylbias”</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYXJyYW5nZShjcmFuMiwgaXBfaWQpXG5gYGAifQ== -->
-<pre class="r"><code>arrange(cran2, ip_id)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucGxvdChhaXJxdWFsaXR5JFdpbmQsIGFpcnF1YWxpdHkkT3pvbmUsIHR5cGUgPSBcIm5cIilcbnBvaW50cyhub3RtYXkkV2luZCxub3RtYXkkT3pvbmUsY29sPVwicmVkXCIscGNoPTE4KVxucG9pbnRzKG5vdG1heSRXaW5kLG5vdG1heSRPem9uZSxjb2w9XCJyZWRcIixwY2g9OClcbmxlZ2VuZChcInRvcHJpZ2h0XCIsIHBjaD1jKDE3LDgpLCBjb2w9YyhcImJsdWVcIiwgXCJyZWRcIiksIGxlZ2VuZD1jKFwiTWF5XCIsIFwiT3RoZXIgTW9udGhzXCIpKVxuYWJsaW5lKHY9bWVkaWFuKGFpcm1pbGVzJFdpbmQpLCBsdHk9Mixsd2Q9MilcbmBgYCJ9 -->
+<pre class="r"><code>plot(airquality$Wind, airquality$Ozone, type = &quot;n&quot;)
+points(notmay$Wind,notmay$Ozone,col=&quot;red&quot;,pch=18)
+points(notmay$Wind,notmay$Ozone,col=&quot;red&quot;,pch=8)
+legend(&quot;topright&quot;, pch=c(17,8), col=c(&quot;blue&quot;, &quot;red&quot;), legend=c(&quot;May&quot;, &quot;Other Months&quot;))
+abline(v=median(airmiles$Wind), lty=2,lwd=2)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<div class="line-block">Nice work!</div>
-<p>|========================================================================================= | 75% | To do the same, but in descending order, change the second argument to desc(ip_id), where desc() stands for ‘descending’. Go | ahead.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYXJyYW5nZShjcmFuMiwgZGVzYyhpcF9pZCkpXG5gYGAifQ== -->
-<pre class="r"><code>arrange(cran2, desc(ip_id))</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBwbG90IHdpbmRvdyBmb3IgdHdvIHBsb3RzIHNpZGUgYnkgc2lkZVxucGFyKG1mcm93PWMoMSwyKSlcbnBsb3QoYWlycXVhbGl0eSRXaW5kLCBhaXJxdWFsaXR5JE96b25lLCBtYWluID0gXCJPem9uZSBhbmQgV2luZFwiKVxucGxvdChhaXJxdWFsaXR5JE96b25lLCBhaXJxdWFsaXR5JFNvbGFyLlIsIG1haW4gPSBcIk96b25lIGFuZCBTb2xhciBSYWRpYXRpb25cIilcbmBgYCJ9 -->
+<pre class="r"><code># plot window for two plots side by side
+par(mfrow=c(1,2))
+plot(airquality$Wind, airquality$Ozone, main = &quot;Ozone and Wind&quot;)
+plot(airquality$Ozone, airquality$Solar.R, main = &quot;Ozone and Solar Radiation&quot;)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<div class="line-block">We can also arrange the data according to the values of multiple variables. For example, arrange(cran2, package, ip_id) will<br />
-first arrange by package names (ascending alphabetically), then by ip_id. This means that if there are multiple rows with the<br />
-same value for package, they will be sorted by ip_id (ascending numerically). Try arrange(cran2, package, ip_id) now.</div>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYXJyYW5nZShjcmFuMiwgcGFja2FnZSwgaXBfaWQpXG5gYGAifQ== -->
-<pre class="r"><code>arrange(cran2, package, ip_id)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBzZXR0aW5nIHVwIHRoZSBwbG90IHdpbmRvd1xucGFyKG1mcm93ID0gYygxLDMpLCBtYXIgPSBjKDQsNCwyLDEpLCBvbWEgPSBjKDAsMCwyLDApKVxucGxvdChhaXJxdWFsaXR5JFdpbmQsIGFpcnF1YWxpdHkkT3pvbmUsIG1haW4gPSBcIk96b25lIGFuZCBXaW5kXCIpXG5wbG90KGFpcnF1YWxpdHkkU29sYXIuUiwgYWlycXVhbGl0eSRPem9uZSwgbWFpbiA9IFwiT3pvbmUgYW5kIFNvbGFyIFJhZGlhdGlvblwiKVxucGxvdChhaXJxdWFsaXR5JFRlbXAsIGFpcnF1YWxpdHkkT3pvbmUsIG1haW4gPSBcIk96b25lIGFuZCBUZW1wZXJhdHVyZVwiKVxuIyBtYWluIHRpdGxlXG5tdGV4dChcIk96b25lIGFuZCBXZWF0aGVyIGluIE5ldyBZb3JrIENpdHlcIiwgb3V0ZXIgPSBUUlVFKVxuYGBgIn0= -->
+<pre class="r"><code># setting up the plot window
+par(mfrow = c(1,3), mar = c(4,4,2,1), oma = c(0,0,2,0))
+plot(airquality$Wind, airquality$Ozone, main = &quot;Ozone and Wind&quot;)
+plot(airquality$Solar.R, airquality$Ozone, main = &quot;Ozone and Solar Radiation&quot;)
+plot(airquality$Temp, airquality$Ozone, main = &quot;Ozone and Temperature&quot;)
+# main title
+mtext(&quot;Ozone and Weather in New York City&quot;, outer = TRUE)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<div class="line-block">Arrange cran2 by the following three variables, in this order: country (ascending), r_version (descending), and ip_id<br />
-(ascending).</div>
+</div>
+<div id="lattice-plotting-system" class="section level1">
+<h1>Lattice Plotting System</h1>
+<p>Plotting systems: scatterplot xyplot(), box-and-whiskers plot bwplot(), boxplots, histogram and other like stripplot, dotplot, splom and levelplot.</p>
+<div class="line-block">Here’s an example of typical lattice plot call, xyplot(y ~ x | f * g, data). The f and g represent the optional conditioning<br />
+variables. The * represents interaction between them. Remember when we said that lattice is good for plotting multivariate data?<br />
+That’s where these conditioning variables come into play.</div>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYXJyYW5nZShjcmFuMiwgY291bnRyeSwgZGVzYyhyX3ZlcnNpb24pLCBpcF9pZClcbmBgYCJ9 -->
-<pre class="r"><code>arrange(cran2, country, desc(r_version), ip_id)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBFeGFtcGxlIG9mIGEgbGF0dGljZSBiYXNpYyBwbG90IFxueHlwbG90KE96b25lfldpbmQsIGRhdGEgPSBhaXJxdWFsaXR5LCBwY2ggPSA4LCBjb2wgPSBcInJlZFwiLCBtYWluID0gXCJCaWcgQXBwbGUgRGF0YVwiKVxuYGBgIn0= -->
+<pre class="r"><code># Example of a lattice basic plot 
+xyplot(Ozone~Wind, data = airquality, pch = 8, col = &quot;red&quot;, main = &quot;Big Apple Data&quot;)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<div class="line-block">To illustrate the next major function in dplyr, let’s take another subset of our original data. Use select() to grab 3 columns<br />
-from cran – ip_id, package, and size (in that order) – and store the result in a new variable called cran3.</div>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY3JhbjMgPC0gc2VsZWN0KGNyYW4sIGlwX2lkLCBwYWNrYWdlLCBzaXplKVxuYGBgIn0= -->
-<pre class="r"><code>cran3 &lt;- select(cran, ip_id, package, size)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBsYXR0aWNsZSBwbG90IHdpdGggYSBsYXlvdXQgdGhhdCBkZXZpZGVzIGl0IGludG8gbW9udGhzXG4jIFNpbmNlIE1vbnRoIGlzIGEgbmFtZWQgY29sdW1uIG9mIHRoZSBhaXJxdWFsaXR5IGRhdGFmcmFtZSB3ZSBoYWQgdG8gdGVsbCBSIHRvIHRyZWF0IGl0IGFzIGEgZmFjdG9yLlxueHlwbG90KE96b25lfldpbmQgfCBhcy5mYWN0b3IoTW9udGgpLCBkYXRhID0gYWlycXVhbGl0eSwgbGF5b3V0ID0gYyg1LDEpKVxuI3h5cGxvdChPem9uZX5XaW5kIHwgTW9udGgsIGxheW91dCA9IGMoNSwxKSwgZGF0YSA9IGFpcnF1YWxpdHkpIGV4YW1wbGUgbGVzcyBpbmZvcm1hdGl2ZSA/XG5gYGAifQ== -->
+<pre class="r"><code># latticle plot with a layout that devides it into months
+# Since Month is a named column of the airquality dataframe we had to tell R to treat it as a factor.
+xyplot(Ozone~Wind | as.factor(Month), data = airquality, layout = c(5,1))
+#xyplot(Ozone~Wind | Month, layout = c(5,1), data = airquality) example less informative ?</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>It’s common to create a new variable based on the value of one or more variables already in a dataset. The mutate() function | does exactly this.</p>
-<p>…</p>
-<p>|===================================================================================================== | 85% | The size variable represents the download size in bytes, which are units of computer memory. These days, megabytes (MB) are a | more common unit of measurement. One megabyte is equal to 2^20 bytes. That’s 2 to the power of 20, which is approximately one | million bytes!</p>
-<p>…</p>
-<p>|======================================================================================================= | 87% | We want to add a column called size_mb that contains the download size in megabytes. Here’s the code to do it:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubXV0YXRlKGNyYW4zLCBzaXplX21iID0gc2l6ZSAvIDJeMjApXG5gYGAifQ== -->
-<pre class="r"><code>mutate(cran3, size_mb = size / 2^20)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI3NpbXBsZSBwbG90IHN0b3JlZCBpbiBwXG5wIDwtIHh5cGxvdChPem9uZX5XaW5kLCBkYXRhID0gYWlycXVhbGl0eSlcbiMgcmV0dXJucyBhbGwgZnVuY3Rpb24gb2YgdGhlIHBsb3Rcbm5hbWVzKHApXG4jIHJldHVybnMgdGhlIGZvcm11bGFyIGRvdWJsZSBzcXVhcmUgYnJhY2tldHMgYXJlIGltcG9ydGFudCBhbmQgcXVvdGVzXG5wW1tcImZvcm11bGFcIl1dXG5gYGAifQ== -->
+<pre class="r"><code>#simple plot stored in p
+p &lt;- xyplot(Ozone~Wind, data = airquality)
+# returns all function of the plot
+names(p)
+# returns the formular double square brackets are important and quotes
+p[[&quot;formula&quot;]]</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>A tibble: 225,468 x 4 ip_id package size size_mb <int> <chr> <int> <dbl> 1 1 htmltools 80589 0.0769 2 2 tseries 321767 0.307<br />
-3 3 party 748063 0.713<br />
-4 3 Hmisc 606104 0.578<br />
-5 4 digest 79825 0.0761 6 3 randomForest 77681 0.0741 7 3 plyr 393754 0.376<br />
-8 5 whisker 28216 0.0269 9 6 Rcpp 5928 0.00565 10 7 hflights 2206029 2.10<br />
-… with 225,458 more rows</p>
-<div class="line-block">Perseverance, that’s the answer.</div>
-<div class="line-block">One very nice feature of mutate() is that you can use the value computed for your second column (size_mb) to create a third<br />
-column, all in the same line of code. To see this in action, repeat the exact same command as above, except add a third<br />
-argument creating a column that is named size_gb and equal to size_mb / 2^10.</div>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubXV0YXRlKGNyYW4zLCBzaXplX21iID0gc2l6ZSAvIDJeMjAsIHNpemVfZ2IgPSBzaXplX21iIC8gMl4xMClcbmBgYCJ9 -->
-<pre class="r"><code>mutate(cran3, size_mb = size / 2^20, size_gb = size_mb / 2^10)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBsYXR0aWNlIHBsb3Rcbnh5cGxvdChwcmljZX5jYXJhdCB8IGNvbG9yKmN1dCwgZGF0YSA9IGRpYW1vbmRzLCBzdHJpcCA9IEZBTFNFLCBwY2ggPSAyMCwgeGxhYiA9IG15eGxhYiwgeWxhYiA9IG15eWxhYiwgbWFpbiA9IG15bWFpbilcbmBgYCJ9 -->
+<pre class="r"><code># lattice plot
+xyplot(price~carat | color*cut, data = diamonds, strip = FALSE, pch = 20, xlab = myxlab, ylab = myylab, main = mymain)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>A tibble: 225,468 x 5 ip_id package size size_mb size_gb <int> <chr> <int> <dbl> <dbl> 1 1 htmltools 80589 0.0769 0.0000751 2 2 tseries 321767 0.307 0.000300<br />
-3 3 party 748063 0.713 0.000697<br />
-4 3 Hmisc 606104 0.578 0.000564<br />
-5 4 digest 79825 0.0761 0.0000743 6 3 randomForest 77681 0.0741 0.0000723 7 3 plyr 393754 0.376 0.000367<br />
-8 5 whisker 28216 0.0269 0.0000263 9 6 Rcpp 5928 0.00565 0.00000552 10 7 hflights 2206029 2.10 0.00205<br />
-… with 225,458 more rows</p>
-<div class="line-block">All that practice is paying off!</div>
-<p>Let’s try one more for practice. Pretend we discovered a glitch in the system that provided the original values for the size | variable. All of the values in cran3 are 1000 bytes less than they should be. Using cran3, create just one new column called</p>
+</div>
+<div id="working-with-colors" class="section level1">
+<h1>Working with Colors</h1>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubXV0YXRlKGNyYW4zLCBjb3JyZWN0X3NpemUgPSBzaXplICsgMTAwMClcbmBgYCJ9 -->
-<pre class="r"><code>mutate(cran3, correct_size = size + 1000)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>The last of the five core dplyr verbs, summarize(), collapses the dataset to a single row. Let’s say we’re interested in | knowing the average download size. summarize(cran, avg_bytes = mean(size)) will yield the mean value of the size variable. | Here we’ve chosen to label the result ‘avg_bytes’, but we could have named it anything. Give it a try.</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3VtbWFyaXplKGNyYW4sIGF2Z19ieXRlcyA9IG1lYW4oc2l6ZSkpXG5gYGAifQ== -->
-<pre class="r"><code>summarize(cran, avg_bytes = mean(size))</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>A tibble: 1 x 1 avg_bytes <dbl> 1 844086.</p>
-<div class="line-block">Excellent job!</div>
-<!-- rnb-text-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBwYWNrYWdlIGdyRGV2aWNlc1xubGlicmFyeShnckRldmljZXMpXG4jIGZ1bmN0aW9uIGNvbG9ycygpIHRvIGNvbnRhaW5zIGFsbCBhdmFpbGFibGUgNjU3IGNvbG9yc1xuY29sb3JzKCkgdG8gY2FsbCBhbGwgY29sb3JzLiBcbiMgcHJldmlldyBvZiAxMCBjb2xvcnNcbnNhbXBsZShjb2xvcnMoKSwgMTApXG4jVGhlIGZpcnN0LCBjb2xvclJhbXAsIHRha2VzIGEgcGFsZXR0ZSBvZiBjb2xvcnMgKHRoZSBhcmd1bWVudHMpIGFuZCByZXR1cm5zIGEgZnVuY3Rpb24gdGhhdCB0YWtlcyB2YWx1ZXMgYmV0d2VlbiAwIGFuZCAxIGFzXG4jIGFyZ3VtZW50cy4gVGhlIDAgYW5kIDEgY29ycmVzcG9uZCB0byB0aGUgZXh0cmVtZXMgb2YgdGhlIGNvbG9yIHBhbGV0dGUuIEFyZ3VtZW50cyBiZXR3ZWVuIDAgYW5kIDEgcmV0dXJuIGJsZW5kcyBvZiB0aGVzZSBleHRyZW1lcy5cbmNvbG9yUmFtcCgpXG4jIGFzc2lnbmluZyBzb21lIGNvbG9yc1xucGFsIDwtIGNvbG9yUmFtcChjKFwicmVkXCIsIFwiYmx1ZVwiKSlcbiNjYWxsaW5nIHBhbCB3aXRoIDBcbnBhbCgwKVxuIyBZb3Ugc2VlIHRoZSB2ZWN0b3IgKDAsMCwyNTUpIHdoaWNoIHJlcHJlc2VudHMgdGhlIGhpZ2hlc3QgaW50ZW5zaXR5IG9mIGJsdWUuIFdoYXQgdmVjdG9yIGRvIHlvdSB0aGluayB0aGUgY2FsbCBwYWwoLjUpIHdpbGwgcmV0dXJuP1xuIyAoMTI3LjUsMCwxMjcuNSkgc2luY2UgaXQgY2FuIG9ubHkgdGFrZSAwIG9yIDEgdGhlIGNhbGwgdG8gLjUgcmV0dXJuIHRoZSBoYWxmIG9mIHRoZSBjb2xvclxuXG4jIFRoZSBhcmd1bWVudCB5b3UgcGFzcyB0byB0aGUgcmV0dXJuZWQgZnVuY3Rpb24gc3BlY2lmaWVzIHRoZSBudW1iZXIgb2YgY29sb3JzIHlvdSB3YW50IHJldHVybmVkLiBFYWNoIGVsZW1lbnQgb2YgdGhlIHJldHVybmVkIHZlY3RvclxuIyBpcyBhIDI0IGJpdCBudW1iZXIsIHJlcHJlc2VudGVkIGFzIDYgaGV4YWRlY2ltYWwgY2hhcmFjdGVycywgd2hpY2ggcmFuZ2UgZnJvbSAwIHRvIEYuIFRoaXMgc2V0IG9mIDYgaGV4IGNoYXJhY3RlcnMgcmVwcmVzZW50cyB0aGVcbiMgaW50ZW5zaXRpZXMgb2YgcmVkLCBncmVlbiwgYW5kIGJsdWUsIDIgY2hhcmFjdGVycyBmb3IgZWFjaCBjb2xvci5cbnAxIDwtIGNvbG9yUmFtcFBhbGV0dGUoYyhcInJlZFwiLCBcImJsdWVcIikpXG5wMSgyKVxucDIgPC0gY29sb3JSYW1wUGFsZXR0ZShjKFwicmVkXCIsIFwieWVsbG93XCIpKVxuIyBmdW5jdGlvbiB0byBjaGVjayBvdXRcbmNvbG9yLnNjYWxlKClcbiMgc2hvd01lIGNvbnRhaW5zIHRoZSBjb2xvci5zY2FsZSBmdW5jdGlvbiBcbnNob3dNZShwMSgyMCkpXG4jV2UgbWVudGlvbmVkIGJlZm9yZSB0aGF0IGNvbG9yUmFtcCAoYW5kIGNvbG9yUmFtcFBhbGV0dGUpIGNvdWxkIHJldHVybiBhIDMgb3IgNCBsb25nIHZlY3RvciBvZiBjb2xvcnMuIFdlIHNhdyAzLWxvbmcgdmVjdG9yc1xuIyByZXR1cm5lZCBpbmRpY2F0aW5nIHJlZCwgZ3JlZW4sIGFuZCBibHVlIGludGVuc2l0aWVzLiBXaGF0IHdvdWxkIHRoZSA0dGggZW50cnkgYmU/XG5wMyA8LSBjb2xvclJhbXBQYWxldHRlKGMoXCJibHVlXCIsIFwiZ3JlZW5cIiksIGFscGhhID0gLjUpXG4jIHNpbXBsZSBzY2F0dGxlcnBsb3Qgd2l0aCBhc3NpZ25lZCByZ2IgY29sb3JzXG5wbG90KHgsIHksIHBjaCA9IDE5LCBjb2wgPSByZ2IoMCwuNSwuNSkpXG4jIDR0aCByZ2IgYXJndW1lbnQgaXMgY2FsbCB0byBhbHBoYVxucGxvdCh4LCB5LCBwY2ggPSAxOSwgY29sID0gcmdiKDAsLjUsLjUsLjMpKVxuYGBgIn0= -->
+<pre class="r"><code># package grDevices
+library(grDevices)
+# function colors() to contains all available 657 colors
+colors() to call all colors. 
+# preview of 10 colors
+sample(colors(), 10)
+#The first, colorRamp, takes a palette of colors (the arguments) and returns a function that takes values between 0 and 1 as
+# arguments. The 0 and 1 correspond to the extremes of the color palette. Arguments between 0 and 1 return blends of these extremes.
+colorRamp()
+# assigning some colors
+pal &lt;- colorRamp(c(&quot;red&quot;, &quot;blue&quot;))
+#calling pal with 0
+pal(0)
+# You see the vector (0,0,255) which represents the highest intensity of blue. What vector do you think the call pal(.5) will return?
+# (127.5,0,127.5) since it can only take 0 or 1 the call to .5 return the half of the color
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIlIgTm90ZWJvb2siDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KDQpBcyBtYXkgb2Z0ZW4gYmUgdGhlIGNhc2UsIHBhcnRpY3VsYXJseSB3aXRoIGxhcmdlciBkYXRhc2V0cywgd2UgYXJlIG9ubHkgaW50ZXJlc3RlZCBpbiBzb21lIG9mIHRoZSB2YXJpYWJsZXMuIFVzZSBzZWxlY3QoY3JhbiwNCnwgaXBfaWQsIHBhY2thZ2UsIGNvdW50cnkpIHRvIHNlbGVjdCBvbmx5IHRoZSBpcF9pZCwgcGFja2FnZSwgYW5kIGNvdW50cnkgdmFyaWFibGVzIGZyb20gdGhlIGNyYW4gZGF0YXNldC4NCg0KYGBge3J9DQpzZWxlY3QoY3JhbiwgaXBfaWQsIHBhY2thZ2UsIGNvdW50cnkpDQpgYGANCiBBIHRpYmJsZTogMjI1LDQ2OCB4IDMNCiAgIGlwX2lkIHBhY2thZ2UgICAgICBjb3VudHJ5DQogICA8aW50PiA8Y2hyPiAgICAgICAgPGNocj4gIA0KIDEgICAgIDEgaHRtbHRvb2xzICAgIFVTICAgICANCiAyICAgICAyIHRzZXJpZXMgICAgICBVUyAgICAgDQogMyAgICAgMyBwYXJ0eSAgICAgICAgVVMgICAgIA0KIDQgICAgIDMgSG1pc2MgICAgICAgIFVTICAgICANCiA1ICAgICA0IGRpZ2VzdCAgICAgICBDQSAgICAgDQogNiAgICAgMyByYW5kb21Gb3Jlc3QgVVMgICAgIA0KIDcgICAgIDMgcGx5ciAgICAgICAgIFVTICAgICANCiA4ICAgICA1IHdoaXNrZXIgICAgICBVUyAgICAgDQogOSAgICAgNiBSY3BwICAgICAgICAgQ04gICAgIA0KMTAgICAgIDcgaGZsaWdodHMgICAgIFVTICAgICANCi4uLiB3aXRoIDIyNSw0NTggbW9yZSByb3dzDQoNCnwgRXhjZWxsZW50IGpvYiEgDQoNCkluc3RlYWQgb2Ygc3BlY2lmeWluZyB0aGUgY29sdW1ucyB3ZSB3YW50IHRvIGtlZXAsIHdlIGNhbiBhbHNvIHNwZWNpZnkgdGhlIGNvbHVtbnMgd2Ugd2FudCB0byB0aHJvdyBhd2F5LiBUbyBzZWUgaG93IHRoaXMNCnwgd29ya3MsIGRvIHNlbGVjdChjcmFuLCAtdGltZSkgdG8gb21pdCB0aGUgdGltZSBjb2x1bW4uDQoNCmBgYHtyfQ0Kc2VsZWN0KGNyYW4sIC10aW1lKQ0KYGBgDQoNCg0KYGBge3J9DQpzZWxlY3QoY3JhbiwgLShYOnNpemUpKQ0KYGBgDQpBIHRpYmJsZTogMjI1LDQ2OCB4IDcNCiAgIHJfdmVyc2lvbiByX2FyY2ggcl9vcyAgICAgIHBhY2thZ2UgICAgICB2ZXJzaW9uIGNvdW50cnkgaXBfaWQNCiAgIDxjaHI+ICAgICA8Y2hyPiAgPGNocj4gICAgIDxjaHI+ICAgICAgICA8Y2hyPiAgIDxjaHI+ICAgPGludD4NCiAxIDMuMS4wICAgICB4ODZfNjQgbWluZ3czMiAgIGh0bWx0b29scyAgICAwLjIuNCAgIFVTICAgICAgICAgIDENCiAyIDMuMS4wICAgICB4ODZfNjQgbWluZ3czMiAgIHRzZXJpZXMgICAgICAwLjEwLTMyIFVTICAgICAgICAgIDINCiAzIDMuMS4wICAgICB4ODZfNjQgbGludXgtZ251IHBhcnR5ICAgICAgICAxLjAtMTUgIFVTICAgICAgICAgIDMNCiA0IDMuMS4wICAgICB4ODZfNjQgbGludXgtZ251IEhtaXNjICAgICAgICAzLjE0LTQgIFVTICAgICAgICAgIDMNCiA1IDMuMC4yICAgICB4ODZfNjQgbGludXgtZ251IGRpZ2VzdCAgICAgICAwLjYuNCAgIENBICAgICAgICAgIDQNCiA2IDMuMS4wICAgICB4ODZfNjQgbGludXgtZ251IHJhbmRvbUZvcmVzdCA0LjYtNyAgIFVTICAgICAgICAgIDMNCiA3IDMuMS4wICAgICB4ODZfNjQgbGludXgtZ251IHBseXIgICAgICAgICAxLjguMSAgIFVTICAgICAgICAgIDMNCiA4IDMuMC4yICAgICB4ODZfNjQgbGludXgtZ251IHdoaXNrZXIgICAgICAwLjMtMiAgIFVTICAgICAgICAgIDUNCiA5IE5BICAgICAgICBOQSAgICAgTkEgICAgICAgIFJjcHAgICAgICAgICAwLjEwLjQgIENOICAgICAgICAgIDYNCjEwIDMuMC4yICAgICB4ODZfNjQgbGludXgtZ251IGhmbGlnaHRzICAgICAwLjEgICAgIFVTICAgICAgICAgIDcNCi4uLiB3aXRoIDIyNSw0NTggbW9yZSByb3dzDQoNCnwgR3JlYXQgam9iIQ0KDQpVc2UgZmlsdGVyKGNyYW4sIHBhY2thZ2UgPT0gInN3aXJsIikgdG8gc2VsZWN0IGFsbCByb3dzIGZvciB3aGljaCB0aGUgcGFja2FnZSB2YXJpYWJsZSBpcyBlcXVhbCB0byAic3dpcmwiLiBCZSBzdXJlIHRvIHVzZSB0d28NCnwgZXF1YWxzIHNpZ25zIHNpZGUtYnktc2lkZSENCg0KYGBge3J9DQpmaWx0ZXIoY3JhbiwgcGFja2FnZSA9PSAic3dpcmwiKQ0KYGBgDQoNCkEgdGliYmxlOiA4MjAgeCAxMQ0KICAgICAgIFggZGF0ZSAgICAgICB0aW1lICAgICAgIHNpemUgcl92ZXJzaW9uIHJfYXJjaCByX29zICAgICAgICAgcGFja2FnZSB2ZXJzaW9uIGNvdW50cnkgaXBfaWQNCiAgIDxpbnQ+IDxjaHI+ICAgICAgPGNocj4gICAgIDxpbnQ+IDxjaHI+ICAgICA8Y2hyPiAgPGNocj4gICAgICAgIDxjaHI+ICAgPGNocj4gICA8Y2hyPiAgIDxpbnQ+DQogMSAgICAyNyAyMDE0LTA3LTA4IDAwOjE3OjE2IDEwNTM1MCAzLjAuMiAgICAgeDg2XzY0IG1pbmd3MzIgICAgICBzd2lybCAgIDIuMi45ICAgVVMgICAgICAgICAyMA0KIDIgICAxNTYgMjAxNC0wNy0wOCAwMDoyMjo1MyAgNDEyNjEgMy4xLjAgICAgIHg4Nl82NCBsaW51eC1nbnUgICAgc3dpcmwgICAyLjIuOSAgIFVTICAgICAgICAgNjYNCiAzICAgMzU4IDIwMTQtMDctMDggMDA6MTM6NDIgMTA1MzM1IDIuMTUuMiAgICB4ODZfNjQgbWluZ3czMiAgICAgIHN3aXJsICAgMi4yLjkgICBDQSAgICAgICAgMTE1DQogNCAgIDU5MyAyMDE0LTA3LTA4IDAwOjU5OjQ1IDEwNTQ2NSAzLjEuMCAgICAgeDg2XzY0IGRhcndpbjEzLjEuMCBzd2lybCAgIDIuMi45ICAgTVggICAgICAgIDE2Mg0KIDUgICA4MzEgMjAxNC0wNy0wOCAwMDo1NToyNyAxMDUzMzUgMy4wLjMgICAgIHg4Nl82NCBtaW5ndzMyICAgICAgc3dpcmwgICAyLjIuOSAgIFVTICAgICAgICAgNTcNCiA2ICAgOTk3IDIwMTQtMDctMDggMDA6MzM6MDYgIDQxMjYxIDMuMS4wICAgICB4ODZfNjQgbWluZ3czMiAgICAgIHN3aXJsICAgMi4yLjkgICBVUyAgICAgICAgIDcwDQogNyAgMTAyMyAyMDE0LTA3LTA4IDAwOjM1OjM2IDEwNjM5MyAzLjEuMCAgICAgeDg2XzY0IG1pbmd3MzIgICAgICBzd2lybCAgIDIuMi45ICAgQlIgICAgICAgIDI0OA0KIDggIDExNDQgMjAxNC0wNy0wOCAwMDowMDozOSAxMDY1MzQgMy4wLjIgICAgIHg4Nl82NCBsaW51eC1nbnUgICAgc3dpcmwgICAyLjIuOSAgIFVTICAgICAgICAyNjENCiA5ICAxNDAyIDIwMTQtMDctMDggMDA6NDE6NDEgIDQxMjYxIDMuMS4wICAgICBpMzg2ICAgbWluZ3czMiAgICAgIHN3aXJsICAgMi4yLjkgICBVUyAgICAgICAgMjM0DQoxMCAgMTQyNCAyMDE0LTA3LTA4IDAwOjQ0OjQ5IDEwNjM5MyAzLjEuMCAgICAgeDg2XzY0IGxpbnV4LWdudSAgICBzd2lybCAgIDIuMi45ICAgVVMgICAgICAgIDMwMQ0KLi4uIHdpdGggODEwIG1vcmUgcm93cw0KDQp8IFlvdSdyZSB0aGUgYmVzdCENCg0KQWdhaW4sIG5vdGUgdGhhdCBmaWx0ZXIoKSByZWNvZ25pemVzICdwYWNrYWdlJyBhcyBhIGNvbHVtbiBvZiBjcmFuLCB3aXRob3V0IHlvdSBoYXZpbmcgdG8gZXhwbGljaXRseSBzcGVjaWZ5IGNyYW4kcGFja2FnZS4NCg0KLi4uDQoNCiAgfD09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgNTIlDQp8IFRoZSA9PSBvcGVyYXRvciBhc2tzIHdoZXRoZXIgdGhlIHRoaW5nIG9uIHRoZSBsZWZ0IGlzIGVxdWFsIHRvIHRoZSB0aGluZyBvbiB0aGUgcmlnaHQuIElmIHllcywgdGhlbiBpdCByZXR1cm5zIFRSVUUuIElmIG5vLA0KfCB0aGVuIEZBTFNFLiBJbiB0aGlzIGNhc2UsIHBhY2thZ2UgaXMgYW4gZW50aXJlIHZlY3RvciAoY29sdW1uKSBvZiB2YWx1ZXMsIHNvIHBhY2thZ2UgPT0gInN3aXJsIiByZXR1cm5zIGEgdmVjdG9yIG9mIFRSVUVzIGFuZA0KfCBGQUxTRXMuIGZpbHRlcigpIHRoZW4gcmV0dXJucyBvbmx5IHRoZSByb3dzIG9mIGNyYW4gY29ycmVzcG9uZGluZyB0byB0aGUgVFJVRXMuDQoNCi4uLg0KDQogIHw9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDUzJQ0KfCBZb3UgY2FuIHNwZWNpZnkgYXMgbWFueSBjb25kaXRpb25zIGFzIHlvdSB3YW50LCBzZXBhcmF0ZWQgYnkgY29tbWFzLiBGb3IgZXhhbXBsZSBmaWx0ZXIoY3Jhbiwgcl92ZXJzaW9uID09ICIzLjEuMSIsIGNvdW50cnkgPT0NCnwgIlVTIikgd2lsbCByZXR1cm4gYWxsIHJvd3Mgb2YgY3JhbiBjb3JyZXNwb25kaW5nIHRvIGRvd25sb2FkcyBmcm9tIHVzZXJzIGluIHRoZSBVUyBydW5uaW5nIFIgdmVyc2lvbiAzLjEuMS4gVHJ5IGl0IG91dC4NCmBgYHtyfQ0KZmlsdGVyKGNyYW4sIHJfdmVyc2lvbiA9PSAiMy4xLjEiLCBjb3VudHJ5ID09ICJVUyIpDQpgYGANCg0KQSB0aWJibGU6IDEsNTg4IHggMTENCiAgICAgICBYIGRhdGUgICAgICAgdGltZSAgICAgICAgc2l6ZSByX3ZlcnNpb24gcl9hcmNoIHJfb3MgICAgICAgICBwYWNrYWdlICAgICAgdmVyc2lvbiBjb3VudHJ5IGlwX2lkDQogICA8aW50PiA8Y2hyPiAgICAgIDxjaHI+ICAgICAgPGludD4gPGNocj4gICAgIDxjaHI+ICA8Y2hyPiAgICAgICAgPGNocj4gICAgICAgIDxjaHI+ICAgPGNocj4gICA8aW50Pg0KIDEgIDIyMTYgMjAxNC0wNy0wOCAwMDo0ODo1OCAgMzg1MTEyIDMuMS4xICAgICB4ODZfNjQgZGFyd2luMTMuMS4wIGNvbG9yc3BhY2UgICAxLjItNCAgIFVTICAgICAgICAxOTENCiAyIDE3MzMyIDIwMTQtMDctMDggMDM6Mzk6NTcgIDE5NzQ1OSAzLjEuMSAgICAgeDg2XzY0IGRhcndpbjEzLjEuMCBodHRyICAgICAgICAgMC4zICAgICBVUyAgICAgICAxNzA0DQogMyAxNzQ2NSAyMDE0LTA3LTA4IDAzOjI1OjM4ICAgMjMyNTkgMy4xLjEgICAgIHg4Nl82NCBkYXJ3aW4xMy4xLjAgc25vdyAgICAgICAgIDAuMy0xMyAgVVMgICAgICAgICA2Mg0KIDQgMTg4NDQgMjAxNC0wNy0wOCAwMzo1OToxNyAgMTkwNTk0IDMuMS4xICAgICB4ODZfNjQgZGFyd2luMTMuMS4wIG1heExpayAgICAgICAxLjItMCAgIFVTICAgICAgIDE1MzMNCiA1IDMwMTgyIDIwMTQtMDctMDggMDQ6MTM6MTUgICA3NzY4MyAzLjEuMSAgICAgaTM4NiAgIG1pbmd3MzIgICAgICByYW5kb21Gb3Jlc3QgNC42LTcgICBVUyAgICAgICAgNjQ2DQogNiAzMDE5MyAyMDE0LTA3LTA4IDA0OjA2OjI2IDIzNTE5NjkgMy4xLjEgICAgIGkzODYgICBtaW5ndzMyICAgICAgZ2dwbG90MiAgICAgIDEuMC4wICAgVVMgICAgICAgICAgOA0KIDcgMzAxOTUgMjAxNC0wNy0wOCAwNDowNzowOSAgMjk5MDgwIDMuMS4xICAgICBpMzg2ICAgbWluZ3czMiAgICAgIGZFeHRyZW1lcyAgICAzMDEwLjgxIFVTICAgICAgIDIwMTANCiA4IDMwMjE3IDIwMTQtMDctMDggMDQ6MzI6MDQgIDU2ODAzNiAzLjEuMSAgICAgaTM4NiAgIG1pbmd3MzIgICAgICBySmF2YSAgICAgICAgMC45LTYgICBVUyAgICAgICAgIDk4DQogOSAzMDI0NSAyMDE0LTA3LTA4IDA0OjEwOjQxICA1MjY4NTggMy4xLjEgICAgIGkzODYgICBtaW5ndzMyICAgICAgTFBDTSAgICAgICAgIDAuNDQtOCAgVVMgICAgICAgICAgOA0KMTAgMzAzNTQgMjAxNC0wNy0wOCAwNDozMjo1MSAxNzYzNzE3IDMuMS4xICAgICBpMzg2ICAgbWluZ3czMiAgICAgIG1nY3YgICAgICAgICAxLjgtMSAgIFVTICAgICAgIDIxMjINCi4uLiB3aXRoIDEsNTc4IG1vcmUgcm93cw0KDQp8IE5pY2Ugd29yayENCg0KDQp8IFRoZSBjb25kaXRpb25zIHBhc3NlZCB0byBmaWx0ZXIoKSBjYW4gbWFrZSB1c2Ugb2YgYW55IG9mIHRoZSBzdGFuZGFyZCBjb21wYXJpc29uIG9wZXJhdG9ycy4gUHVsbCB1cCB0aGUgcmVsZXZhbnQgZG9jdW1lbnRhdGlvbg0KfCB3aXRoID9Db21wYXJpc29uICh0aGF0J3MgYW4gdXBwZXJjYXNlIEMpLg0KDQpPdXIgbGFzdCB0d28gY2FsbHMgdG8gZmlsdGVyKCkgcmVxdWVzdGVkIGFsbCByb3dzIGZvciB3aGljaCBzb21lIGNvbmRpdGlvbiBBTkQgYW5vdGhlciBjb25kaXRpb24gd2VyZSBUUlVFLiBXZSBjYW4gYWxzbw0KfCByZXF1ZXN0IHJvd3MgZm9yIHdoaWNoIEVJVEhFUiBvbmUgY29uZGl0aW9uIE9SIGFub3RoZXIgY29uZGl0aW9uIGFyZSBUUlVFLiBGb3IgZXhhbXBsZSwgZmlsdGVyKGNyYW4sIGNvdW50cnkgPT0gIlVTIiB8IGNvdW50cnkNCnwgPT0gIklOIikgd2lsbCBnaXZlcyB1cyBhbGwgcm93cyBmb3Igd2hpY2ggdGhlIGNvdW50cnkgdmFyaWFibGUgZXF1YWxzIGVpdGhlciAiVVMiIG9yICJJTiIuIEdpdmUgaXQgYSBnby4NCg0KYGBge3J9DQpmaWx0ZXIoY3JhbiwgY291bnRyeSA9PSAiVVMiIHwgY291bnRyeSA9PSAiSU4iKQ0KYGBgDQoNCnwgVGhpcyBpcyBhIHRyaWNreSBvbmUuIGZpbHRlcihjcmFuLCBzaXplID4gMTAwNTAwLCByX29zID09ICJsaW51eC1nbnUiKSB3aWxsIGdpdmUgdXMgYWxsIHJvd3MgZm9yIHdoaWNoIHNpemUgaXMgc3RyaWN0bHkNCnwgZ3JlYXRlciB0aGFuIDEwMDUwMCBhbmQgcl9vcyBpcyAibGludXgtZ251Ii4NCmBgYHtyfQ0KZmlsdGVyKGNyYW4sIHNpemUgPiAxMDA1MDAsIHJfb3MgPT0gImxpbnV4LWdudSIpDQpgYGANCg0KfCBPa2F5LCByZWFkeSB0byBwdXQgYWxsIG9mIHRoaXMgdG9nZXRoZXI/IFVzZSBmaWx0ZXIoKSB0byByZXR1cm4gYWxsIHJvd3Mgb2YgY3JhbiBmb3Igd2hpY2ggcl92ZXJzaW9uIGlzIE5PVCBOQS4gSGludDogWW91IHdpbGwNCnwgbmVlZCB0byB1c2UgIWlzLm5hKCkgYXMgcGFydCBvZiB5b3VyIHNlY29uZCBhcmd1bWVudCB0byBmaWx0ZXIoKS4NCmBgYHtyfQ0KZmlsdGVyKGNyYW4sICFpcy5uYShyX3ZlcnNpb24pKQ0KYGBgDQoNCnwgU29tZXRpbWVzIHdlIHdhbnQgdG8gb3JkZXIgdGhlIHJvd3Mgb2YgYSBkYXRhc2V0IGFjY29yZGluZyB0byB0aGUgdmFsdWVzIG9mIGEgcGFydGljdWxhciB2YXJpYWJsZS4gVGhpcyBpcyB0aGUgam9iIG9mDQp8IGFycmFuZ2UoKS4NCg0KLi4uDQoNCiAgfD09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgNzIlDQp8IFRvIHNlZSBob3cgYXJyYW5nZSgpIHdvcmtzLCBsZXQncyBmaXJzdCB0YWtlIGEgc3Vic2V0IG9mIGNyYW4uIHNlbGVjdCgpIGFsbCBjb2x1bW5zIGZyb20gc2l6ZSB0aHJvdWdoIGlwX2lkIGFuZCBzdG9yZSB0aGUNCnwgcmVzdWx0IGluIGNyYW4yLg0KYGBge3J9DQpjcmFuMiA8LSBzZWxlY3QoY3Jhbiwgc2l6ZTppcF9pZCkNCmBgYA0KDQp8IE5vdywgdG8gb3JkZXIgdGhlIFJPV1Mgb2YgY3JhbjIgc28gdGhhdCBpcF9pZCBpcyBpbiBhc2NlbmRpbmcgb3JkZXIgKGZyb20gc21hbGwgdG8gbGFyZ2UpLCB0eXBlIGFycmFuZ2UoY3JhbjIsIGlwX2lkKS4gWW91IG1heQ0KfCB3YW50IHRvIG1ha2UgeW91ciBjb25zb2xlIHdpZGUgZW5vdWdoIHNvIHRoYXQgeW91IGNhbiBzZWUgaXBfaWQsIHdoaWNoIGlzIHRoZSBsYXN0IGNvbHVtbi4NCmBgYHtyfQ0KYXJyYW5nZShjcmFuMiwgaXBfaWQpDQpgYGANCg0KfCBOaWNlIHdvcmshDQoNCiAgfD09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgNzUlDQp8IFRvIGRvIHRoZSBzYW1lLCBidXQgaW4gZGVzY2VuZGluZyBvcmRlciwgY2hhbmdlIHRoZSBzZWNvbmQgYXJndW1lbnQgdG8gZGVzYyhpcF9pZCksIHdoZXJlIGRlc2MoKSBzdGFuZHMgZm9yICdkZXNjZW5kaW5nJy4gR28NCnwgYWhlYWQuDQpgYGB7cn0NCmFycmFuZ2UoY3JhbjIsIGRlc2MoaXBfaWQpKQ0KYGBgDQoNCnwgV2UgY2FuIGFsc28gYXJyYW5nZSB0aGUgZGF0YSBhY2NvcmRpbmcgdG8gdGhlIHZhbHVlcyBvZiBtdWx0aXBsZSB2YXJpYWJsZXMuIEZvciBleGFtcGxlLCBhcnJhbmdlKGNyYW4yLCBwYWNrYWdlLCBpcF9pZCkgd2lsbA0KfCBmaXJzdCBhcnJhbmdlIGJ5IHBhY2thZ2UgbmFtZXMgKGFzY2VuZGluZyBhbHBoYWJldGljYWxseSksIHRoZW4gYnkgaXBfaWQuIFRoaXMgbWVhbnMgdGhhdCBpZiB0aGVyZSBhcmUgbXVsdGlwbGUgcm93cyB3aXRoIHRoZQ0KfCBzYW1lIHZhbHVlIGZvciBwYWNrYWdlLCB0aGV5IHdpbGwgYmUgc29ydGVkIGJ5IGlwX2lkIChhc2NlbmRpbmcgbnVtZXJpY2FsbHkpLiBUcnkgYXJyYW5nZShjcmFuMiwgcGFja2FnZSwgaXBfaWQpIG5vdy4NCmBgYHtyfQ0KYXJyYW5nZShjcmFuMiwgcGFja2FnZSwgaXBfaWQpDQpgYGANCg0KfCBBcnJhbmdlIGNyYW4yIGJ5IHRoZSBmb2xsb3dpbmcgdGhyZWUgdmFyaWFibGVzLCBpbiB0aGlzIG9yZGVyOiBjb3VudHJ5IChhc2NlbmRpbmcpLCByX3ZlcnNpb24gKGRlc2NlbmRpbmcpLCBhbmQgaXBfaWQNCnwgKGFzY2VuZGluZykuDQpgYGB7cn0NCmFycmFuZ2UoY3JhbjIsIGNvdW50cnksIGRlc2Mocl92ZXJzaW9uKSwgaXBfaWQpDQpgYGANCg0KfCBUbyBpbGx1c3RyYXRlIHRoZSBuZXh0IG1ham9yIGZ1bmN0aW9uIGluIGRwbHlyLCBsZXQncyB0YWtlIGFub3RoZXIgc3Vic2V0IG9mIG91ciBvcmlnaW5hbCBkYXRhLiBVc2Ugc2VsZWN0KCkgdG8gZ3JhYiAzIGNvbHVtbnMNCnwgZnJvbSBjcmFuIC0tIGlwX2lkLCBwYWNrYWdlLCBhbmQgc2l6ZSAoaW4gdGhhdCBvcmRlcikgLS0gYW5kIHN0b3JlIHRoZSByZXN1bHQgaW4gYSBuZXcgdmFyaWFibGUgY2FsbGVkIGNyYW4zLg0KYGBge3J9DQpjcmFuMyA8LSBzZWxlY3QoY3JhbiwgaXBfaWQsIHBhY2thZ2UsIHNpemUpDQpgYGANCg0KSXQncyBjb21tb24gdG8gY3JlYXRlIGEgbmV3IHZhcmlhYmxlIGJhc2VkIG9uIHRoZSB2YWx1ZSBvZiBvbmUgb3IgbW9yZSB2YXJpYWJsZXMgYWxyZWFkeSBpbiBhIGRhdGFzZXQuIFRoZSBtdXRhdGUoKSBmdW5jdGlvbg0KfCBkb2VzIGV4YWN0bHkgdGhpcy4NCg0KLi4uDQoNCiAgfD09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09ICAgICAgICAgICAgICAgICAgfCAgODUlDQp8IFRoZSBzaXplIHZhcmlhYmxlIHJlcHJlc2VudHMgdGhlIGRvd25sb2FkIHNpemUgaW4gYnl0ZXMsIHdoaWNoIGFyZSB1bml0cyBvZiBjb21wdXRlciBtZW1vcnkuIFRoZXNlIGRheXMsIG1lZ2FieXRlcyAoTUIpIGFyZSBhDQp8IG1vcmUgY29tbW9uIHVuaXQgb2YgbWVhc3VyZW1lbnQuIE9uZSBtZWdhYnl0ZSBpcyBlcXVhbCB0byAyXjIwIGJ5dGVzLiBUaGF0J3MgMiB0byB0aGUgcG93ZXIgb2YgMjAsIHdoaWNoIGlzIGFwcHJveGltYXRlbHkgb25lDQp8IG1pbGxpb24gYnl0ZXMhDQoNCi4uLg0KDQogIHw9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09ICAgICAgICAgICAgICAgIHwgIDg3JQ0KfCBXZSB3YW50IHRvIGFkZCBhIGNvbHVtbiBjYWxsZWQgc2l6ZV9tYiB0aGF0IGNvbnRhaW5zIHRoZSBkb3dubG9hZCBzaXplIGluIG1lZ2FieXRlcy4gSGVyZSdzIHRoZSBjb2RlIHRvIGRvIGl0Og0KDQpgYGB7cn0NCm11dGF0ZShjcmFuMywgc2l6ZV9tYiA9IHNpemUgLyAyXjIwKQ0KYGBgDQoNCiBBIHRpYmJsZTogMjI1LDQ2OCB4IDQNCiAgIGlwX2lkIHBhY2thZ2UgICAgICAgICBzaXplIHNpemVfbWINCiAgIDxpbnQ+IDxjaHI+ICAgICAgICAgIDxpbnQ+ICAgPGRibD4NCiAxICAgICAxIGh0bWx0b29scyAgICAgIDgwNTg5IDAuMDc2OSANCiAyICAgICAyIHRzZXJpZXMgICAgICAgMzIxNzY3IDAuMzA3ICANCiAzICAgICAzIHBhcnR5ICAgICAgICAgNzQ4MDYzIDAuNzEzICANCiA0ICAgICAzIEhtaXNjICAgICAgICAgNjA2MTA0IDAuNTc4ICANCiA1ICAgICA0IGRpZ2VzdCAgICAgICAgIDc5ODI1IDAuMDc2MSANCiA2ICAgICAzIHJhbmRvbUZvcmVzdCAgIDc3NjgxIDAuMDc0MSANCiA3ICAgICAzIHBseXIgICAgICAgICAgMzkzNzU0IDAuMzc2ICANCiA4ICAgICA1IHdoaXNrZXIgICAgICAgIDI4MjE2IDAuMDI2OSANCiA5ICAgICA2IFJjcHAgICAgICAgICAgICA1OTI4IDAuMDA1NjUNCjEwICAgICA3IGhmbGlnaHRzICAgICAyMjA2MDI5IDIuMTAgICANCiAuLi4gd2l0aCAyMjUsNDU4IG1vcmUgcm93cw0KDQp8IFBlcnNldmVyYW5jZSwgdGhhdCdzIHRoZSBhbnN3ZXIuDQoNCnwgT25lIHZlcnkgbmljZSBmZWF0dXJlIG9mIG11dGF0ZSgpIGlzIHRoYXQgeW91IGNhbiB1c2UgdGhlIHZhbHVlIGNvbXB1dGVkIGZvciB5b3VyIHNlY29uZCBjb2x1bW4gKHNpemVfbWIpIHRvIGNyZWF0ZSBhIHRoaXJkDQp8IGNvbHVtbiwgYWxsIGluIHRoZSBzYW1lIGxpbmUgb2YgY29kZS4gVG8gc2VlIHRoaXMgaW4gYWN0aW9uLCByZXBlYXQgdGhlIGV4YWN0IHNhbWUgY29tbWFuZCBhcyBhYm92ZSwgZXhjZXB0IGFkZCBhIHRoaXJkDQp8IGFyZ3VtZW50IGNyZWF0aW5nIGEgY29sdW1uIHRoYXQgaXMgbmFtZWQgc2l6ZV9nYiBhbmQgZXF1YWwgdG8gc2l6ZV9tYiAvIDJeMTAuDQpgYGB7cn0NCm11dGF0ZShjcmFuMywgc2l6ZV9tYiA9IHNpemUgLyAyXjIwLCBzaXplX2diID0gc2l6ZV9tYiAvIDJeMTApDQpgYGANCkEgdGliYmxlOiAyMjUsNDY4IHggNQ0KICAgaXBfaWQgcGFja2FnZSAgICAgICAgIHNpemUgc2l6ZV9tYiAgICBzaXplX2diDQogICA8aW50PiA8Y2hyPiAgICAgICAgICA8aW50PiAgIDxkYmw+ICAgICAgPGRibD4NCiAxICAgICAxIGh0bWx0b29scyAgICAgIDgwNTg5IDAuMDc2OSAgMC4wMDAwNzUxIA0KIDIgICAgIDIgdHNlcmllcyAgICAgICAzMjE3NjcgMC4zMDcgICAwLjAwMDMwMCAgDQogMyAgICAgMyBwYXJ0eSAgICAgICAgIDc0ODA2MyAwLjcxMyAgIDAuMDAwNjk3ICANCiA0ICAgICAzIEhtaXNjICAgICAgICAgNjA2MTA0IDAuNTc4ICAgMC4wMDA1NjQgIA0KIDUgICAgIDQgZGlnZXN0ICAgICAgICAgNzk4MjUgMC4wNzYxICAwLjAwMDA3NDMgDQogNiAgICAgMyByYW5kb21Gb3Jlc3QgICA3NzY4MSAwLjA3NDEgIDAuMDAwMDcyMyANCiA3ICAgICAzIHBseXIgICAgICAgICAgMzkzNzU0IDAuMzc2ICAgMC4wMDAzNjcgIA0KIDggICAgIDUgd2hpc2tlciAgICAgICAgMjgyMTYgMC4wMjY5ICAwLjAwMDAyNjMgDQogOSAgICAgNiBSY3BwICAgICAgICAgICAgNTkyOCAwLjAwNTY1IDAuMDAwMDA1NTINCjEwICAgICA3IGhmbGlnaHRzICAgICAyMjA2MDI5IDIuMTAgICAgMC4wMDIwNSAgIA0KLi4uIHdpdGggMjI1LDQ1OCBtb3JlIHJvd3MNCg0KfCBBbGwgdGhhdCBwcmFjdGljZSBpcyBwYXlpbmcgb2ZmIQ0KDQpMZXQncyB0cnkgb25lIG1vcmUgZm9yIHByYWN0aWNlLiBQcmV0ZW5kIHdlIGRpc2NvdmVyZWQgYSBnbGl0Y2ggaW4gdGhlIHN5c3RlbSB0aGF0IHByb3ZpZGVkIHRoZSBvcmlnaW5hbCB2YWx1ZXMgZm9yIHRoZSBzaXplDQp8IHZhcmlhYmxlLiBBbGwgb2YgdGhlIHZhbHVlcyBpbiBjcmFuMyBhcmUgMTAwMCBieXRlcyBsZXNzIHRoYW4gdGhleSBzaG91bGQgYmUuIFVzaW5nIGNyYW4zLCBjcmVhdGUganVzdCBvbmUgbmV3IGNvbHVtbiBjYWxsZWQNCmBgYHtyfQ0KbXV0YXRlKGNyYW4zLCBjb3JyZWN0X3NpemUgPSBzaXplICsgMTAwMCkNCmBgYA0KDQogVGhlIGxhc3Qgb2YgdGhlIGZpdmUgY29yZSBkcGx5ciB2ZXJicywgc3VtbWFyaXplKCksIGNvbGxhcHNlcyB0aGUgZGF0YXNldCB0byBhIHNpbmdsZSByb3cuIExldCdzIHNheSB3ZSdyZSBpbnRlcmVzdGVkIGluDQp8IGtub3dpbmcgdGhlIGF2ZXJhZ2UgZG93bmxvYWQgc2l6ZS4gc3VtbWFyaXplKGNyYW4sIGF2Z19ieXRlcyA9IG1lYW4oc2l6ZSkpIHdpbGwgeWllbGQgdGhlIG1lYW4gdmFsdWUgb2YgdGhlIHNpemUgdmFyaWFibGUuDQp8IEhlcmUgd2UndmUgY2hvc2VuIHRvIGxhYmVsIHRoZSByZXN1bHQgJ2F2Z19ieXRlcycsIGJ1dCB3ZSBjb3VsZCBoYXZlIG5hbWVkIGl0IGFueXRoaW5nLiBHaXZlIGl0IGEgdHJ5Lg0KYGBge3J9DQpzdW1tYXJpemUoY3JhbiwgYXZnX2J5dGVzID0gbWVhbihzaXplKSkNCmBgYA0KQSB0aWJibGU6IDEgeCAxDQogIGF2Z19ieXRlcw0KICAgICAgPGRibD4NCjEgICA4NDQwODYuDQoNCnwgRXhjZWxsZW50IGpvYiENCg0KDQoNCg==</div>
+# The argument you pass to the returned function specifies the number of colors you want returned. Each element of the returned vector
+# is a 24 bit number, represented as 6 hexadecimal characters, which range from 0 to F. This set of 6 hex characters represents the
+# intensities of red, green, and blue, 2 characters for each color.
+p1 &lt;- colorRampPalette(c(&quot;red&quot;, &quot;blue&quot;))
+p1(2)
+p2 &lt;- colorRampPalette(c(&quot;red&quot;, &quot;yellow&quot;))
+# function to check out
+color.scale()
+# showMe contains the color.scale function 
+showMe(p1(20))
+#We mentioned before that colorRamp (and colorRampPalette) could return a 3 or 4 long vector of colors. We saw 3-long vectors
+# returned indicating red, green, and blue intensities. What would the 4th entry be?
+p3 &lt;- colorRampPalette(c(&quot;blue&quot;, &quot;green&quot;), alpha = .5)
+# simple scattlerplot with assigned rgb colors
+plot(x, y, pch = 19, col = rgb(0,.5,.5))
+# 4th rgb argument is call to alpha
+plot(x, y, pch = 19, col = rgb(0,.5,.5,.3))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShSQ29sb3JCcmV3ZXIpXG4jT3VyIGxhc3QgdG9waWMgZm9yIHRoaXMgbGVzc29uIGlzIHRoZSBSQ29sb3JCcmV3ZXIgUGFja2FnZSwgYXZhaWxhYmxlIG9uIENSQU4sIHRoYXQgY29udGFpbnMgaW50ZXJlc3RpbmcgYW5kIHVzZWZ1bCBjb2xvciBwYWxldHRlcyxcbiMgb2Ygd2hpY2ggdGhlcmUgYXJlIDMgdHlwZXMsIHNlcXVlbnRpYWwsIGRpdmVyZ2VudCwgYW5kIHF1YWxpdGF0aXZlLiBXaGljaCBvbmUgeW91IHdvdWxkIGNob29zZSB0byB1c2UgZGVwZW5kcyBvbiB5b3VyIGRhdGEuXG5cbmNvbHMgPC0gYnJld2VyLnBhbCgzLCBcIkJ1R25cIilcbnBhbCA8LSBjb2xvclJhbXBQYWxldHRlKGNvbHMpXG5zaG93TWUocGFsKDIwKSlcbiMgcHJvdmVkZXMgYSBwbG90IHdpdGggZGVuc2l0eVxuaW1hZ2Uodm9sY2FubywgY29sID0gcGFsKDIwKSlcbiMgZGlmZmVyZW50IGNvbG9yIHBhY2thZ2VcbmltYWdlKHZvbGNhbm8sIGNvbCA9IHAxKDIwKSlcblxuIyBhbHBoYSBvZiB0aGUgcmdiKCkgZnVuY3Rpb24gcmV0cnVucyBkZW5zaXR5XG5gYGAifQ== -->
+<pre class="r"><code>library(RColorBrewer)
+#Our last topic for this lesson is the RColorBrewer Package, available on CRAN, that contains interesting and useful color palettes,
+# of which there are 3 types, sequential, divergent, and qualitative. Which one you would choose to use depends on your data.
+
+cols &lt;- brewer.pal(3, &quot;BuGn&quot;)
+pal &lt;- colorRampPalette(cols)
+showMe(pal(20))
+# provedes a plot with density
+image(volcano, col = pal(20))
+# different color package
+image(volcano, col = p1(20))
+
+# alpha of the rgb() function retruns density</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+</div>
+
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIlIgTm90ZWJvb2siDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KDQojIEdyYXBoaWMgZGV2aWNlcyBpbiBSDQoNClBsb3R0aW5nIHdvcmtzIHZpYSBzZW5kaW5nIGl0IHRvIGRpZmZlcmVudCBkZXZpY2VzLiBXaW5kb3dzLCBMaW51eCBhbmQgTWF4IGhhdmUgZGlmZmVyZW50IG9uZXMgdG8gY2FsbC4gDQpTZWUgP0RldmljZXMgdG8gZmluZCBvdXQgd2hpY2ggb25lcyBhcmUgYXZhaWxhYmxlIG9uIHRoaXMgY29tcHV0ZXIuIA0KDQp3aXRoIGNvbW1hbmQgY2FuIGNhbGwgYSBkYXRhc2V0IGxpa2UgZmFpdGhmdWwgYW5kIGRpcmVjdCBpdCB0byBhIHBsb3QgY29tbWFuZCB3aXRoIHggYW5kIHkgYXJndWVtdG5zLiANCg0KYGBge3J9DQp3aXRoKGZhaXRoZnVsLCBwbG90KGVydXB0aW9ucywgd2FpdGluZykpDQp0aXRsZShtYWluID0gIk9sZCBGYWl0aGZ1bCBHZXlzZXIgZGF0YSIpDQpgYGANCg0KU2ltcGxlLCByaWdodD8gIE5vdyBydW4gdGhlIGNvbW1hbmQgZGV2LmN1cigpLiBUaGlzIHdpbGwgc2hvdyB5b3UgdGhlIGN1cnJlbnQgcGxvdHRpbmcgZGV2aWNlLCB0aGUgc2NyZWVuLg0KYGBge3J9DQpkZXYuY3VyKCkNCmBgYA0KUlN0dWRpb0dEIA0KICAgICAgICAyIA0KDQpJbiBjYXNlIHRoZSBkZXZpY2UgaXMgc3dpdGNoZWQgdG8gZWcuIHBkZiwgcG5nLCBhcmUgYW5vdGhlciBvdGhlciB0aGlzIGNvbW1hbmQgd2lsbCBzaG93IHRoZSBkZXZpY2UgYW5kIG51bWJlci4gZGV2Lm9mZigpIHdpbGwgY2xvc2UgYW5kIHJldmVydCBiYWNrIHRvIGRlZmF1bHQuIA0KDQpUaGUgc2Vjb25kIHdheSB0byBjcmVhdGUgYSBwbG90IGlzIHRvIHNlbmQgaXQgdG8gYSBmaWxlIGRldmljZS4gRGVwZW5kaW5nIG9uIHRoZSB0eXBlIG9mIHBsb3QgeW91J3JlIG1ha2luZywgeW91IGV4cGxpY2l0bHkgbGF1bmNoIGEgZ3JhcGhpY3MgZGV2aWNlLA0KZS5nLiwgYSBwZGYgZmlsZS4gVHlwZSB0aGUgY29tbWFuZCBwZGYoZmlsZT0ibXlwbG90LnBkZiIpIHRvIGxhdW5jaCB0aGUgZmlsZSBkZXZpY2UuIFRoaXMgd2lsbCBjcmVhdGUgdGhlIHBkZiBmaWxlIG15cGxvdC5wZGYgaW4geW91ciB3b3JraW5nIGRpcmVjdG9yeS4NCmBgYHtyfQ0KcGRmKGZpbGU9Im15cGxvdC5wZGYiKQ0Kd2l0aChmYWl0aGZ1bCwgcGxvdChlcnVwdGlvbnMsIHdhaXRpbmcpKQ0KdGl0bGUobWFpbiA9ICJPbGQgRmFpdGhmdWwgR2V5c2VyIGRhdGEiKQ0KZGV2Lm9mZg0KYGBgDQoNCmhlcmUgYXJlIHR3byBiYXNpYyB0eXBlcyBvZiBmaWxlIGRldmljZXMsIHZlY3RvciBhbmQgYml0bWFwIGRldmljZXMuIFRoZXNlIHVzZSBkaWZmZXJlbnQgZm9ybWF0cyBhbmQgaGF2ZSBkaWZmZXJlbnQgY2hhcmFjdGVyaXN0aWNzLiBWZWN0b3IgZm9ybWF0cw0KfCBhcmUgZ29vZCBmb3IgbGluZSBkcmF3aW5ncyBhbmQgcGxvdHMgd2l0aCBzb2xpZCBjb2xvcnMgdXNpbmcgYSBtb2Rlc3QgbnVtYmVyIG9mIHBvaW50cywgd2hpbGUgYml0bWFwIGZvcm1hdHMgYXJlIGdvb2QgZm9yIHBsb3RzIHdpdGggYSBsYXJnZSBudW1iZXIgb2YNCnwgcG9pbnRzLCBuYXR1cmFsIHNjZW5lcyBvciB3ZWItYmFzZWQgcGxvdHMuDQoNCnwgV2UnbGwgbWVudGlvbiA0IHNwZWNpZmljIHZlY3RvciBmb3JtYXRzLiBUaGUgZmlyc3QgaXMgcGRmLCB3aGljaCB3ZSd2ZSBqdXN0IHVzZWQgaW4gb3VyIGV4YW1wbGUuIFRoaXMgaXMgdXNlZnVsIGZvciBsaW5lLXR5cGUgZ3JhcGhpY3MgYW5kIHBhcGVycy4gSXQNCnwgcmVzaXplcyB3ZWxsLCBpcyB1c3VhbGx5IHBvcnRhYmxlLCBidXQgaXQgaXMgbm90IGVmZmljaWVudCBpZiBhIHBsb3QgaGFzIG1hbnkgb2JqZWN0cy9wb2ludHMuDQoNCnwgVGhlIHNlY29uZCBpcyBzdmcgd2hpY2ggaXMgWE1MLWJhc2VkLCBzY2FsYWJsZSB2ZWN0b3IgZ3JhcGhpY3MuIFRoaXMgc3VwcG9ydHMgYW5pbWF0aW9uIGFuZCBpbnRlcmFjdGl2aXR5IGFuZCBpcyBwb3RlbnRpYWxseSB1c2VmdWwgZm9yIHdlYi1iYXNlZA0KfCBwbG90cy4NCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgDQp8IFRoZSBsYXN0IHR3byB2ZWN0b3IgZm9ybWF0cyBhcmUgd2luLm1ldGFmaWxlLCBhIFdpbmRvd3Mtb25seSBtZXRhZmlsZSBmb3JtYXQsIGFuZCBwb3N0c2NyaXB0IChwcyksIGFuIG9sZGVyIGZvcm1hdCB3aGljaCBhbHNvIHJlc2l6ZXMgd2VsbCwgaXMgdXN1YWxseQ0KfCBwb3J0YWJsZSwgYW5kIGNhbiBiZSB1c2VkIHRvIGNyZWF0ZSBlbmNhcHN1bGF0ZWQgcG9zdHNjcmlwdCBmaWxlcy4gVW5mb3J0dW5hdGVseSwgV2luZG93cyBzeXN0ZW1zIG9mdGVuIGRvbid0IGhhdmUgYSBwb3N0c2NyaXB0IHZpZXdlci4NCg0KfCBXZSdsbCBhbHNvIG1lbnRpb24gNCBkaWZmZXJlbnQgYml0bWFwIGZvcm1hdHMuIFRoZSBmaXJzdCBpcyBwbmcgKFBvcnRhYmxlIE5ldHdvcmsgR3JhcGhpY3MpIHdoaWNoIGlzIGdvb2QgZm9yIGxpbmUgZHJhd2luZ3Mgb3IgaW1hZ2VzIHdpdGggc29saWQNCnwgY29sb3JzLiBJdCB1c2VzIGxvc3NsZXNzIGNvbXByZXNzaW9uIChsaWtlIHRoZSBvbGQgR0lGIGZvcm1hdCksIGFuZCBtb3N0IHdlYiBicm93c2VycyBjYW4gcmVhZCB0aGlzIGZvcm1hdCBuYXRpdmVseS4gSW4gYWRkaXRpb24sIHBuZyBpcyBnb29kIGZvciBwbG90cw0KfCB3aXRoIG1hbnkgcG9pbnRzLCBidXQgaXQgZG9lcyBub3QgcmVzaXplIHdlbGwuDQoNCnwgVGhlIGRldmljZSBpcyBiYWNrIHRvIHdoYXQgaXQgd2FzIHdoZW4geW91IHN0YXJ0ZWQuIEFzIHlvdSBtaWdodCBoYXZlIGd1ZXNzZWQsIGV2ZXJ5IG9wZW4gZ3JhcGhpY3MgZGV2aWNlIGlzIGFzc2lnbmVkIGFuIGludGVnZXIgZ3JlYXRlciB0aGFuIG9yIGVxdWFsDQp8IHRvIDIuIFlvdSBjYW4gY2hhbmdlIHRoZSBhY3RpdmUgZ3JhcGhpY3MgZGV2aWNlIHdpdGggZGV2LnNldCg8aW50ZWdlcj4pIHdoZXJlIDxpbnRlZ2VyPiBpcyB0aGUgbnVtYmVyIGFzc29jaWF0ZWQgd2l0aCB0aGUgZ3JhcGhpY3MgZGV2aWNlIHlvdSB3YW50IHRvDQp8IHN3aXRjaCB0by4NCg0KfCBZb3UgY2FuIGFsc28gY29weSBhIHBsb3QgZnJvbSBvbmUgZGV2aWNlIHRvIGFub3RoZXIuIFRoaXMgY2FuIHNhdmUgeW91IHNvbWUgdGltZSBidXQgYmV3YXJlISBDb3B5aW5nIGEgcGxvdCBpcyBub3QgYW4gZXhhY3Qgb3BlcmF0aW9uLCBzbyB0aGUgcmVzdWx0DQp8IG1heSBub3QgYmUgaWRlbnRpY2FsIHRvIHRoZSBvcmlnaW5hbC4gUiBwcm92aWRlcyBzb21lIGZ1bmN0aW9ucyB0byBoZWxwIHlvdSBkbyB0aGlzLiBUaGUgZnVuY3Rpb24gZGV2LmNvcHkgY29waWVzIGEgcGxvdCBmcm9tIG9uZSBkZXZpY2UgdG8gYW5vdGhlciwNCnwgYW5kIGRldi5jb3B5MnBkZiBzcGVjaWZpY2FsbHkgY29waWVzIGEgcGxvdCB0byBhIFBERiBmaWxlLg0KDQogTm93IHJ1biBkZXYuY29weSB3aXRoIHRoZSAyIGFyZ3VtZW50cy4gVGhlIGZpcnN0IGlzIHBuZywgYW5kIHRoZSBzZWNvbmQgaXMgZmlsZSBzZXQgZXF1YWwgdG8gImdleXNlcnBsb3QucG5nIi4gVGhpcyB3aWxsIGNvcHkgeW91ciBzY3JlZW4gcGxvdCB0byBhIHBuZw0KfCBmaWxlIGluIHlvdXIgd29ya2luZyBkaXJlY3Rvcnkgd2hpY2ggeW91IGNhbiB2aWV3IEFGVEVSIHlvdSBjbG9zZSB0aGUgZGV2aWNlLg0KDQpgYGB7cn0NCmRldi5jb3B5KHBuZywgZmlsZSA9ICJnZXlzZXJwbG90LnBuZyIpDQpgYGANCnBuZyANCiAgNA0KICANCiMgUGxvdHRpbmcgU3lzdGVtcw0KICANCmBgYHtyfQ0KIyBMYXR0aWNlDQp4eXBsb3QoTGlmZS5FeHAgfiBJbmNvbWUgfCByZWdpb24sIGRhdGEgPSBzdGF0ZSwgbGF5b3V0ID0gYyg0LDEpKQ0KDQpgYGANCg0KYGBge3J9DQojIEJhc2UgKHBsb3QsIGhpc3QsIGJveHBsb3QsIGJhcnBsb3QpDQp3aXRoKGNhcnMsIHBsb3Qoc3BlZWQsIGRpc3QpKQ0KdGV4dChtZWFuKGNhcnMkc3BlZWQpLCBtYXgoY2FycyRkaXN0KSwgIlNXSVJMIHJ1bGVzISIpDQpgYGANCg0KYGBge3J9DQojIGdncGxvdDINCnFwbG90KGRpc3BsLCBod3ksIGRhdGEgPSBtcGcpDQpgYGANCg0KYGBge3J9DQojYm94cGxvdA0KYm94cGxvdChPem9uZX5Nb250aCwgYWlycXVhbGl0eSwgeGxhYiA9ICJNb250aCIsIHlsYWIgPSAiT3pvbmUgKHBwYikiLCBjb2wuYXhpcyA9ICJibHVlIiwgY29sLmxhYiA9ICJyZWQiLCBtYWluID0gIk96b25lIHdhdGggZXZlciB0aGUgZioqKiIpDQpgYGANCg0KYGBge3J9DQojIGhpc3RvZ3JhbQ0KaGlzdChhaXJxdWFsaXR5JE96b25lKQ0KYGBgDQoNCmBgYHtyfQ0KIyBTY2F0dGVycGxvdA0Kd2l0aChhaXJxdWFsaXR5LCBwbG90KFdpbmQsIE96b25lKSwgbWFpbiA9ICJPem9uZS4uLiIpDQpgYGANCg0KbGVuZ3RoIHdpdGggdGhlIGFyZ3VtZW50IHBhcigpIG5vdy4NCg0KWzFdIDcyDQpgYGB7cn0NCmxlbmd0aChwYXIoKSkNCmBgYA0KDQp8IFRoYXQncyBjb3JyZWN0IQ0KfCBTbyB0aGVyZSBhcmUgYSBib2F0bG9hZCAoNzIpIG9mIHBhcmFtZXRlcnMgdGhhdCBwYXIoKSBnaXZlcyB5b3UgYWNjZXNzIHRvLiBSdW4gdGhlIFIgZnVuY3Rpb24gbmFtZXMgd2l0aCBwYXIoKSBhcw0KfCBpdHMgYXJndW1lbnQgdG8gc2VlIHdoYXQgdGhlc2UgcGFyYW1ldGVycyBhcmUuDQoNCmBgYHtyfQ0KIG5hbWVzKHBhcigpKQ0KYGBgDQogWzFdICJ4bG9nIiAgICAgICJ5bG9nIiAgICAgICJhZGoiICAgICAgICJhbm4iICAgICAgICJhc2siICAgICAgICJiZyIgICAgICAgICJidHkiICAgICAgICJjZXgiICAgICAgICJjZXguYXhpcyIgDQpbMTBdICJjZXgubGFiIiAgICJjZXgubWFpbiIgICJjZXguc3ViIiAgICJjaW4iICAgICAgICJjb2wiICAgICAgICJjb2wuYXhpcyIgICJjb2wubGFiIiAgICJjb2wubWFpbiIgICJjb2wuc3ViIiAgDQpbMTldICJjcmEiICAgICAgICJjcnQiICAgICAgICJjc2kiICAgICAgICJjeHkiICAgICAgICJkaW4iICAgICAgICJlcnIiICAgICAgICJmYW1pbHkiICAgICJmZyIgICAgICAgICJmaWciICAgICAgDQpbMjhdICJmaW4iICAgICAgICJmb250IiAgICAgICJmb250LmF4aXMiICJmb250LmxhYiIgICJmb250Lm1haW4iICJmb250LnN1YiIgICJsYWIiICAgICAgICJsYXMiICAgICAgICJsZW5kIiAgICAgDQpbMzddICJsaGVpZ2h0IiAgICJsam9pbiIgICAgICJsbWl0cmUiICAgICJsdHkiICAgICAgICJsd2QiICAgICAgICJtYWkiICAgICAgICJtYXIiICAgICAgICJtZXgiICAgICAgICJtZmNvbCIgICAgDQpbNDZdICJtZmciICAgICAgICJtZnJvdyIgICAgICJtZ3AiICAgICAgICJta2giICAgICAgICJuZXciICAgICAgICJvbWEiICAgICAgICJvbWQiICAgICAgICJvbWkiICAgICAgICJwYWdlIiAgICAgDQpbNTVdICJwY2giICAgICAgICJwaW4iICAgICAgICJwbHQiICAgICAgICJwcyIgICAgICAgICJwdHkiICAgICAgICJzbW8iICAgICAgICJzcnQiICAgICAgICJ0Y2siICAgICAgICJ0Y2wiICAgICAgDQpbNjRdICJ1c3IiICAgICAgICJ4YXhwIiAgICAgICJ4YXhzIiAgICAgICJ4YXh0IiAgICAgICJ4cGQiICAgICAgICJ5YXhwIiAgICAgICJ5YXhzIiAgICAgICJ5YXh0IiAgICAgICJ5bGJpYXMiICAgDQoNCmBgYHtyfQ0KcGxvdChhaXJxdWFsaXR5JFdpbmQsIGFpcnF1YWxpdHkkT3pvbmUsIHR5cGUgPSAibiIpDQpwb2ludHMobm90bWF5JFdpbmQsbm90bWF5JE96b25lLGNvbD0icmVkIixwY2g9MTgpDQpwb2ludHMobm90bWF5JFdpbmQsbm90bWF5JE96b25lLGNvbD0icmVkIixwY2g9OCkNCmxlZ2VuZCgidG9wcmlnaHQiLCBwY2g9YygxNyw4KSwgY29sPWMoImJsdWUiLCAicmVkIiksIGxlZ2VuZD1jKCJNYXkiLCAiT3RoZXIgTW9udGhzIikpDQphYmxpbmUodj1tZWRpYW4oYWlybWlsZXMkV2luZCksIGx0eT0yLGx3ZD0yKQ0KYGBgDQoNCmBgYHtyfQ0KIyBwbG90IHdpbmRvdyBmb3IgdHdvIHBsb3RzIHNpZGUgYnkgc2lkZQ0KcGFyKG1mcm93PWMoMSwyKSkNCnBsb3QoYWlycXVhbGl0eSRXaW5kLCBhaXJxdWFsaXR5JE96b25lLCBtYWluID0gIk96b25lIGFuZCBXaW5kIikNCnBsb3QoYWlycXVhbGl0eSRPem9uZSwgYWlycXVhbGl0eSRTb2xhci5SLCBtYWluID0gIk96b25lIGFuZCBTb2xhciBSYWRpYXRpb24iKQ0KYGBgDQoNCmBgYHtyfQ0KIyBzZXR0aW5nIHVwIHRoZSBwbG90IHdpbmRvdw0KcGFyKG1mcm93ID0gYygxLDMpLCBtYXIgPSBjKDQsNCwyLDEpLCBvbWEgPSBjKDAsMCwyLDApKQ0KcGxvdChhaXJxdWFsaXR5JFdpbmQsIGFpcnF1YWxpdHkkT3pvbmUsIG1haW4gPSAiT3pvbmUgYW5kIFdpbmQiKQ0KcGxvdChhaXJxdWFsaXR5JFNvbGFyLlIsIGFpcnF1YWxpdHkkT3pvbmUsIG1haW4gPSAiT3pvbmUgYW5kIFNvbGFyIFJhZGlhdGlvbiIpDQpwbG90KGFpcnF1YWxpdHkkVGVtcCwgYWlycXVhbGl0eSRPem9uZSwgbWFpbiA9ICJPem9uZSBhbmQgVGVtcGVyYXR1cmUiKQ0KIyBtYWluIHRpdGxlDQptdGV4dCgiT3pvbmUgYW5kIFdlYXRoZXIgaW4gTmV3IFlvcmsgQ2l0eSIsIG91dGVyID0gVFJVRSkNCmBgYA0KDQojIExhdHRpY2UgUGxvdHRpbmcgU3lzdGVtDQoNClBsb3R0aW5nIHN5c3RlbXM6IHNjYXR0ZXJwbG90IHh5cGxvdCgpLCBib3gtYW5kLXdoaXNrZXJzIHBsb3QgYndwbG90KCksIGJveHBsb3RzLCBoaXN0b2dyYW0gYW5kIG90aGVyIGxpa2Ugc3RyaXBwbG90LCBkb3RwbG90LCBzcGxvbSBhbmQgbGV2ZWxwbG90LiANCg0KfCBIZXJlJ3MgYW4gZXhhbXBsZSBvZiB0eXBpY2FsIGxhdHRpY2UgcGxvdCBjYWxsLCB4eXBsb3QoeSB+IHggfCBmICogZywgZGF0YSkuIFRoZSBmIGFuZCBnIHJlcHJlc2VudCB0aGUgb3B0aW9uYWwgY29uZGl0aW9uaW5nDQp8IHZhcmlhYmxlcy4gVGhlICogcmVwcmVzZW50cyBpbnRlcmFjdGlvbiBiZXR3ZWVuIHRoZW0uIFJlbWVtYmVyIHdoZW4gd2Ugc2FpZCB0aGF0IGxhdHRpY2UgaXMgZ29vZCBmb3IgcGxvdHRpbmcgbXVsdGl2YXJpYXRlIGRhdGE/DQp8IFRoYXQncyB3aGVyZSB0aGVzZSBjb25kaXRpb25pbmcgdmFyaWFibGVzIGNvbWUgaW50byBwbGF5Lg0KDQpgYGB7cn0NCiMgRXhhbXBsZSBvZiBhIGxhdHRpY2UgYmFzaWMgcGxvdCANCnh5cGxvdChPem9uZX5XaW5kLCBkYXRhID0gYWlycXVhbGl0eSwgcGNoID0gOCwgY29sID0gInJlZCIsIG1haW4gPSAiQmlnIEFwcGxlIERhdGEiKQ0KYGBgDQoNCmBgYHtyfQ0KIyBsYXR0aWNsZSBwbG90IHdpdGggYSBsYXlvdXQgdGhhdCBkZXZpZGVzIGl0IGludG8gbW9udGhzDQojIFNpbmNlIE1vbnRoIGlzIGEgbmFtZWQgY29sdW1uIG9mIHRoZSBhaXJxdWFsaXR5IGRhdGFmcmFtZSB3ZSBoYWQgdG8gdGVsbCBSIHRvIHRyZWF0IGl0IGFzIGEgZmFjdG9yLg0KeHlwbG90KE96b25lfldpbmQgfCBhcy5mYWN0b3IoTW9udGgpLCBkYXRhID0gYWlycXVhbGl0eSwgbGF5b3V0ID0gYyg1LDEpKQ0KI3h5cGxvdChPem9uZX5XaW5kIHwgTW9udGgsIGxheW91dCA9IGMoNSwxKSwgZGF0YSA9IGFpcnF1YWxpdHkpIGV4YW1wbGUgbGVzcyBpbmZvcm1hdGl2ZSA/DQpgYGANCg0KYGBge3J9DQojc2ltcGxlIHBsb3Qgc3RvcmVkIGluIHANCnAgPC0geHlwbG90KE96b25lfldpbmQsIGRhdGEgPSBhaXJxdWFsaXR5KQ0KIyByZXR1cm5zIGFsbCBmdW5jdGlvbiBvZiB0aGUgcGxvdA0KbmFtZXMocCkNCiMgcmV0dXJucyB0aGUgZm9ybXVsYXIgZG91YmxlIHNxdWFyZSBicmFja2V0cyBhcmUgaW1wb3J0YW50IGFuZCBxdW90ZXMNCnBbWyJmb3JtdWxhIl1dDQpgYGANCg0KYGBge3J9DQojIGxhdHRpY2UgcGxvdA0KeHlwbG90KHByaWNlfmNhcmF0IHwgY29sb3IqY3V0LCBkYXRhID0gZGlhbW9uZHMsIHN0cmlwID0gRkFMU0UsIHBjaCA9IDIwLCB4bGFiID0gbXl4bGFiLCB5bGFiID0gbXl5bGFiLCBtYWluID0gbXltYWluKQ0KYGBgDQoNCiMgV29ya2luZyB3aXRoIENvbG9ycw0KYGBge3J9DQojIHBhY2thZ2UgZ3JEZXZpY2VzDQpsaWJyYXJ5KGdyRGV2aWNlcykNCiMgZnVuY3Rpb24gY29sb3JzKCkgdG8gY29udGFpbnMgYWxsIGF2YWlsYWJsZSA2NTcgY29sb3JzDQpjb2xvcnMoKSB0byBjYWxsIGFsbCBjb2xvcnMuIA0KIyBwcmV2aWV3IG9mIDEwIGNvbG9ycw0Kc2FtcGxlKGNvbG9ycygpLCAxMCkNCiNUaGUgZmlyc3QsIGNvbG9yUmFtcCwgdGFrZXMgYSBwYWxldHRlIG9mIGNvbG9ycyAodGhlIGFyZ3VtZW50cykgYW5kIHJldHVybnMgYSBmdW5jdGlvbiB0aGF0IHRha2VzIHZhbHVlcyBiZXR3ZWVuIDAgYW5kIDEgYXMNCiMgYXJndW1lbnRzLiBUaGUgMCBhbmQgMSBjb3JyZXNwb25kIHRvIHRoZSBleHRyZW1lcyBvZiB0aGUgY29sb3IgcGFsZXR0ZS4gQXJndW1lbnRzIGJldHdlZW4gMCBhbmQgMSByZXR1cm4gYmxlbmRzIG9mIHRoZXNlIGV4dHJlbWVzLg0KY29sb3JSYW1wKCkNCiMgYXNzaWduaW5nIHNvbWUgY29sb3JzDQpwYWwgPC0gY29sb3JSYW1wKGMoInJlZCIsICJibHVlIikpDQojY2FsbGluZyBwYWwgd2l0aCAwDQpwYWwoMCkNCiMgWW91IHNlZSB0aGUgdmVjdG9yICgwLDAsMjU1KSB3aGljaCByZXByZXNlbnRzIHRoZSBoaWdoZXN0IGludGVuc2l0eSBvZiBibHVlLiBXaGF0IHZlY3RvciBkbyB5b3UgdGhpbmsgdGhlIGNhbGwgcGFsKC41KSB3aWxsIHJldHVybj8NCiMgKDEyNy41LDAsMTI3LjUpIHNpbmNlIGl0IGNhbiBvbmx5IHRha2UgMCBvciAxIHRoZSBjYWxsIHRvIC41IHJldHVybiB0aGUgaGFsZiBvZiB0aGUgY29sb3INCg0KIyBUaGUgYXJndW1lbnQgeW91IHBhc3MgdG8gdGhlIHJldHVybmVkIGZ1bmN0aW9uIHNwZWNpZmllcyB0aGUgbnVtYmVyIG9mIGNvbG9ycyB5b3Ugd2FudCByZXR1cm5lZC4gRWFjaCBlbGVtZW50IG9mIHRoZSByZXR1cm5lZCB2ZWN0b3INCiMgaXMgYSAyNCBiaXQgbnVtYmVyLCByZXByZXNlbnRlZCBhcyA2IGhleGFkZWNpbWFsIGNoYXJhY3RlcnMsIHdoaWNoIHJhbmdlIGZyb20gMCB0byBGLiBUaGlzIHNldCBvZiA2IGhleCBjaGFyYWN0ZXJzIHJlcHJlc2VudHMgdGhlDQojIGludGVuc2l0aWVzIG9mIHJlZCwgZ3JlZW4sIGFuZCBibHVlLCAyIGNoYXJhY3RlcnMgZm9yIGVhY2ggY29sb3IuDQpwMSA8LSBjb2xvclJhbXBQYWxldHRlKGMoInJlZCIsICJibHVlIikpDQpwMSgyKQ0KcDIgPC0gY29sb3JSYW1wUGFsZXR0ZShjKCJyZWQiLCAieWVsbG93IikpDQojIGZ1bmN0aW9uIHRvIGNoZWNrIG91dA0KY29sb3Iuc2NhbGUoKQ0KIyBzaG93TWUgY29udGFpbnMgdGhlIGNvbG9yLnNjYWxlIGZ1bmN0aW9uIA0Kc2hvd01lKHAxKDIwKSkNCiNXZSBtZW50aW9uZWQgYmVmb3JlIHRoYXQgY29sb3JSYW1wIChhbmQgY29sb3JSYW1wUGFsZXR0ZSkgY291bGQgcmV0dXJuIGEgMyBvciA0IGxvbmcgdmVjdG9yIG9mIGNvbG9ycy4gV2Ugc2F3IDMtbG9uZyB2ZWN0b3JzDQojIHJldHVybmVkIGluZGljYXRpbmcgcmVkLCBncmVlbiwgYW5kIGJsdWUgaW50ZW5zaXRpZXMuIFdoYXQgd291bGQgdGhlIDR0aCBlbnRyeSBiZT8NCnAzIDwtIGNvbG9yUmFtcFBhbGV0dGUoYygiYmx1ZSIsICJncmVlbiIpLCBhbHBoYSA9IC41KQ0KIyBzaW1wbGUgc2NhdHRsZXJwbG90IHdpdGggYXNzaWduZWQgcmdiIGNvbG9ycw0KcGxvdCh4LCB5LCBwY2ggPSAxOSwgY29sID0gcmdiKDAsLjUsLjUpKQ0KIyA0dGggcmdiIGFyZ3VtZW50IGlzIGNhbGwgdG8gYWxwaGENCnBsb3QoeCwgeSwgcGNoID0gMTksIGNvbCA9IHJnYigwLC41LC41LC4zKSkNCmBgYA0KDQpgYGB7cn0NCmxpYnJhcnkoUkNvbG9yQnJld2VyKQ0KI091ciBsYXN0IHRvcGljIGZvciB0aGlzIGxlc3NvbiBpcyB0aGUgUkNvbG9yQnJld2VyIFBhY2thZ2UsIGF2YWlsYWJsZSBvbiBDUkFOLCB0aGF0IGNvbnRhaW5zIGludGVyZXN0aW5nIGFuZCB1c2VmdWwgY29sb3IgcGFsZXR0ZXMsDQojIG9mIHdoaWNoIHRoZXJlIGFyZSAzIHR5cGVzLCBzZXF1ZW50aWFsLCBkaXZlcmdlbnQsIGFuZCBxdWFsaXRhdGl2ZS4gV2hpY2ggb25lIHlvdSB3b3VsZCBjaG9vc2UgdG8gdXNlIGRlcGVuZHMgb24geW91ciBkYXRhLg0KDQpjb2xzIDwtIGJyZXdlci5wYWwoMywgIkJ1R24iKQ0KcGFsIDwtIGNvbG9yUmFtcFBhbGV0dGUoY29scykNCnNob3dNZShwYWwoMjApKQ0KIyBwcm92ZWRlcyBhIHBsb3Qgd2l0aCBkZW5zaXR5DQppbWFnZSh2b2xjYW5vLCBjb2wgPSBwYWwoMjApKQ0KIyBkaWZmZXJlbnQgY29sb3IgcGFja2FnZQ0KaW1hZ2Uodm9sY2FubywgY29sID0gcDEoMjApKQ0KDQojIGFscGhhIG9mIHRoZSByZ2IoKSBmdW5jdGlvbiByZXRydW5zIGRlbnNpdHkNCmBgYA0KDQo=</div>
 
 
 

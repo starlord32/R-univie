@@ -1,9 +1,10 @@
 ---
 title: "Data manipulation with dplyr"
 author: "Daniel Stoxreiter"
+output: pdf_document
 ---
 
-**NB:** The worksheet has beed developed and prepared by Lincoln Mullen. Source: Lincoln A. Mullen, *Computational Historical Thinking: With Applications in R (2018–)*: <http://dh-r.lincolnmullen.com>.
+**NB:** The worksheet has beed developed and prepared by Lincoln Mullen. Source: Lincoln A. Mullen, *Computational Historical Thinking: With Applications in R (2018)*: <http://dh-r.lincolnmullen.com>.
 
 The best way to learn R or computational history is to practice. These worksheets contain a series of questions designed to teach you about R or different computational methods. The worksheets are R Markdown documents that include text and code together. The places where you are expected to answer questions are marked like this.
 
@@ -22,20 +23,14 @@ We will begin by loading the necessary packages and data. We will use the `metho
 ```{r, message=FALSE}
 library(tidyverse)
 library(historydata)
-data(methodists)
-methodists
+load("C:/Users/Daniel/Documents/R_course/R-univie/lession5/methodists.rda")
 ```
-
-```{r}
-
-```
-
 
 ## Selecting columns (`select()`)
 
 The first data manipulation verb that we are going to use is `select()`. This function lets us pass the names of the columns that we want to keep. 
 
-```{r}
+```{r, results="hide"}
 methodists %>% 
   select(year, meeting, members_total)
 ```
@@ -46,42 +41,46 @@ Read the documentation for this function, `?select`.
 
 (@) Select the columns for `year`, `meeting`, as well as all columns that begin with the word `members_`.
 
-```{r}
-
+```{r, results="hide"}
+methodists %>%
+  select(year, meeting, contains("members_"))
 ```
 
 (@) Remove the column `url`.
 
-```{r}
-
+```{r, results="hide"}
+methodists %>%
+  select(-url)
 ```
 
 ## Filtering rows (`filter()`)
 
 The `select()` function lets us pick certain columns. The `filter()` function lets select certain rows based on logical conditions. For example, here we get the only the meetings where the total number of members is at greater than 1,000.
 
-```{r}
+```{r, results="hide"}
 methodists %>% 
   filter(members_total > 1000)
 ```
 
 (@) Get just the rows from New York in 1800.
 
-```{r}
-
+```{r, results="hide"}
+methodists %>%
+  filter(state == "New York", year == 1800)
 ```
 
 (@) Which Methodist meetings had only black members?
 
-```{r}
-
+```{r, results="hide"}
+methodists %>%
+  filter(members_black > 0, members_white == 0)
 ```
 
 ## Creating new columns (`mutate()`)
 
 Very often one will want to create a new column based on other columns in the data. For instance, in our Methodist data, there is a column called `year`, but that column represents the year that the minutes were reported. The membership figures are actually for the previous year. Here we create a new column called `year_recorded`, where each value is one less than in `year`.
 
-```{r}
+```{r, results="hide"}
 methodists %>% 
   mutate(year_recorded = year - 1) %>% 
   select(year, year_recorded, meeting)
@@ -91,29 +90,38 @@ Notice that we chained the data manipulation functions using the pipe (`%>%`). T
 
 (@) Create two new columns, one with the percentage of white members, and one with the percentage of black members.
 
-```{r}
-
+```{r, results="hide"}
+methodists %>%
+  mutate(percentage_white =  members_white / members_total * 100) %>%
+  mutate(percentage_black = members_black / members_total * 100) %>%
+  select(year, state, meeting, percentage_black, percentage_white)
 ```
 
 ## Sorting columns (`arrange()`)
 
 Often we want to sort a data frame by one of its columns. This can be done with the verb `arrange()`. By default `arrange()` will sort from least to greatest; we can use the function `desc()` to sort from greatest to least. In this example, we sort the data frame to get the meetings with the highest number of white members.
 
-```{r}
+```{r, results="hide"}
 methodists %>% 
   arrange(desc(members_white))
 ```
 
 (@) Which meetings had the highest number of black members? Select only the necessary columns so that the results print in a meaningful way.
 
-```{r}
-
+```{r, results="hide"}
+methodists %>%
+  arrange(desc(members_black)) %>%
+  select(year, state, meeting, members_black)
 ```
 
 (@) Which meetings had the high percentage of black members without being entirely black?
 
-```{r}
-
+```{r, results="hide"}
+methodists %>%
+  mutate(percentage_black = members_black / members_total * 100) %>%
+  filter(percentage_black < 100) %>%
+  arrange(desc(percentage_black)) %>%
+  select(year, state, meeting, percentage_black, members_black, members_white)
 ```
 
 ## Split-apply-combine (`group_by()`)
@@ -124,7 +132,7 @@ We can solve this kind of problem with what Hadley Wickham calls the "split-appl
 
 Take a simple example using the `top_n()` function, which returns the top `n` (in this case, top 1) results for a particular column. After selecting a few columns, we get the row in the data frame which has the highest value for `members_black`.
 
-```{r}
+```{r, results="hide"}
 methodists %>% 
   select(year, meeting, members_total, members_black) %>% 
   top_n(1, members_black)
@@ -132,7 +140,7 @@ methodists %>%
 
 We can change how that code works by using the `group_by()` function. Now we get the one row for each unique year in the dataset.
 
-```{r}
+```{r, results="hide"}
 methodists %>% 
   select(year, meeting, members_total, members_black) %>% 
   group_by(year) %>% 
@@ -144,25 +152,42 @@ We get the same results more concisely and reliably, though the steps of "split-
 (@) For each year, which was the biggest circuit?
 
 ```{r}
-
+methodists %>%
+  select(year, meeting, members_total) %>%
+  group_by(year) %>%
+  top_n(1, members_total)
 ```
 
 (@) For each year, which church had the biggest percentage of black members without being entirely black?
 
 ```{r}
-
+methodists %>%
+  select(year, meeting, members_black, members_white, members_total) %>%
+  mutate(percentage_black = members_black / members_total * 100) %>%
+  filter(percentage_black < 100) %>%  
+  group_by(year) %>%
+  top_n(1, percentage_black)
 ```
 
 (@) For the year 1825, what was the biggest meeting in each conference? In each district?
 
 ```{r}
-
+methodists %>%
+  select(year, conference, district, meeting, members_total) %>%
+  filter(year == 1825) %>%
+  #group_by(conference) %>%
+  group_by(district) %>%
+  top_n(1, members_total)
 ```
 
 (@) For each year, what was the biggest church in the Baltimore conference?
 
 ```{r}
-
+methodists %>%
+  select(year, conference, meeting, members_total) %>%
+  filter(conference == "Baltimore") %>%
+  group_by(year) %>%
+  top_n(1, members_total)
 ```
 
 ## Summarizing or aggregating data (`summarize()`)
@@ -190,13 +215,19 @@ methodists %>%
 (@) How many meetings were there in each conference in each year since 1802?
 
 ```{r}
-
+methodists %>%
+  filter(year >= 1802) %>%
+  group_by(year, conference) %>%
+  summarize(total_meetings = n())
 ```
 
 (@) What is the average number of white, black, Indian and total members for each year since 1786?
 
 ```{r}
-
+methodists %>%
+  filter(year >= 1786) %>%
+  group_by(year) %>%
+  summarise(avg_white = mean(members_white), avg_black = mean(members_black), avg_indian = mean(members_indian), avg_total = mean(members_total))
 ```
 
 Being able to create summaries like these is essential for visualizing the data.
