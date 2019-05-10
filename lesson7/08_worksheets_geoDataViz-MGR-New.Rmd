@@ -10,7 +10,7 @@ author: "Daniel Stoxreiter"
 We will need some new libraries that are developed for working with maps. You may want to install those libraries outside of the notebook, so that it does not try to reinstall them everytime you `knit` it.
 
 ```{r}
-#install.packages(c("cowplot", "googleway", "ggplot2", "ggrepel", "ggspatial", "libwgeom", "sf", "rnaturalearth", "rnaturalearthdata", "rnaturalearthhires"))
+#install.packages(c("cowplot", "googleway", "ggplot2", "ggrepel", "ggspatial", "libwgeom", "sf", "rnaturalearth", "rnaturalearthdata", "rnaturalearthhires", "rgeos"))
 ```
 
 
@@ -109,12 +109,17 @@ Let's get some data first. The data comes from: <http://atlantides.org/downloads
 
 ```{r message=TRUE}
 
-#data_link <- "http://atlantides.org/downloads/pleiades/dumps/pleiades-locations-latest.csv.gz"
-#download.file(data_link,"pleiades-locations-latest.csv.gz")
+data_link <- "http://atlantides.org/downloads/pleiades/dumps/pleiades-locations-latest.csv.gz"
+download.file(data_link,"pleiades-locations-latest.csv.gz")
 locsRaw <- read.csv(gzfile("pleiades-locations-latest.csv.gz"),stringsAsFactors=F,header=T,sep=',')
 locsRaw
 
 ```
+
+```{r}
+unique(locsRaw$title)
+```
+
 
 The data contains *geolocations*, which are also categorized chronologically, The chronology is rather tricky: there are several main periods, but they are not used discretionally as many places often exist in multiple periods. These look as follows:
 
@@ -162,7 +167,7 @@ unique(locsRaw$featureType)
 
 You can use this line of code to check what kind of information is stored in other columns.
 
-Now we can select some specific feature we are interested in and add this data to our cartogram. As you can see, however, the data is quite messy and makes things rather difficult. So, for filtering our data it is best to use `regular expressions` like shown below. You can use `nrow()` to count how many of those items are in the data—mapping some low frequency objects may not be very informative.
+Now we can select some specific feature we are interested in and add this data to our cartogram. As you can see, however, the data is quite messy and makes things rather difficult. So, for filtering our data it is best to use `regular expressions` like shown below. You can use `nrow()` to count how many of those items are in the data mapping some low frequency objects may not be very informative.
 
 ```{r}
 locs=locsRaw[ with(locsRaw, grepl("\\bfort\\b",featureType)),]
@@ -225,7 +230,7 @@ ggsave(file="forts_in_austria.png",plot=ourPlot,dpi=300,width=7,height=5)
 
 ```
 
-By the way, we can store the plot into a variable and then reuse it. This is convenient for saving: we can use `ggsave()`—as shown above—to save our plot into a separate image. Check the folder with your R Notebook—there should be a file called `forts_in_austria.png`. There is a variety of parameters that you can adjust to get the exact quality of your image that you need. Check `?ggsave` for more details (or `google` it).
+By the way, we can store the plot into a variable and then reuse it. This is convenient for saving: we can use `ggsave()` as shown above to save our plot into a separate image. Check the folder with your R Notebook there should be a file called `forts_in_austria.png`. There is a variety of parameters that you can adjust to get the exact quality of your image that you need. Check `?ggsave` for more details (or `google` it).
 
 Now, let's do some exercises.
 
@@ -236,11 +241,6 @@ Now, let's do some exercises.
 * `hellenistic-republican` (330-30BC)
 * `roman` (30BC-300CE)
 * `late-antique` (300-640CE)
-
-```{r}
-summary(austria)
-```
-
 
 ```{r}
 
@@ -280,24 +280,31 @@ unique(world$admin)
 
 ```{r}
 # narrow the data down to long lat were the wall is
-world %>%
-  filter()
+library(dplyr)
+locsRaw
+hadrian <- locsRaw %>%
+  filter(reprLong > -5 & reprLong < 1) %>%
+  filter(reprLat > 54.5 & reprLat < 55.5)
+hadrian
+unique(hadrian$featureType)
 ```
 
 
 ```{r}
+library(ggplot2)
+library(ggspatial)
 gb <- subset(world, admin == "United Kingdom")
 
 locs=locsRaw[ with(locsRaw, grepl("\\bfort\\b",featureType)),]
-locsWall=locs[ with(locs, grepl("\\bwall\\b",featureType)),]
+locsWall=locsRaw[ with(locsRaw, grepl("\\bunknown\\b",featureType)),]
 
-ourPlot <- ggplot(data = gb) +
+ourPlot <- ggplot(data = world) +
     geom_sf(fill="grey70", color="grey50") +
-    geom_point(data=locsRaw,color="grey20",alpha=.25,size=.15,aes(y=reprLat,x=reprLong)) +
+    #geom_point(data=locsRaw,color="pink",alpha=.25,size=.15,aes(y=reprLat,x=reprLong)) +
     geom_point(data=locs,color="red",alpha=.75,size=1,aes(y=reprLat,x=reprLong)) +
     geom_point(data=locsWall,color="blue",alpha=.75,size=1,aes(y=reprLat,x=reprLong)) +
-    geom_point(color="black",alpha=1,shape=1, size=3,aes(y=48.210033,x=16.363449)) +
-    geom_text(x=16.363449+.5, y=48.210033+.1, label="vienna", color="black", size=4) +
+    #geom_point(color="black",alpha=1,shape=1, size=3,aes(y=48.210033,x=16.363449)) +
+    #geom_text(x=16.363449+.5, y=48.210033+.1, label="vienna", color="black", size=4) +
     coord_sf(xlim = c(-4,0), ylim = c(53,57), expand = FALSE) +
     theme(panel.grid.major = element_line(color = gray(.1), linetype = "dotted", size = 0.5),
           panel.background = element_rect(fill = "grey90")) +
@@ -307,37 +314,188 @@ ourPlot <- ggplot(data = gb) +
         pad_x = unit(0.0, "in"), pad_y = unit(0.2, "in"),
         style = north_arrow_fancy_orienteering) +
     #xlab("") + ylab("") +
-    ggtitle("Ancient and Early Medieval Forts", subtitle = "Zooming on Modern Austria")
+    ggtitle("Hadrians Wall or THE WALL", subtitle = "watch out for white walkers")
 
 ourPlot
-ggsave(file="forts_in_united_kingdom.png",plot=ourPlot,dpi=300,width=7,height=5)
+ggsave(file="forts_in_hadrians_wall.png",plot=ourPlot,dpi=300,width=7,height=5)
 
 ```
 
 (@) Explore Pleiades dataset and create three maps of something interesting that you discover.
 
-(@) Plot 1: *add some explanations here* (but also do not forget to add all necessary information into the map/cartogram).
+(@) Plot 1: *Plot that shows Europe, North Africa and parts of Asia with an timelaps of forts that were build in different timeperiods.* (but also do not forget to add all necessary information into the map/cartogram).
 
 ```{r}
+#install.packages("gifski")
+library(gifski)
+library(gganimate)
+library(ggplot2)
+library(ggspatial)
+library(dplyr)
 
+# This first part search for regular expression for all time periods of "timePeriodsKeys" that are relevant.
+
+locsPeriods=locsRaw[ with(locsRaw, grepl("\\broman\\b|\\bclassical\\b|\\barchaic\\b|\\blate-antique\\b|\\hellenistic-republican\\b",timePeriodsKeys)),]
+
+# The second part searches for a specifc first letter in "timePeriods" or a specifc first letter plus any other following letter. E.g. R = Roman
+# RL = Roman,Late-Antique
+
+locsArchaic=locsPeriods[ with(locsPeriods, grepl("^A|A\\w+",timePeriods)),]
+locsRoman=locsPeriods[ with(locsPeriods, grepl("^R|R\\w+",timePeriods)),]
+locsClassical=locsPeriods[ with(locsPeriods, grepl("^C|C\\w+",timePeriods)),]
+locsHellenisticRepublican=locsPeriods[ with(locsPeriods, grepl("^H|H\\w+",timePeriods)),]
+locsLateAntique=locsPeriods[ with(locsPeriods, grepl("^L|L\\w+",timePeriods)),]
+
+# Before I could work on the plot I had to clean the data and add a new column called "epoch". The new variable assigns observatoins to one specific timeperiod.
+# I assumed that the varialbe "timePeriods" does provide shortcuts for timePeriodsKeys and the first letter in "timePeriods" would be the period in which a fort, # or settlement, or any sight was built first. E.g. "RL" = "Romen,Late-Antique" will be assiged to the value "roman". 
+
+locsArchaic <- locsArchaic %>%
+  select(uid) %>%
+  mutate(epoch = "archaic")
+
+locsRoman <- locsRoman %>%
+  select(uid) %>%
+  mutate(epoch = "roman")
+
+locsClassical <- locsClassical %>%
+  select(uid) %>%
+  mutate(epoch = "classical")
+
+locsHellenisticRepublican <- locsHellenisticRepublican %>%
+  select(uid) %>%
+  mutate(epoch = "hellenistic-republican")
+
+locsLateAntique <- locsLateAntique %>%
+  select(uid) %>%
+  mutate(epoch = "late-antique")
+
+# The following section joins the resulting different data frames fully into one
+
+joinLocs <- full_join(locsClassical, locsArchaic)
+joinLocs <- full_join(joinLocs, locsRoman)
+joinLocs <- full_join(joinLocs, locsLateAntique)
+joinLocs <- full_join(joinLocs, locsHellenisticRepublican)
+
+# The next section left_joins the larger database in "locsPeriods" with the newly "joinLocs" data frame.
+
+joinedLocs <- left_join(locsPeriods, joinLocs, by = "uid")
+
+# Finally filter for specifc timeperiods to avoid NAs
+
+locsNicelyCleaned <- joinedLocs %>%
+  filter(epoch == c("classical", "roman", "late-antique", "hellenistic-republican", "archaic"))
 ```
 
-(@) Plot 2: *add some explanations here* (but also do not forget to add all necessary information into the map/cartogram).
 
 ```{r}
+# searches for "fort" with regular expression to receive forts only
+locs=locsNicelyCleaned[ with(locsNicelyCleaned, grepl("\\bfort\\b",featureType)),]
 
+# Plotting
+
+# creates a plot with a world map
+ourPlot <- ggplot(data = world) +
+    # creates the colors for the world map
+    geom_sf(fill="grey70", color="grey50") +
+    # creates plottings points from the "locs" dataframe and adds a dot on specific coordinates
+    geom_point(data=locs,alpha=.7,size=2,aes(y=reprLat,x=reprLong,color=epoch)) +
+    # defines the area of the world map that is displayed
+    coord_sf(xlim = c(-15,50), ylim = c(20,75), expand = FALSE) +
+    # defines the theme of the plot
+    theme(panel.grid.major = element_line(color = gray(.1), linetype = "dotted", size = 0.5),
+          panel.background = element_rect(fill = "grey90")) +
+    # assigns names to x and y axis
+    xlab("Longitude") + ylab("Latitude") +
+    # creates a annotation scale
+    annotation_scale(location = "bl", width_hint = 0.25) +
+    # creates an north arrow for the annotation
+    annotation_north_arrow(location = "bl", which_north = "true", 
+        pad_x = unit(0.0, "in"), pad_y = unit(0.2, "in"),
+        style = north_arrow_fancy_orienteering) +
+    #xlab("") + ylab("") +
+    # creates the title for the plot
+    ggtitle("Forts timelaps {closest_state}", subtitle = "Frame {frame} of {nframes}")+
+    # changes the title for the colors which are the different timeperiods of the epoch column
+    labs(color = "Timeperiods")+
+    # animation that uses the  new "epoch" column to display forts of various timperiods one by one
+    transition_states(epoch,
+                      transition_length = 3,
+                      state_length = 100,
+                      wrap = FALSE)+
+    enter_fade()+
+    exit_fade()
+
+ourPlot
+ggsave(file="forts_in_different_periods.png",plot=ourPlot,dpi=300,width=7,height=5)
+```
+
+
+(@) Plot 2: *This graphs shows Churches that were build in different timeperiods.* (but also do not forget to add all necessary information into the map/cartogram).
+
+```{r}
+locsChurch=locsNicelyCleaned[ with(locsNicelyCleaned, grepl("\\bchurch\\b",featureType)),]
+
+ourPlot <- ggplot(data = world) +
+    geom_sf(fill="grey70", color="grey50") +
+    geom_point(data=locsChurch,size=2,aes(y=reprLat,x=reprLong,color=epoch)) +
+    coord_sf(xlim = c(-15,50), ylim = c(20,75), expand = FALSE) +
+    theme(panel.grid.major = element_line(color = gray(.1), linetype = "dotted", size = 0.5),
+          panel.background = element_rect(fill = "grey90")) +
+    xlab("Longitude") + ylab("Latitude") +
+    annotation_scale(location = "bl", width_hint = 0.25) +
+    annotation_north_arrow(location = "bl", which_north = "true", 
+        pad_x = unit(0.0, "in"), pad_y = unit(0.2, "in"),
+        style = north_arrow_fancy_orienteering) +
+    #xlab("") + ylab("") +
+    ggtitle("Church timelaps {closest_state}", subtitle = "Frame {frame} of {nframes}")+
+    labs(color = "Timeperiods")+
+    transition_states(epoch,
+                      transition_length = 3,
+                      state_length = 100,
+                      wrap = FALSE)+
+    enter_fade()+
+    exit_fade()
+
+ourPlot
+ggsave(file="churches_in_different_timeperiods.png",plot=ourPlot,dpi=300,width=7,height=5)
 ```
 
 (@) Plot 3: *add some explanations here* (but also do not forget to add all necessary information into the map/cartogram).
 
 ```{r}
+locsSettlement=locsNicelyCleaned[ with(locsNicelyCleaned, grepl("\\bsettlement\\b",featureType)),]
+locsChurch=locsNicelyCleaned[ with(locsNicelyCleaned, grepl("\\bchurch\\b",featureType)),]
 
+ourPlot <- ggplot(data = world) +
+    geom_sf(fill="grey70", color="grey50") +
+    geom_point(data=locsChurch,color="red",size=5,aes(y=reprLat,x=reprLong)) +
+    geom_point(data=locsSettlement,alpha=.7,size=2,aes(y=reprLat,x=reprLong,color=epoch)) +
+    coord_sf(xlim = c(-15,50), ylim = c(20,75), expand = FALSE) +
+    theme(panel.grid.major = element_line(color = gray(.1), linetype = "dotted", size = 0.5),
+          panel.background = element_rect(fill = "grey90")) +
+    xlab("Longitude") + ylab("Latitude") +
+    annotation_scale(location = "bl", width_hint = 0.25) +
+    annotation_north_arrow(location = "bl", which_north = "true", 
+        pad_x = unit(0.0, "in"), pad_y = unit(0.2, "in"),
+        style = north_arrow_fancy_orienteering) +
+    #xlab("") + ylab("") +
+    ggtitle("Settlements and Churches timelaps of {closest_state} period", subtitle = "Frame {frame} of {nframes}")+
+    labs(color = "Timeperiods")+
+    transition_states(epoch,
+                      transition_length = 3,
+                      state_length = 100,
+                      wrap = FALSE)+
+    enter_fade()+
+    exit_fade()
+
+ourPlot
+ggsave(file="settlements_in_different_timeperiods.png",plot=ourPlot,dpi=300,width=7,height=5)
 ```
 
 
 ## `Europop` package
 
-The `europop` package has information on population of european cities, which we can now map. There are two main tables:  `europop`—with the historical populations of European cities, and `city_coords`—with the latitudes and longitudes of those cities. With this new data you now should be able to map European cities. Your task is as follows:
+The `europop` package has information on population of european cities, which we can now map. There are two main tables:  `europop` with the historical populations of European cities, and `city_coords`âwith the latitudes and longitudes of those cities. With this new data you now should be able to map European cities. Your task is as follows:
 
 * create maps of 5 different periods (i.e., 5 maps)
 * colorcode your map by regions
@@ -346,16 +504,245 @@ The `europop` package has information on population of european cities, which we
 * you may need to adjust your legend (`google` it!) 
 
 ```{r}
+#install.packages("europop")
+library(dplyr)
 library(tidyverse)
-library(europop) #install.packages("europop")
-  
-# add your code after this line...
+library(europop)
+library(ggplot2)
+library(ggspatial)
+library(gganimate)
+unique(europop$year)
+unique(europop$region)
+biggestCities <- europop %>%
+  filter(population >= 305 & year == 1800)
+biggestCities
+
+new_data <- data.frame("region" = c("Scandinavia", "England and Wales", "Scotland", "Ireland", "The Netherlands", "Belgium", "Germany", "France", "Switzerland", "Northern Italy", "Central Italy", "Souther Italy", "Spain", "Portual", "Austria and Czechoslovakia", "Poland"), "long" = c(15.150000, -1.210000, -3.900000, -7.480000, 6.220000, 4.810000, 9.800000, 2.250000, 8.060000, 10.170000, 12.354946, 16.581014, -2.939996, -8.346877, 16.456718, 17.009529), "lat" = c(61.400000, 51.980000, 56.960000, 52.690000, 52.990000, 50.900000, 50.500000, 48.290000, 46.890000, 42.337603, 42.139779, 39.170254, 39.664747, 48.686041, 48.509328, 51.862042))
+
+europopCoor <- left_join(europop, new_data, by = "region")
+europopCoor
+
+ourPlot <- ggplot(data = world) +
+    geom_sf(fill="grey80", color="grey50") +
+    geom_count(data=europopCoor,alpha=.6,aes(y=lat,x=long,color=region,size=population), na.rm=TRUE) +
+    geom_count(data=europopCoor,color="red",alpha=.6,aes(y=63,x=0,size=population), na.rm=TRUE) +  
+    coord_sf(xlim = c(-13,30), ylim = c(35,70), expand = FALSE) +
+    geom_text(x=-0.241680+.5, y=51.528558+.1, label="London", color="black", size=4) +
+    geom_text(x=2.2770205+.5, y=48.858837+.1, label="Paris", color="black", size=4) +
+    geom_text(x=14.1765627+.5, y=40.853912+.1, label="Napoli", color="black", size=4) +
+    geom_text(x=4.828583+.5, y=52.354627+.1, label="Amsterdam", color="black", size=4) +
+    geom_text(x=12.395915+.5, y=41.909986+.1, label="Rome", color="black", size=4) +
+    geom_text(x=-6.385785+.5, y=53.324238+.1, label="Dublin", color="black", size=4) +
+    geom_text(x=-3.819619+.5, y=40.437869+.1, label="Madrid", color="black", size=4) +
+    geom_text(x=16.363449+.5, y=48.210033+.1, label="vienna", color="black", size=4) +
+    geom_text(x=13.284650+.5, y=52.506761+.1, label="Berlin", color="black", size=4) +
+    geom_text(x=-9.195222+.5, y=38.743621+.1, label="Lisboa", color="black", size=4) +
+    theme(panel.grid.major = element_line(color = gray(.1), linetype = "dotted", size = 0.5),
+          panel.background = element_rect(fill = "grey90")) +
+    xlab("Longitude") + ylab("Latitude") +
+    annotation_scale(location = "br", width_hint = 0.25) +
+    annotation_north_arrow(location = "br", which_north = "true", 
+        pad_x = unit(0.0, "in"), pad_y = unit(0.2, "in"),
+        style = north_arrow_fancy_orienteering) +
+    #xlab("") + ylab("") +
+    ggtitle("Population timelaps of {closest_state}", subtitle = "Frame {frame} of {nframes}")+
+    labs(color = "Regions", size = "Aggregated Population")+
+    transition_states(year,
+                      transition_length = 5,
+                      state_length = 100,
+                      wrap = FALSE)+
+    enter_fade()+
+    exit_fade()
+
+ourPlot
+ggsave(file="european_population_timelaps.png",plot=ourPlot,dpi=300,width=7,height=5)
 
 ```
 
+```{r}
+library(dplyr)
+library(tidyverse)
+library(europop)
+library(ggplot2)
+library(ggspatial)
+library(gganimate)
+unique(europop$year)
+biggestCities <- europop %>%
+  filter(population >= 150)
+
+europopRen <- europop %>%
+  filter(year == 1500) %>%
+  mutate(period = "Rennaissance")
+  
+europopRef <- europop %>%
+  filter(year == 1550) %>%
+  mutate(period = "Reformation")
+
+europopWar <- europop %>%
+  filter(year == 1600) %>%
+  mutate(period = "30 Years War")
+
+europopWar2 <- europop %>%
+  filter(year == 1650) %>%
+  mutate(period = "30 Years War")
+
+europopRom <- europop %>%
+  filter(year == 1700) %>%
+  mutate(period = "Romatic")
+
+europopRom2 <- europop %>%
+  filter(year == 1750) %>%
+  mutate(period = "Romatic")
+
+europopHist <- europop %>%
+  filter(year == 1800) %>%
+  mutate(period = "Historicism")
+
+europopPeriods <- full_join(europopRen, europopRef)
+europopPeriods <- full_join(europopPeriods, europopWar)
+europopPeriods <- full_join(europopPeriods, europopWar2)
+europopPeriods <- full_join(europopPeriods, europopRom)
+europopPeriods <- full_join(europopPeriods, europopRom2)
+europopPeriods <- full_join(europopPeriods, europopHist)
+europopPeriodsCoor <- left_join(europopCoor, europopPeriods)
+```
+
+```{r}
+ourPlot <- ggplot(data = world) +
+    geom_sf(fill="grey80", color="grey50") +
+    geom_count(data=europopPeriodsCoor,alpha=.6,aes(y=lat,x=long,color=region,size=population), na.rm=TRUE) +
+    coord_sf(xlim = c(-13,30), ylim = c(35,70), expand = FALSE) +
+    geom_text(x=-0.241680+.5, y=51.528558-.3, label="London", color="black", size=4) +
+    geom_point(x=-0.241680+.5, y=51.528558, color="black", size=2, shape=2) +
+    geom_text(x=2.2770205+.5, y=48.858837-.3, label="Paris", color="black", size=4) +
+    geom_point(x=2.2770205+.5, y=48.858837, color="black", size=2, shape=2) +  
+    geom_text(x=14.1765627+.5, y=40.853912-.3, label="Napoli", color="black", size=4) +
+    geom_point(x=14.1765627+.5, y=40.853912, color="black", size=2, shape=2) +  
+    geom_text(x=4.828583+.5, y=52.354627-.3, label="Amsterdam", color="black", size=4) +
+    geom_point(x=4.828583+.5, y=52.354627, color="black", size=2, shape=2) +  
+    geom_text(x=12.395915+.5, y=41.909986-.3, label="Rome", color="black", size=4) +
+    geom_point(x=12.395915+.5, y=41.909986, color="black", size=2, shape=2) +  
+    geom_text(x=-6.385785+.5, y=53.324238-.3, label="Dublin", color="black", size=4) +
+    geom_point(x=-6.385785+.5, y=53.324238, color="black", size=2, shape=2) + 
+    geom_text(x=-3.819619+.5, y=40.437869+.3, label="Madrid", color="black", size=4) +
+    geom_point(x=-3.819619+.5, y=40.437869, color="black", size=2, shape=2) +
+    geom_text(x=16.363449+.5, y=48.210033-.3, label="vienna", color="black", size=4) +
+    geom_point(x=16.363449+.5, y=48.210033, color="black", size=2, shape=2) +  
+    geom_text(x=13.284650+.5, y=52.506761-.3, label="Berlin", color="black", size=4) +
+    geom_point(x=13.284650+.5, y=52.506761, color="black", size=2, shape=2) +  
+    geom_text(x=-9.195222+.5, y=38.743621-.3, label="Lisboa", color="black", size=4) +
+    geom_point(x=-9.195222+.5, y=38.743621, color="black", size=2, shape=2) +
+    theme(panel.grid.major = element_line(color = gray(.1), linetype = "dotted", size = 0.5),
+          panel.background = element_rect(fill = "grey90")) +
+    xlab("Longitude") + ylab("Latitude") +
+    annotation_scale(location = "br", width_hint = 0.25) +
+    annotation_north_arrow(location = "br", which_north = "true", 
+        pad_x = unit(0.0, "in"), pad_y = unit(0.2, "in"),
+        style = north_arrow_fancy_orienteering) +
+    #xlab("") + ylab("") +
+    ggtitle("Population timelaps during {closest_state}", subtitle = "Frame {frame} of {nframes}")+
+    labs(color = "Periods", size = "Aggregated Population")+
+    transition_states(period,
+                      transition_length = 5,
+                      state_length = 100,
+                      wrap = FALSE)+
+    enter_fade()+
+    exit_fade()
+
+ourPlot
+ggsave(file="european_population_timelaps_periods.png",plot=ourPlot,dpi=300,width=7,height=5)
+```
+
+```{r}
+Rennaissance <- europopPeriodsCoor %>%
+  filter(period=="Rennaissance")
+
+ourPlot <- ggplot(data = world) +
+    geom_sf(fill="grey80", color="grey50") +
+    geom_count(data=Rennaissance,alpha=.2,aes(y=lat,x=long,color=region,size=population), na.rm=TRUE) +
+    coord_sf(xlim = c(-13,30), ylim = c(35,70), expand = FALSE) +
+    geom_text(x=-0.241680+.5, y=51.528558-.3, label="London", color="black", size=3) +
+    geom_point(x=-0.241680+.5, y=51.528558, color="black", size=1, shape=2) +
+    geom_text(x=2.2770205+.5, y=48.858837-.3, label="Paris", color="black", size=3) +
+    geom_point(x=2.2770205+.5, y=48.858837, color="black", size=1, shape=2) +  
+    geom_text(x=14.1765627+.5, y=40.853912-.3, label="Napoli", color="black", size=3) +
+    geom_point(x=14.1765627+.5, y=40.853912, color="black", size=1, shape=2) +  
+    geom_text(x=4.828583+.5, y=52.354627-.3, label="Amsterdam", color="black", size=3) +
+    geom_point(x=4.828583+.5, y=52.354627, color="black", size=1, shape=2) +  
+    geom_text(x=12.395915+.5, y=41.909986-.3, label="Rome", color="black", size=3) +
+    geom_point(x=12.395915+.5, y=41.909986, color="black", size=1, shape=2) +  
+    geom_text(x=-6.385785+.5, y=53.324238-.3, label="Dublin", color="black", size=3) +
+    geom_point(x=-6.385785+.5, y=53.324238, color="black", size=1, shape=2) + 
+    geom_text(x=-3.819619+.5, y=40.437869+.3, label="Madrid", color="black", size=3) +
+    geom_point(x=-3.819619+.5, y=40.437869, color="black", size=1, shape=2) +
+    geom_text(x=16.363449+.5, y=48.210033-.3, label="vienna", color="black", size=3) +
+    geom_point(x=16.363449+.5, y=48.210033, color="black", size=1, shape=2) +  
+    geom_text(x=13.284650+.5, y=52.506761-.3, label="Berlin", color="black", size=3) +
+    geom_point(x=13.284650+.5, y=52.506761, color="black", size=1, shape=2) +  
+    geom_text(x=-9.195222+.5, y=38.743621-.3, label="Lisboa", color="black", size=3) +
+    geom_point(x=-9.195222+.5, y=38.743621, color="black", size=1, shape=2) +
+    theme(panel.grid.major = element_line(color = gray(.1), linetype = "dotted", size = 0.5),
+          panel.background = element_rect(fill = "grey90")) +
+    xlab("Longitude") + ylab("Latitude") +
+    annotation_scale(location = "br", width_hint = 0.25) +
+    annotation_north_arrow(location = "br", which_north = "true", 
+        pad_x = unit(0.0, "in"), pad_y = unit(0.2, "in"),
+        style = north_arrow_fancy_orienteering) +
+    #xlab("") + ylab("") +
+    ggtitle("Population during Rennaissance around 1500", subtitle = "")+
+    labs(color = "Regions", size = "Aggregated Population in 1000")
+
+ourPlot
+ggsave(file="european_population_period_rennaissance.png",plot=ourPlot,dpi=300,width=7,height=5)
+```
+
+```{r}
+Reformation <- europopPeriodsCoor %>%
+  filter(period=="Reformation")
+
+ourPlot <- ggplot(data = world) +
+    geom_sf(fill="grey80", color="grey50") +
+    geom_count(data=Reformation,alpha=.2,aes(y=lat,x=long,color=region,size=population), na.rm=TRUE) +
+    coord_sf(xlim = c(-13,30), ylim = c(35,70), expand = FALSE) +
+    geom_text(x=-0.241680+.5, y=51.528558-.3, label="London", color="black", size=3) +
+    geom_point(x=-0.241680+.5, y=51.528558, color="black", size=1, shape=2) +
+    geom_text(x=2.2770205+.5, y=48.858837-.3, label="Paris", color="black", size=3) +
+    geom_point(x=2.2770205+.5, y=48.858837, color="black", size=1, shape=2) +  
+    geom_text(x=14.1765627+.5, y=40.853912-.3, label="Napoli", color="black", size=3) +
+    geom_point(x=14.1765627+.5, y=40.853912, color="black", size=1, shape=2) +  
+    geom_text(x=4.828583+.5, y=52.354627-.3, label="Amsterdam", color="black", size=3) +
+    geom_point(x=4.828583+.5, y=52.354627, color="black", size=1, shape=2) +  
+    geom_text(x=12.395915+.5, y=41.909986-.3, label="Rome", color="black", size=3) +
+    geom_point(x=12.395915+.5, y=41.909986, color="black", size=1, shape=2) +  
+    geom_text(x=-6.385785+.5, y=53.324238-.3, label="Dublin", color="black", size=3) +
+    geom_point(x=-6.385785+.5, y=53.324238, color="black", size=1, shape=2) + 
+    geom_text(x=-3.819619+.5, y=40.437869+.3, label="Madrid", color="black", size=3) +
+    geom_point(x=-3.819619+.5, y=40.437869, color="black", size=1, shape=2) +
+    geom_text(x=16.363449+.5, y=48.210033-.3, label="vienna", color="black", size=3) +
+    geom_point(x=16.363449+.5, y=48.210033, color="black", size=1, shape=2) +  
+    geom_text(x=13.284650+.5, y=52.506761-.3, label="Berlin", color="black", size=3) +
+    geom_point(x=13.284650+.5, y=52.506761, color="black", size=1, shape=2) +  
+    geom_text(x=-9.195222+.5, y=38.743621-.3, label="Lisboa", color="black", size=3) +
+    geom_point(x=-9.195222+.5, y=38.743621, color="black", size=1, shape=2) +
+    theme(panel.grid.major = element_line(color = gray(.1), linetype = "dotted", size = 0.5),
+          panel.background = element_rect(fill = "grey90")) +
+    xlab("Longitude") + ylab("Latitude") +
+    annotation_scale(location = "br", width_hint = 0.25) +
+    annotation_north_arrow(location = "br", which_north = "true", 
+        pad_x = unit(0.0, "in"), pad_y = unit(0.2, "in"),
+        style = north_arrow_fancy_orienteering) +
+    #xlab("") + ylab("") +
+    ggtitle("Population during Reformation around 1550", subtitle = "")+
+    labs(color = "Regions", size = "Aggregated Population in 1000")
+
+ourPlot
+ggsave(file="european_population_period_reformation.png",plot=ourPlot,dpi=300,width=7,height=5)
+```
+
+
 # References
 
-* Mel Moreno, Mathieu Basille. *Drawing beautiful maps programmatically with R, sf and ggplot2 — Part 1: Basics*, October 25, 2018, <https://www.r-spatial.org/r/2018/10/25/ggplot2-sf.html>.
+* Mel Moreno, Mathieu Basille. *Drawing beautiful maps programmatically with R, sf and ggplot2 Part 1: Basics*, October 25, 2018, <https://www.r-spatial.org/r/2018/10/25/ggplot2-sf.html>.
 * Robin Lovelace, Jakub Nowosad, Jannes Muenchow. *Geocomputation with R*, April 24, 2019, <https://geocompr.robinlovelace.net/>, *In particular, check:* Making maps in R, <https://geocompr.robinlovelace.net/adv-map.html>.
 * *R Graph Gallery: Maps*, <https://www.r-graph-gallery.com/map/>.
 * James Cheshire, *Spatial.ly*, 2016, <http://spatial.ly/r/>.
