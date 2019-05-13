@@ -1,6 +1,9 @@
 ---
 title: "Visualizing Geographical Data"
 author: "Daniel Stoxreiter"
+output:
+  html_document:
+    df_print: paged
 ---
 
 **NB:** The worksheet has beed developed and prepared by Maxim Romanov for the course "R for Historical Research" (U Vienna, Spring 2019)
@@ -15,6 +18,7 @@ We will need some new libraries that are developed for working with maps. You ma
 
 
 ```{r}
+library(tinytex)
 library("ggplot2")
 theme_set(theme_bw())
 library("sf")
@@ -112,14 +116,8 @@ Let's get some data first. The data comes from: <http://atlantides.org/downloads
 data_link <- "http://atlantides.org/downloads/pleiades/dumps/pleiades-locations-latest.csv.gz"
 download.file(data_link,"pleiades-locations-latest.csv.gz")
 locsRaw <- read.csv(gzfile("pleiades-locations-latest.csv.gz"),stringsAsFactors=F,header=T,sep=',')
-locsRaw
 
 ```
-
-```{r}
-unique(locsRaw$title)
-```
-
 
 The data contains *geolocations*, which are also categorized chronologically, The chronology is rather tricky: there are several main periods, but they are not used discretionally as many places often exist in multiple periods. These look as follows:
 
@@ -271,10 +269,6 @@ ourPlot
 ggsave(file="forts_in_austria_period_period.png",plot=ourPlot,dpi=300,width=7,height=5)
 
 ```
-```{r}
-unique(world$admin)
-```
-
 
 (@) Can you create the map of (Hadrian's Wall)[https://en.wikipedia.org/wiki/Hadrian's_Wall]? Try to make the map as informative as possible (you can use a map from Wikipedia as a model).
 
@@ -285,8 +279,6 @@ locsRaw
 hadrian <- locsRaw %>%
   filter(reprLong > -5 & reprLong < 1) %>%
   filter(reprLat > 54.5 & reprLat < 55.5)
-hadrian
-unique(hadrian$featureType)
 ```
 
 
@@ -417,20 +409,28 @@ ourPlot <- ggplot(data = world) +
     ggtitle("Forts timelaps {closest_state}", subtitle = "Frame {frame} of {nframes}")+
     # changes the title for the colors which are the different timeperiods of the epoch column
     labs(color = "Timeperiods")+
+    theme(legend.box = "horizontal",
+          legend.box.margin = margin(0.2, 0.01, 0.1, 0.01, "cm"),
+          legend.margin = margin(1.5, 0.01, 0.01, 0.5, "cm"),
+          legend.direction = "vertical",
+          legend.spacing = unit(0.01, "cm"),
+          legend.text = element_text(size=8),
+          legend.title = element_text(size=10))
+    # Legend Documentation: https://www.datanovia.com/en/blog/ggplot-legend-title-position-and-labels/  
     # animation that uses the  new "epoch" column to display forts of various timperiods one by one
-    transition_states(epoch,
-                      transition_length = 3,
-                      state_length = 100,
-                      wrap = FALSE)+
-    enter_fade()+
-    exit_fade()
+    # transition_states(epoch,
+    #                 transition_length = 3,
+    #                 state_length = 100,
+    #                 wrap = FALSE)+
+    # enter_fade()+
+    # exit_fade()
 
 ourPlot
 ggsave(file="forts_in_different_periods.png",plot=ourPlot,dpi=300,width=7,height=5)
 ```
 
 
-(@) Plot 2: *This graphs shows Churches that were build in different timeperiods.* (but also do not forget to add all necessary information into the map/cartogram).
+(@) Plot 2: *This graphs shows Churches that were build in different timeperiods. (The animation/transition is commented out due to long rendering times)* (but also do not forget to add all necessary information into the map/cartogram).
 
 ```{r}
 locsChurch=locsNicelyCleaned[ with(locsNicelyCleaned, grepl("\\bchurch\\b",featureType)),]
@@ -449,18 +449,26 @@ ourPlot <- ggplot(data = world) +
     #xlab("") + ylab("") +
     ggtitle("Church timelaps {closest_state}", subtitle = "Frame {frame} of {nframes}")+
     labs(color = "Timeperiods")+
-    transition_states(epoch,
-                      transition_length = 3,
-                      state_length = 100,
-                      wrap = FALSE)+
-    enter_fade()+
-    exit_fade()
+    theme(legend.box = "horizontal",
+          legend.box.margin = margin(0.2, 0.01, 0.1, 0.01, "cm"),
+          legend.margin = margin(1.5, 0.01, 0.01, 0.5, "cm"),
+          legend.direction = "vertical",
+          legend.spacing = unit(0.01, "cm"),
+          legend.text = element_text(size=8),
+          legend.title = element_text(size=10))
+    # Legend Documentation: https://www.datanovia.com/en/blog/ggplot-legend-title-position-and-labels/  
+    # transition_states(epoch,
+    #                 transition_length = 3,
+    #                 state_length = 100,
+    #                 wrap = FALSE)+
+    # enter_fade()+
+    # exit_fade()
 
 ourPlot
 ggsave(file="churches_in_different_timeperiods.png",plot=ourPlot,dpi=300,width=7,height=5)
 ```
 
-(@) Plot 3: *add some explanations here* (but also do not forget to add all necessary information into the map/cartogram).
+(@) Plot 3: *This plot shows Churches in red dots and Settlements (The animation/transition is commented out due to long rendering times)* (but also do not forget to add all necessary information into the map/cartogram).
 
 ```{r}
 locsSettlement=locsNicelyCleaned[ with(locsNicelyCleaned, grepl("\\bsettlement\\b",featureType)),]
@@ -481,12 +489,20 @@ ourPlot <- ggplot(data = world) +
     #xlab("") + ylab("") +
     ggtitle("Settlements and Churches timelaps of {closest_state} period", subtitle = "Frame {frame} of {nframes}")+
     labs(color = "Timeperiods")+
-    transition_states(epoch,
-                      transition_length = 3,
-                      state_length = 100,
-                      wrap = FALSE)+
-    enter_fade()+
-    exit_fade()
+    theme(legend.box = "horizontal",
+          legend.box.margin = margin(0.2, 0.01, 0.1, 0.01, "cm"),
+          legend.margin = margin(1.5, 0.01, 0.01, 0.5, "cm"),
+          legend.direction = "vertical",
+          legend.spacing = unit(0.01, "cm"),
+          legend.text = element_text(size=8),
+          legend.title = element_text(size=10))
+    # Legend Documentation: https://www.datanovia.com/en/blog/ggplot-legend-title-position-and-labels/
+    # transition_states(epoch,
+    #                 transition_length = 3,
+    #                 state_length = 100,
+    #                 wrap = FALSE)+
+    # enter_fade()+
+    # exit_fade()
 
 ourPlot
 ggsave(file="settlements_in_different_timeperiods.png",plot=ourPlot,dpi=300,width=7,height=5)
@@ -511,17 +527,16 @@ library(europop)
 library(ggplot2)
 library(ggspatial)
 library(gganimate)
-unique(europop$year)
-unique(europop$region)
 biggestCities <- europop %>%
   filter(population >= 305 & year == 1800)
-biggestCities
 
-new_data <- data.frame("region" = c("Scandinavia", "England and Wales", "Scotland", "Ireland", "The Netherlands", "Belgium", "Germany", "France", "Switzerland", "Northern Italy", "Central Italy", "Souther Italy", "Spain", "Portual", "Austria and Czechoslovakia", "Poland"), "long" = c(15.150000, -1.210000, -3.900000, -7.480000, 6.220000, 4.810000, 9.800000, 2.250000, 8.060000, 10.170000, 12.354946, 16.581014, -2.939996, -8.346877, 16.456718, 17.009529), "lat" = c(61.400000, 51.980000, 56.960000, 52.690000, 52.990000, 50.900000, 50.500000, 48.290000, 46.890000, 42.337603, 42.139779, 39.170254, 39.664747, 48.686041, 48.509328, 51.862042))
+new_data <- data.frame("region" = c("Scandinavia", "England and Wales", "Scotland", "Ireland", "The Netherlands", "Belgium", "Germany", "France", "Switzerland", "Northern Italy", "Central Italy", "Souther Italy", "Spain", "Portual", "Austria and Czechoslovakia", "Poland"), "long" = c(15.150000, -1.210000, -3.900000, -7.480000, 6.220000, 4.810000, 9.800000, 2.250000, 8.060000, 10.170000, 12.354946, 16.581014, -2.939996, -8.346877, 16.456718, 17.009529), "lat" = c(61.400000, 51.980000, 56.960000, 52.690000, 52.990000, 50.900000, 50.500000, 48.290000, 46.890000, 45.337603, 42.139779, 39.170254, 39.664747, 48.686041, 48.509328, 51.862042))
 
 europopCoor <- left_join(europop, new_data, by = "region")
-europopCoor
+```
 
+
+```{r}
 ourPlot <- ggplot(data = world) +
     geom_sf(fill="grey80", color="grey50") +
     geom_count(data=europopCoor,alpha=.6,aes(y=lat,x=long,color=region,size=population), na.rm=TRUE) +
@@ -547,12 +562,20 @@ ourPlot <- ggplot(data = world) +
     #xlab("") + ylab("") +
     ggtitle("Population timelaps of {closest_state}", subtitle = "Frame {frame} of {nframes}")+
     labs(color = "Regions", size = "Aggregated Population")+
-    transition_states(year,
-                      transition_length = 5,
-                      state_length = 100,
-                      wrap = FALSE)+
-    enter_fade()+
-    exit_fade()
+    theme(legend.box = "horizontal",
+          legend.box.margin = margin(0.2, 0.01, 0.1, 0.01, "cm"),
+          legend.margin = margin(1.5, 0.01, 0.01, 0.5, "cm"),
+          legend.direction = "vertical",
+          legend.spacing = unit(0.01, "cm"),
+          legend.text = element_text(size=8),
+          legend.title = element_text(size=10))
+    # Legend Documentation: https://www.datanovia.com/en/blog/ggplot-legend-title-position-and-labels/
+    # transition_states(year,
+    #                  transition_length = 5,
+    #                  state_length = 100,
+    #                  wrap = FALSE)+
+    # enter_fade()+
+    # exit_fade()
 
 ourPlot
 ggsave(file="european_population_timelaps.png",plot=ourPlot,dpi=300,width=7,height=5)
@@ -642,12 +665,20 @@ ourPlot <- ggplot(data = world) +
     #xlab("") + ylab("") +
     ggtitle("Population timelaps during {closest_state}", subtitle = "Frame {frame} of {nframes}")+
     labs(color = "Periods", size = "Aggregated Population")+
-    transition_states(period,
-                      transition_length = 5,
-                      state_length = 100,
-                      wrap = FALSE)+
-    enter_fade()+
-    exit_fade()
+      theme(legend.box = "horizontal",
+          legend.box.margin = margin(0.2, 0.01, 0.1, 0.01, "cm"),
+          legend.margin = margin(1.5, 0.01, 0.01, 0.5, "cm"),
+          legend.direction = "vertical",
+          legend.spacing = unit(0.01, "cm"),
+          legend.text = element_text(size=8),
+          legend.title = element_text(size=10))
+    # Legend Documentation: https://www.datanovia.com/en/blog/ggplot-legend-title-position-and-labels/
+    # transition_states(period,
+    #                 transition_length = 5,
+    #                 state_length = 100,
+    #                 wrap = FALSE)+
+    # enter_fade()+
+    # exit_fade()
 
 ourPlot
 ggsave(file="european_population_timelaps_periods.png",plot=ourPlot,dpi=300,width=7,height=5)
@@ -690,7 +721,16 @@ ourPlot <- ggplot(data = world) +
         style = north_arrow_fancy_orienteering) +
     #xlab("") + ylab("") +
     ggtitle("Population during Rennaissance around 1500", subtitle = "")+
-    labs(color = "Regions", size = "Aggregated Population in 1000")
+    labs(color = "Regions", size = "Aggregated Population in 1000")+
+    theme(legend.box = "horizontal",
+          legend.box.margin = margin(0.2, 0.01, 0.1, 0.01, "cm"),
+          legend.margin = margin(1.5, 0.01, 0.01, 0.5, "cm"),
+          legend.direction = "vertical",
+          legend.spacing = unit(0.01, "cm"),
+          legend.text = element_text(size=8),
+          legend.title = element_text(size=10))
+    # Legend Documentation: https://www.datanovia.com/en/blog/ggplot-legend-title-position-and-labels/
+    
 
 ourPlot
 ggsave(file="european_population_period_rennaissance.png",plot=ourPlot,dpi=300,width=7,height=5)
@@ -733,12 +773,177 @@ ourPlot <- ggplot(data = world) +
         style = north_arrow_fancy_orienteering) +
     #xlab("") + ylab("") +
     ggtitle("Population during Reformation around 1550", subtitle = "")+
-    labs(color = "Regions", size = "Aggregated Population in 1000")
+    labs(color = "Regions", size = "Aggregated Population in 1000")+
+    theme(legend.box = "horizontal",
+          legend.box.margin = margin(0.2, 0.01, 0.1, 0.01, "cm"),
+          legend.margin = margin(1.5, 0.01, 0.01, 0.5, "cm"),
+          legend.direction = "vertical",
+          legend.spacing = unit(0.01, "cm"),
+          legend.text = element_text(size=8),
+          legend.title = element_text(size=10))
+    # Legend Documentation: https://www.datanovia.com/en/blog/ggplot-legend-title-position-and-labels/
+
 
 ourPlot
 ggsave(file="european_population_period_reformation.png",plot=ourPlot,dpi=300,width=7,height=5)
 ```
 
+```{r}
+war <- europopPeriodsCoor %>%
+  filter(period=="30 Years War")
+
+ourPlot <- ggplot(data = world) +
+    geom_sf(fill="grey80", color="grey50") +
+    geom_count(data=war,alpha=.2,aes(y=lat,x=long,color=region,size=population), na.rm=TRUE) +
+    coord_sf(xlim = c(-13,30), ylim = c(35,70), expand = FALSE) +
+    geom_text(x=-0.241680+.5, y=51.528558-.3, label="London", color="black", size=3) +
+    geom_point(x=-0.241680+.5, y=51.528558, color="black", size=1, shape=2) +
+    geom_text(x=2.2770205+.5, y=48.858837-.3, label="Paris", color="black", size=3) +
+    geom_point(x=2.2770205+.5, y=48.858837, color="black", size=1, shape=2) +  
+    geom_text(x=14.1765627+.5, y=40.853912-.3, label="Napoli", color="black", size=3) +
+    geom_point(x=14.1765627+.5, y=40.853912, color="black", size=1, shape=2) +  
+    geom_text(x=4.828583+.5, y=52.354627-.3, label="Amsterdam", color="black", size=3) +
+    geom_point(x=4.828583+.5, y=52.354627, color="black", size=1, shape=2) +  
+    geom_text(x=12.395915+.5, y=41.909986-.3, label="Rome", color="black", size=3) +
+    geom_point(x=12.395915+.5, y=41.909986, color="black", size=1, shape=2) +  
+    geom_text(x=-6.385785+.5, y=53.324238-.3, label="Dublin", color="black", size=3) +
+    geom_point(x=-6.385785+.5, y=53.324238, color="black", size=1, shape=2) + 
+    geom_text(x=-3.819619+.5, y=40.437869+.3, label="Madrid", color="black", size=3) +
+    geom_point(x=-3.819619+.5, y=40.437869, color="black", size=1, shape=2) +
+    geom_text(x=16.363449+.5, y=48.210033-.3, label="vienna", color="black", size=3) +
+    geom_point(x=16.363449+.5, y=48.210033, color="black", size=1, shape=2) +  
+    geom_text(x=13.284650+.5, y=52.506761-.3, label="Berlin", color="black", size=3) +
+    geom_point(x=13.284650+.5, y=52.506761, color="black", size=1, shape=2) +  
+    geom_text(x=-9.195222+.5, y=38.743621-.3, label="Lisboa", color="black", size=3) +
+    geom_point(x=-9.195222+.5, y=38.743621, color="black", size=1, shape=2) +
+    theme(panel.grid.major = element_line(color = gray(.1), linetype = "dotted", size = 0.5),
+          panel.background = element_rect(fill = "grey90")) +
+    xlab("Longitude") + ylab("Latitude") +
+    annotation_scale(location = "br", width_hint = 0.25) +
+    annotation_north_arrow(location = "br", which_north = "true", 
+        pad_x = unit(0.0, "in"), pad_y = unit(0.2, "in"),
+        style = north_arrow_fancy_orienteering) +
+    #xlab("") + ylab("") +
+    ggtitle("Population during 30 Years of War from 1600 to 1650", subtitle = "")+
+    labs(color = "Regions", size = "Aggregated Population in 1000")+
+    theme(legend.box = "horizontal",
+          legend.box.margin = margin(0.2, 0.01, 0.1, 0.01, "cm"),
+          legend.margin = margin(1.5, 0.01, 0.01, 0.5, "cm"),
+          legend.direction = "vertical",
+          legend.spacing = unit(0.01, "cm"),
+          legend.text = element_text(size=8),
+          legend.title = element_text(size=10))
+    # Legend Documentation: https://www.datanovia.com/en/blog/ggplot-legend-title-position-and-labels/
+
+
+ourPlot
+ggsave(file="european_population_period_war.png",plot=ourPlot,dpi=300,width=7,height=5)
+```
+
+
+```{r}
+historicism <- europopPeriodsCoor %>%
+  filter(period=="Historicism")
+
+ourPlot <- ggplot(data = world) +
+    geom_sf(fill="grey80", color="grey50") +
+    geom_count(data=historicism,alpha=.2,aes(y=lat,x=long,color=region,size=population), na.rm=TRUE) +
+    coord_sf(xlim = c(-13,30), ylim = c(35,70), expand = FALSE) +
+    geom_text(x=-0.241680+.5, y=51.528558-.3, label="London", color="black", size=3) +
+    geom_point(x=-0.241680+.5, y=51.528558, color="black", size=1, shape=2) +
+    geom_text(x=2.2770205+.5, y=48.858837-.3, label="Paris", color="black", size=3) +
+    geom_point(x=2.2770205+.5, y=48.858837, color="black", size=1, shape=2) +  
+    geom_text(x=14.1765627+.5, y=40.853912-.3, label="Napoli", color="black", size=3) +
+    geom_point(x=14.1765627+.5, y=40.853912, color="black", size=1, shape=2) +  
+    geom_text(x=4.828583+.5, y=52.354627-.3, label="Amsterdam", color="black", size=3) +
+    geom_point(x=4.828583+.5, y=52.354627, color="black", size=1, shape=2) +  
+    geom_text(x=12.395915+.5, y=41.909986-.3, label="Rome", color="black", size=3) +
+    geom_point(x=12.395915+.5, y=41.909986, color="black", size=1, shape=2) +  
+    geom_text(x=-6.385785+.5, y=53.324238-.3, label="Dublin", color="black", size=3) +
+    geom_point(x=-6.385785+.5, y=53.324238, color="black", size=1, shape=2) + 
+    geom_text(x=-3.819619+.5, y=40.437869+.3, label="Madrid", color="black", size=3) +
+    geom_point(x=-3.819619+.5, y=40.437869, color="black", size=1, shape=2) +
+    geom_text(x=16.363449+.5, y=48.210033-.3, label="vienna", color="black", size=3) +
+    geom_point(x=16.363449+.5, y=48.210033, color="black", size=1, shape=2) +  
+    geom_text(x=13.284650+.5, y=52.506761-.3, label="Berlin", color="black", size=3) +
+    geom_point(x=13.284650+.5, y=52.506761, color="black", size=1, shape=2) +  
+    geom_text(x=-9.195222+.5, y=38.743621-.3, label="Lisboa", color="black", size=3) +
+    geom_point(x=-9.195222+.5, y=38.743621, color="black", size=1, shape=2) +
+    theme(panel.grid.major = element_line(color = gray(.1), linetype = "dotted", size = 0.5),
+          panel.background = element_rect(fill = "grey90")) +
+    xlab("Longitude") + ylab("Latitude") +
+    annotation_scale(location = "br", width_hint = 0.25) +
+    annotation_north_arrow(location = "br", which_north = "true", 
+        pad_x = unit(0.0, "in"), pad_y = unit(0.2, "in"),
+        style = north_arrow_fancy_orienteering) +
+    #xlab("") + ylab("") +
+    ggtitle("Population during Historicism around 1800", subtitle = "")+
+    labs(color = "Regions", size = "Aggregated Population in 1000")+
+    theme(legend.box = "horizontal",
+          legend.box.margin = margin(0.2, 0.01, 0.1, 0.01, "cm"),
+          legend.margin = margin(1.5, 0.01, 0.01, 0.5, "cm"),
+          legend.direction = "vertical",
+          legend.spacing = unit(0.01, "cm"),
+          legend.text = element_text(size=8),
+          legend.title = element_text(size=10))
+    # Legend Documentation: https://www.datanovia.com/en/blog/ggplot-legend-title-position-and-labels/
+
+
+ourPlot
+ggsave(file="european_population_period_historicism.png",plot=ourPlot,dpi=300,width=7,height=5)
+```
+
+```{r}
+romantic <- europopPeriodsCoor %>%
+  filter(period=="Romantic")
+
+ourPlot <- ggplot(data = world) +
+    geom_sf(fill="grey80", color="grey50") +
+    geom_count(data=romantic,alpha=.2,aes(y=lat,x=long,color=region,size=population), na.rm=TRUE) +
+    coord_sf(xlim = c(-13,30), ylim = c(35,70), expand = FALSE) +
+    geom_text(x=-0.241680+.5, y=51.528558-.3, label="London", color="black", size=3) +
+    geom_point(x=-0.241680+.5, y=51.528558, color="black", size=1, shape=2) +
+    geom_text(x=2.2770205+.5, y=48.858837-.3, label="Paris", color="black", size=3) +
+    geom_point(x=2.2770205+.5, y=48.858837, color="black", size=1, shape=2) +  
+    geom_text(x=14.1765627+.5, y=40.853912-.3, label="Napoli", color="black", size=3) +
+    geom_point(x=14.1765627+.5, y=40.853912, color="black", size=1, shape=2) +  
+    geom_text(x=4.828583+.5, y=52.354627-.3, label="Amsterdam", color="black", size=3) +
+    geom_point(x=4.828583+.5, y=52.354627, color="black", size=1, shape=2) +  
+    geom_text(x=12.395915+.5, y=41.909986-.3, label="Rome", color="black", size=3) +
+    geom_point(x=12.395915+.5, y=41.909986, color="black", size=1, shape=2) +  
+    geom_text(x=-6.385785+.5, y=53.324238-.3, label="Dublin", color="black", size=3) +
+    geom_point(x=-6.385785+.5, y=53.324238, color="black", size=1, shape=2) + 
+    geom_text(x=-3.819619+.5, y=40.437869+.3, label="Madrid", color="black", size=3) +
+    geom_point(x=-3.819619+.5, y=40.437869, color="black", size=1, shape=2) +
+    geom_text(x=16.363449+.5, y=48.210033-.3, label="vienna", color="black", size=3) +
+    geom_point(x=16.363449+.5, y=48.210033, color="black", size=1, shape=2) +  
+    geom_text(x=13.284650+.5, y=52.506761-.3, label="Berlin", color="black", size=3) +
+    geom_point(x=13.284650+.5, y=52.506761, color="black", size=1, shape=2) +  
+    geom_text(x=-9.195222+.5, y=38.743621-.3, label="Lisboa", color="black", size=3) +
+    geom_point(x=-9.195222+.5, y=38.743621, color="black", size=1, shape=2) +
+    theme(panel.grid.major = element_line(color = gray(.1), linetype = "dotted", size = 0.5),
+          panel.background = element_rect(fill = "grey90")) +
+    xlab("Longitude") + ylab("Latitude") +
+    annotation_scale(location = "br", width_hint = 0.25) +
+    annotation_north_arrow(location = "br", which_north = "true", 
+        pad_x = unit(0.0, "in"), pad_y = unit(0.2, "in"),
+        style = north_arrow_fancy_orienteering) +
+    #xlab("") + ylab("") +
+    ggtitle("Population during Romantic period from 1700 to 1750", subtitle = "")+
+    labs(color = "Regions", size = "Aggregated Population in 1000")+
+    theme(legend.box = "horizontal",
+          legend.box.margin = margin(0.2, 0.01, 0.1, 0.01, "cm"),
+          legend.margin = margin(1.5, 0.01, 0.01, 0.5, "cm"),
+          legend.direction = "vertical",
+          legend.spacing = unit(0.01, "cm"),
+          legend.text = element_text(size=8),
+          legend.title = element_text(size=10))
+    # Legend Documentation: https://www.datanovia.com/en/blog/ggplot-legend-title-position-and-labels/
+
+
+ourPlot
+ggsave(file="european_population_period_romantic.png",plot=ourPlot,dpi=300,width=7,height=5)
+```
 
 # References
 
