@@ -1,0 +1,791 @@
+---
+title: "L10 — Social Network Analysis with R (02)"
+author: ''
+output:
+  html_document:
+    df_print: paged
+    toc: true
+    highlight: tango
+    number_sections: yes
+---
+
+**NB:** The worksheet has beed developed and prepared by Maxim Romanov for the course "R for Historical Research" (U Vienna, Spring 2019); Code snippets, data, and descriptions reused from: 1) <https://kateto.net/network-visualization>; 2) <http://doi.org/10.5281/zenodo.1411479> (modified).
+
+# Social Network Analysis with R (02)
+
+- Analysis: network metrics and measures
+- Other SNA libraries for R: Interactive Networks
+
+# Libraries
+
+The following are the librsries that we will need for this section. Install those that you do not have yet.
+
+```{r message=FALSE}
+# General ones 
+library(tidyverse)
+library(readr)
+library(stringr)
+library(RColorBrewer)
+
+# SNA Specific
+library(igraph)
+library(ggraph)
+library(ggrepel)
+library(ggalt)
+library(visNetwork)
+```
+
+**NB:** `igraph` is the main SNA library. There are other packages we can use to visualize graphs (`ggraph`, for example), but most calculations and the overall analysis is still to be performed with `igraph`. You can get an overview of its contents with `library(help="igraph")`. More information: <https://igraph.org/r/>; full documentation: <https://igraph.org/r/doc/igraph.pdf>
+
+# Data
+
+Our practice datasets will include:
+
+* Star Wars Network Data: [sw_network_data_updated_190524.zip](https://univie-histr-2019.github.io/files/sw_network_data_updated_190524.zip).
+
+# Star Wars Network
+
+## Edges
+
+Let's start with loading our Star Wars data and then creating and upgrading our `igraph` object. 
+
+```{r}
+#library(tidyverse)
+#library(readr)
+
+sw_e_all <- read_delim("sw_network_edges_allCharacters.csv",
+                       "\t", escape_double = FALSE, trim_ws = TRUE)
+
+sw_e_all <- sw_e_all %>%
+  mutate(episodeD = as.numeric(gsub("episode-", "", episode)))
+
+sw_e_total <- sw_e_all %>%
+  group_by(source, target) %>%
+  summarize(weight=sum(weight))
+
+head(sw_e_all)
+
+sw_e_prequel <- sw_e_all %>%
+  filter(episodeD <= 3) %>%
+  group_by(source, target) %>%
+  summarize(weight=sum(weight))
+
+```
+
+(@) Get edges for the original trilogy.
+
+```{r}
+
+# your code
+
+```
+
+
+(@) Load edges where characters with double personalities are split (three characters: Anakin Skywalker and Darth Vader, Palpatine and Darth Sidious, Count Dooku and Darth Tiranus).
+
+```{r}
+
+# your code
+
+```
+
+## Nodes
+
+We will need to generate two separate list on nodes from our loaded data: 
+
+```{r}
+sw_n_prequel <- as.data.frame(unique(c(sw_e_prequel$source,sw_e_prequel$target)))
+colnames(sw_n_prequel) <- "ID"
+head(sw_n_prequel)
+```
+
+(@) Generate the list of nodes for the original trilogy.
+
+```{r}
+
+# your code
+
+```
+
+Using our file with nodes, we can join additional data to our lists of nodes.
+
+```{r message=FALSE, warning=FALSE}
+sw_n_data <- read_delim("sw_network_nodes_allCharacters.csv", "\t", escape_double = FALSE, trim_ws = TRUE)
+
+sw_n_prequel <- sw_n_prequel %>%
+  left_join(sw_n_data, by="ID")
+head(sw_n_prequel)
+
+```
+
+(@) Repeat this operation for the original trilogy.
+
+```{r}
+
+# your code
+
+```
+
+Keep in mind that you can always tweak edges and nodes data depending on what you what you are trying to glean out from your network. (**NB:** for this you may want to create copies of the original EDGES and NODES files and edit them in Excel or other spreadsheet program). In our current example, for instance, you may want to add more data into **AFFILIATION** (or create columns with binary divisions, like the *Rebel Alliance* versus the *Empire*, etc.); perhaps, to color specific nodes with distinct colors (for example, we may want to use the same colors for the split personalities like Anakin and Darth Vader). You can also add as many additional columns as you see fit (for example, homeworlds).
+
+## Graph / Network Object
+
+Now that we have both necessary components, we can start with our analysis. First, we need to create a graph object, using `igraph` library.
+
+```{r}
+#library(igraph)
+
+sw_network_prequel_bare <- graph_from_data_frame(d=sw_e_prequel, vertices=sw_n_prequel, directed=F)
+```
+
+You can check the contents of the `igraph` object in the following manner:
+
+1) for the nodes: 
+
+```{r}
+vertex_attr(sw_network_prequel_bare)
+```
+
+2) for the edges:
+
+```{r}
+edge_attr(sw_network_prequel_bare)
+```
+
+(@) Create an `igraph` object for the original trilogy
+
+```{r}
+
+# your code
+
+```
+
+## Coloring nodes
+
+### Approach 1
+
+Let's add some additional information. Below is another example how we can assign colors in a bit more efficient manner.
+
+```{r}
+sw_network <- sw_network_prequel_bare
+
+newColors <- V(sw_network)$SIDE
+
+newColors <- replace(newColors, newColors=="light", "gold")
+newColors <- replace(newColors, newColors=="dark", "blue")
+newColors <- replace(newColors, newColors=="neutral", "lightblue")
+newColors <- replace(newColors, newColors=="anakin", "gold")
+
+V(sw_network)$color <- newColors
+V(sw_network)$color
+```
+
+**NB:** As you have noticed, graphs do not always come out readable. To fix that, you can add parameters for width and height, as you can see in the code chunk parameters below (`{r fig.height=15, fig.width=22}`):
+
+```{r fig.height=15, fig.width=22}
+set.seed(1)
+plot(sw_network, vertex.size=5, label.cex=10)
+```
+
+**NB:** with the following code you can save a PDF of your graph. You can change `width=` and `height=` to get a usable graph of your network.
+
+```{r}
+pdf(file="practiceGraph_swNetwork.pdf", width=30, height=20)
+set.seed(1)
+plot(sw_network, vertex.size=2, label.cex=10)
+dev.off()
+```
+
+### Approach 2
+
+We can use the code below to assign colors based on affiliations. However, since values are listed in an untidy manner, we may want to apply a different approach. Namely, we can color our nodes in a binary mode: if a there is a certain affiliation in **AFFILIATIONS**, we assign color `X`, if not—we assign color `Y`.
+
+In the example below, `ifelse()` statement is used to check whether a condition is true or not. `str_detect()` (from library `stringr`) is used to check is "Rebel Alliance" occurs in **AFFILIATIONS** value.
+
+```{r fig.height=15, fig.width=22}
+aff <- data.frame(V(sw_network)$AFFILIATIONS)
+aff <- cbind(aff, V(sw_network)$AFFILIATIONS)
+colnames(aff) <- c("AFFILIATIONS", "COLORS")
+
+library(stringr)
+# do not forget that capital letters and small letters are different characters!
+aff$COLORS <- ifelse(str_detect(aff$COLORS, "Separatists"), "red", "white")
+
+V(sw_network)$color <-aff$COLORS
+
+set.seed(1)
+plot(sw_network, layout=layout_with_fr, vertex.size=5)
+
+# now let's assign the same color to all nodes
+V(sw_network)$color <- "orange"
+```
+
+(@) Generate graph with characters from the Outer Rim territories highlighted with a distinct color.
+
+```{r}
+
+# your code
+
+```
+
+
+(@) Color nodes for the original trilogy and generate a graph. Explain how you color the nodes.
+
+```{r}
+
+# your code
+
+```
+
+We can add more information to our `igraph` object to make the plot of our network more informative: for example, we can assign various sizes to nodes, based on their degree, and modify the thickness (width) of edges based on their weights. Last but not least, we can display the labels to all the nodes (we can also modify the size of the labels based on the degree of each node).
+
+# Analysis
+
+We can run a number of analytical procedures on our graph, results of which will allow us to learn new things about our network data. We will cover only the major elements. For more, you can consult: <https://kateto.net/networks-r-igraph> (also, see *References* below).
+
+## Centrality Measures
+
+To put simply, the more connections a node has, the more central is its place (that does not really work for ego-networks though). Yet there is a variety of way to calculate that. For example: 1) we can simply count the number of connections; 2) we can also factor in the weights of all connections; 3) we can also factor in the degrees of connected nodes, etc. Things get more complicated in directed graphs...
+
+### Centrality / Node degree
+
+Degree is the number of edges that a node has; in directed graphs nodes have `in-` and `out-degrees`, which are the some of incoming and outgoing edges. The function `degree()` has a mode of `in` for in-degree, `out` for out-degree, and `all` or `total` for total degree. 
+
+```{r}
+deg <- degree(sw_network, mode="all")
+sort(deg, decreasing = T)[1:15]
+```
+
+(@) Who have the highest degrees in the original trilogy?
+
+```{r}
+
+# your code
+
+```
+
+```{r}
+set.seed(1)
+plot(sw_network,
+     vertex.size=deg/5,
+     vertex.label.cex=0.5,
+     vertex.color="white",
+     layout=layout_with_fr,
+     vertex.label.color="black")
+
+hist(deg, main="Distribution of Node Degrees")
+```
+
+(@) Generate graph for the original trilogy with nodes sized by their degrees
+
+```{r}
+
+# your code
+
+```
+
+```{r}
+# normalized: leveling centrality score by dividing by the theoretical maximum
+degree <- degree(sw_network, mode="all")
+sort(degree, decreasing = TRUE)
+centr_degree(sw_network, mode="all", normalized=T)
+```
+
+### Eigenvector Centrality
+
+Eigenvector centrality takes into considerartion the degree of connected nodes. In other words, while centrality of certain two nodes may be the same (say, they are each connected to three other nodes), their eigenvector centrality will be different because one node is connected to nodes with degrees 3, while another—to nodes with degrees 1; the first node will have higher eigenvector centrality value.
+
+```{r}
+sw_network_eigen <- sw_network
+
+eigenCent <- eigen_centrality(sw_network_eigen)$vector
+sort(eigenCent,decreasing=TRUE)[1:10]
+
+plot(sort(eigenCent,decreasing=TRUE))
+points(x=7, y=sort(eigenCent,decreasing=TRUE)[7], col="red", pch=19)
+points(x=15, y=sort(eigenCent,decreasing=TRUE)[15], col="red", pch=19)
+```
+
+(@) Who has the highest eigenvector centrality in the original trilogy?
+
+```{r}
+
+# your code
+
+```
+
+**NB:** Here is another way to color nodes:
+
+```{r}
+bins <- unique(quantile(eigenCent, seq(0,1,length.out=50)))
+vals <- cut(eigenCent, bins, labels=FALSE, include.lowest=TRUE)
+colorVals <- rev(heat.colors(length(bins)))[vals]
+V(sw_network_eigen)$color <- colorVals
+
+set.seed(1)
+plot(sw_network_eigen,
+     vertex.label=NA,
+     layout=layout_with_fr,
+     vertex.size=5,
+     main="Eigenvector")
+```
+
+## Betweenness centrality
+
+The vertex and edge betweenness are (roughly) defined by the number of geodesics (shortest paths) going through a vertex or an edge.
+
+```{r}
+betweenCent <- betweenness(sw_network, directed=F)
+cor(betweenCent,eigenCent)
+
+sort(betweenCent,decreasing=TRUE)[1:10]
+plot(sort(betweenCent,decreasing=TRUE))
+points(x=11, y=sort(betweenCent,decreasing=TRUE)[11], col="red", pch=19)
+points(x=20, y=sort(betweenCent,decreasing=TRUE)[20], col="red", pch=19)
+```
+
+```{r}
+sw_network_bw <- sw_network
+
+betweenCent <- betweenness(sw_network_bw, directed=F)
+bins <- unique(quantile(betweenCent, seq(0,1,length.out=50)))
+vals <- cut(betweenCent, bins, labels=FALSE, include.lowest=TRUE)
+colorVals <- rev(heat.colors(length(bins)))[vals]
+V(sw_network_bw)$color <- colorVals
+
+set.seed(1)
+plot(sw_network_bw,
+     vertex.label=NA,
+     layout=layout_with_fr,
+     vertex.size=5,
+     main="Betweenness")
+```
+
+Nodes that have relatively low eigenvector centrality and relatively high betweenness centrality are often called gate-keepers: connecting [rather] disjoint parts of the graph, these nodes function purely as links, rather than central hubs. (Keep in mind, that such nodes are not necessarily binary and opten depend on cut off values).
+
+```{r}
+betweenCent <- betweenness(sw_network)
+eigenCent <- evcent(sw_network)$vector
+colorVals <- rep("white", length(betweenCent))
+# the values are taken experimentally from graphs above. Can you find that?
+colorVals[which(
+  eigenCent <= sort(eigenCent,decreasing=TRUE)[7] &
+    betweenCent > sort(betweenCent,decreasing=TRUE)[11])
+          ] <- "red" # vertices which connect disjoint parts of the graph
+V(sw_network)$color <- colorVals
+
+set.seed(1)
+plot.igraph(sw_network,
+            layout=layout_with_fr,
+            #vertex.label=NA,
+            vertex.size=5)
+```
+
+(@) Who are the gate-keepers in the prequel?
+
+>> your answer
+
+(@) Who are the gate-keepers in the original trilogy?
+
+```{r}
+
+# your code
+
+```
+
+## Cliques
+
+Cliques are interconnected components within networks. `cliques()` finds all cliques in a given network. Parameters `min=` and `max=` determine the number of nodes for cliques to find. For more details, try `?cliques`.
+
+```{r}
+swCliques <- cliques(sw_network, min=9)
+swCliques
+```
+
+The following code extracts only the largest cliques (the result is the same as above):
+
+```{r}
+lCliques <- largest.cliques(sw_network)
+lCliques
+```
+
+There are two largest cliques, which we can plot like this:
+
+```{r}
+c1 <- lCliques[[1]]
+c2 <- lCliques[[2]]
+
+g1 <- graph.full(length(c1))
+V(g1)$name <- V(sw_network)$name[c1]
+
+g2 <- graph.full(length(c2))
+V(g2)$name <- V(sw_network)$name[c2]
+
+g1 <- induced_subgraph(sw_network, lCliques[[1]])
+g2 <- induced_subgraph(sw_network, lCliques[[2]])
+```
+
+```{r fig.height=15, fig.width=22}
+par(mfrow=c(1,2))
+
+set.seed(78)
+plot(g1, layout=layout_nicely,
+     #vertex.label=NA,
+     vertex.color="orange",      
+     vertex.size=5)
+set.seed(78)
+plot(g2, layout=layout_nicely,
+     #vertex.label=NA,
+     vertex.color="orange",
+     vertex.size=5)
+```
+
+For more details on cliques, check `?cliques`.
+
+(@) What are the largest cliques in the original trilogy?
+
+```{r}
+
+# your code
+
+```
+
+## Communities
+
+Communities are clusters of nodes which are densely connected with each other, while the density of connections among clusters is weaker than among the nodes that belong to individual clusters. Identification of communities is a tricky process because there are plenty algorithms which are used for this purpose and they all are based on different assumptions about networks.
+
+`igraph` has the several community detection algorithms. These functions try to find communities, where a community is a set of nodes with many edges inside the community and few edges between outside it (i.e. between the community itself and the rest of the graph). For a nice summary of these algorithms can be found at <https://stackoverflow.com/questions/9471906/>; you can also read about them using help function, like `??cluster_walktrap`.
+
+- `cluster_walktrap()`
+- `cluster_spinglass()`
+- `cluster_leading_eigen()`
+- `cluster_edge_betweenness()`
+- `cluster_fast_greedy()`
+- `cluster_louvain()`
+- `cluster_label_prop()`
+- `cluster_infomap()`
+
+(**Note:** `cluster_leading_eigen()` does not seem to be suitable for our Star Wars network—it throws an error, so we will skip it.)
+
+Generally, the graph/network must be undirected for running such algorithms (same for cliques); any graph can be made undirected with `simplify()`, or re-create an `igraph` object with option `directed=FALSE`. 
+
+Let's try them all. We will use `set.seed(1)` and `layout_with_dh()` for generating each graph, which generate networks of the same shape allowing us to compare the outputs much easier.
+
+```{r}
+test <- sw_network
+
+cluster_walktrap = cluster_walktrap(test)
+cluster_spinglass = cluster_spinglass(test)
+#cluster_leading_eigen = cluster_leading_eigen(test) # this a
+cluster_edge_betweenness = cluster_edge_betweenness(test)
+cluster_fast_greedy = cluster_fast_greedy(test)
+cluster_louvain = cluster_louvain(test)
+cluster_label_prop = cluster_label_prop(test)
+cluster_infomap <- cluster_infomap(test) # for directed graphs
+```
+
+These functions generate objects of the class `communites`; we can extract information on communities with line like `cluster_walktrap$membership`—these vector can be attached to our nodes table and we can thus collect all analytical information into one table and reuse it later.
+
+Now we can generate graphs of communities identified with all these algorithms. Now, in `plot()` we first add a `communities` object, then `igraph` object, then everything else. **NB:** `deparse(substitute(cluster_infomap)` converts the name of the variable into a string so that we could plot it on the graph. 
+
+```{r fig.height=15, fig.width=22}
+par(mfrow=c(1,2), mar=c(1,1,1,1))
+
+set.seed(1)
+plot(cluster_walktrap, test, layout=layout_with_dh, vertex.label=NA, vertex.size=5)
+title(deparse(substitute(cluster_walktrap)), cex.main=2)
+
+set.seed(1)
+plot(cluster_spinglass, test, layout=layout_with_dh, vertex.label=NA, vertex.size=5)
+title(deparse(substitute(cluster_spinglass)), cex.main=2)
+
+set.seed(1)
+plot(cluster_edge_betweenness, test, layout=layout_with_dh, vertex.label=NA, vertex.size=5)
+title(deparse(substitute(cluster_edge_betweenness)), cex.main=2)
+
+set.seed(1)
+plot(cluster_fast_greedy, test, layout=layout_with_dh, vertex.label=NA, vertex.size=5)
+title(deparse(substitute(cluster_fast_greedy)), cex.main=2)
+
+set.seed(1)
+plot(cluster_louvain, test, layout=layout_with_dh, vertex.label=NA, vertex.size=5)
+title(deparse(substitute(cluster_louvain)), cex.main=2)
+
+set.seed(1)
+plot(cluster_label_prop, test, layout=layout_with_dh, vertex.label=NA, vertex.size=5)
+title(deparse(substitute(cluster_label_prop)), cex.main=2)
+
+set.seed(1)
+plot(cluster_infomap, test, layout=layout_with_dh, vertex.label=NA, vertex.size=5)
+title(deparse(substitute(cluster_infomap)), cex.main=2)
+```
+
+(@) Generate communities for the original trilogy. What are they, who are their members? Feel free to share any thoughts on this issue.
+
+```{r}
+
+# your code
+
+```
+
+# Alternative visualizations
+
+## `ggraph`
+
+`ggraph` library is a part of the `ggplot` family and offers offers comparable options for plotting graphs, relying on the concept of the grammar of graphics. 
+
+```{r fig.height=9, fig.width=15}
+library(ggraph)
+library(ggrepel)
+library(ggalt)
+
+set.seed(786)
+
+sw_network_ggraph <- sw_network
+V(sw_network_ggraph)$cluster_louvain <- as.character(cluster_louvain$membership)
+
+vDegree <- degree(sw_network_ggraph, mode="all")
+V(sw_network_ggraph)$degree <- vDegree
+
+swNetworkPlot <- ggraph(sw_network_ggraph, 'igraph', algorithm = 'with_fr') +
+  geom_encircle(s_shape=.1, expand=0.01, alpha=.25, col="black", aes(x=x, y=y, group=cluster_louvain, fill=cluster_louvain))+   geom_edge_link(aes(alpha=weight), width=0.5) +
+  geom_node_point(aes(color=cluster_louvain, size=degree), alpha=1) +
+  geom_node_label(aes(label=name), color="black", size=3, repel=TRUE, alpha=0.75) +
+  #ggforce::theme_no_axes() +
+  theme_graph()+
+  scale_size_continuous(range=c(0.1,10), limits=c(1,max(V(sw_network_ggraph)$degree)))
+
+swNetworkPlot
+
+#ggsave(file=paste0("practiceGraph_swNetwork_TEST.png"),plot=swNetworkPlot,dpi=600,width=15,height=9)
+```
+
+(@) Generate a similar graph for the original trilogy, but use a different layout:
+
+```{r}
+
+# your code
+
+```
+
+Just for reference, these are layouts from `igraph` that can be used as arguments for `algorithm=` (i.e. `argument="with_kk"`).
+
+```
+ [1] "as_bipartite"  "as_star"       "as_tree"       "components"    "in_circle"    
+ [6] "nicely"        "on_grid"       "on_sphere"     "randomly"      "with_dh"      
+[11] "with_drl"      "with_fr"       "with_gem"      "with_graphopt" "with_kk"      
+[16] "with_lgl"      "with_mds"      "with_sugiyama"
+```
+`ggraph` also has additional layouts: `layout_igraph_auto`, `layout_igraph_circlepack`, `layout_igraph_dendrogram`, `layout_igraph_hive`, `layout_igraph_linear`, `layout_igraph_manual`, `layout_igraph_partition`. See, <https://www.rdocumentation.org/packages/ggraph/versions/1.0.2/>.
+
+In addition to `igraph` layouts, `ggraph` has a series of its own. Here is a nice example of an arc diagram:
+
+```{r fig.height=5, fig.width=20}
+swNetworkPlot <- ggraph(sw_network_ggraph, layout="linear") + 
+  geom_edge_arc(aes(width = weight), alpha = 0.8) + 
+  scale_edge_width(range = c(0.2, 4)) +
+  geom_node_text(aes(label = name), angle=90, size=3, hjust=0, nudge_x=0.0, nudge_y=-7) +
+  labs(edge_width = "Interactions") +
+  theme_graph()
+
+swNetworkPlot
+#ggsave(file=paste0("practiceGraph_swNetwork_TEST.png"),plot=swNetworkPlot,dpi=600,width=20,height=7)
+```
+
+The same arc diagram, but plotted differently (added `coord_flip()`), and with some more improvements:
+
+```{r fig.height=10, fig.width=5}
+yNudge = 8
+
+swNetworkPlot <- ggraph(sw_network_ggraph, layout="linear") + 
+  geom_edge_arc(aes(width = weight, y=y+yNudge, yend=yend+yNudge), alpha = 0.8) + 
+  #geom_node_point(aes(color=cluster_louvain, size=degree)) +
+  geom_node_point(aes(size=degree, y=y+yNudge-1)) +
+  geom_node_point(aes(size=degree, y=y-yNudge), color="white") +
+  geom_node_text(aes(label = name, y=y+yNudge-1), size=3, hjust=1, nudge_y = -1) +
+  scale_edge_width(range = c(0.2, 4)) +
+  coord_flip()+
+  labs(edge_width = "Interactions") +
+  theme_graph()
+
+swNetworkPlot
+#ggsave(file=paste0("practiceGraph_swNetwork_TEST.png"),plot=swNetworkPlot,dpi=600,width=10,height=17)
+```
+
+(@) Analyze the code for the graph above: you can comment/uncomment lines of code to check what they are adding or modifying. Explain each line of code below.
+
+>> your answer
+
+(@) Generate a similar graph for the original trilogy. Add whatever modifications you consider appropriate and valuable.
+
+```{r}
+
+# your code
+
+```
+
+For more on layouts, see [this library creator's website]( https://www.data-imaginist.com/2017/ggraph-introduction-layouts/). You can also find examples of how to work with [nodes](https://www.data-imaginist.com/2017/ggraph-introduction-nodes/) and [edges](https://www.data-imaginist.com/2017/ggraph-introduction-edges/).
+
+## `visNetwork`: interactive graphs
+
+Using `visNetwork` library we can build an interactive network right from our `igraph` object. In the example below—which is generated with just one line of code (!)—you can zoom in and out, pan around and click on nodes to see what other nodes they are connected to.
+
+```{r}
+library(visNetwork)
+visIgraph(sw_network_prequel_bare)
+```
+
+`visNetwork` also offers control over most parameters. Here is another example. First, we need to convert our `igraph` object into `visNetwork` data structure:
+
+So, let's add different nework parameters and create our network with an interactive plot.
+
+**NB:** if your network is large, it may take a lot of time to generate a graph. You can use the following parameters to speed up the graph generation (in the code below these lines are commented out):
+
+- `visPhysics(stabilization = FALSE)` : turns off real-time stabilization of nodes in the graph;
+- `visEdges(smooth = FALSE)` : uses straight edges instead of curves;
+- `visIgraphLayout(layout = "layout_in_circle")` : uses `igraph` to pregenerate the layout.
+
+```{r}
+
+data <- toVisNetworkData(sw_network_ggraph)
+nodes <- data[[1]]
+edges <- data[[2]]
+
+library(RColorBrewer)
+#nodes$color <- brewer.pal(12, "Set3")[as.factor(nodes$cluster_louvain)]
+nodes$color <- brewer.pal(12, "Set3")[as.factor(nodes$SIDE)]
+
+nodes$shape <- "dot" 
+nodes$shadow <- TRUE # Nodes will drop shadow
+nodes$title <- nodes$label # Text on click
+nodes$size <- round(nodes$degree/2, 3) # Node size
+nodes$borderWidth <- 2 # Node border width
+nodes$color.border <- "black"
+
+edges$width <- round(edges$weight/2,3)
+
+set.seed(1)
+visNetwork(nodes, edges, width="100%", height="750px") %>%
+  #visPhysics(stabilization = FALSE) %>% 
+  #visEdges(smooth = FALSE) %>%
+  visIgraphLayout(layout = "layout_with_fr") %>%
+  visOptions(highlightNearest = TRUE,
+             selectedBy = "cluster_louvain",
+             nodesIdSelection = TRUE)
+```
+
+For more details on `visNetwork`: <https://datastorm-open.github.io/visNetwork/>. This example is based on: <https://wesslen.github.io/text%20mining/topic-networks/>.
+
+(@) Generate an interactive network for the original trilogy? Provide a short description of your visualization.
+
+```{r}
+
+# your code
+
+```
+
+# Reference: parameters for plotting with `igraph`
+
+|||
+|:-- |:--- |
+|**NODES**||
+|`vertex.color`|Node color|
+|`vertex.frame.color`|Node border color|
+|`vertex.shape`|One of “none”, “circle”, “square”, “csquare”, “rectangle” “crectangle”, “vrectangle”, “pie”, “raster”, or “sphere”|
+|`vertex.size`|Size of the node (default is 15)|
+|`vertex.size2`|The second size of the node (e.g. for a rectangle)|
+|`vertex.label`|Character vector used to label the nodes|
+|`vertex.label.family`|Font family of the label (e.g.“Times”, “Helvetica”)|
+|`vertex.label.font`|Font: 1 plain, 2 bold, 3, italic, 4 bold italic, 5 symbol|
+|`vertex.label.cex`|Font size (multiplication factor, device-dependent)|
+|`vertex.label.dist`|Distance between the label and the vertex|
+|`vertex.label.degree`|The position of the label in relation to the vertex, where 0 right, “pi” is left, “pi/2” is below, and “-pi/2” is above|
+|**EDGES**||
+|`edge.color`|Edge color|
+|`edge.width`|Edge width, defaults to 1|
+|`edge.arrow.size`|Arrow size, defaults to 1|
+|`edge.arrow.width`|Arrow width, defaults to 1|
+|`edge.lty`|Line type, could be 0 or “blank”, 1 or “solid”, 2 or “dashed”, 3 or “dotted”, 4 or “dotdash”, 5 or “longdash”, 6 or “twodash”|
+|`edge.label`|Character vector used to label edges|
+|`edge.label.family`|Font family of the label (e.g.“Times”, “Helvetica”)|
+|`edge.label.font`|Font: 1 plain, 2 bold, 3, italic, 4 bold italic, 5 symbol|
+|`edge.label.cex`|Font size for edge labels|
+|`edge.curved`|Edge curvature, range 0-1 (FALSE sets it to 0, TRUE to 0.5)|
+|`arrow.mode`|Vector specifying whether edges should have arrows, possible values: 0 no arrow, 1 back, 2 forward, 3 both|
+|**OTHER**||
+|`margin`|Empty space margins around the plot, vector with length 4|
+|`frame`|if TRUE, the plot will be framed|
+|`main`|If set, adds a title to the plot|
+|`sub`|If set, adds a subtitle to the plot|
+
+# Review: Layout algorithms
+
+Let's take another look at the layout algorithms. We can use coloring of nodes (based on eigenvector centrality: high is red, low is white) to visually check how layouts work.
+
+(@) Take a close look at the resultant graphs and compare them. Can you discern any pattern? Describe it.
+
+>> your answer
+
+```{r fig.height=15, fig.width=22}
+layouts <- grep("^layout_", ls("package:igraph"), value=TRUE)[-1] 
+# Remove layouts that do not apply to our graph.
+layouts <- layouts[!grepl("bipartite|merge|norm|sugiyama", layouts)]
+
+par(mfrow=c(1,2), mar=c(1,1,1,1))
+for (layout in layouts) {
+  l <- do.call(layout, list(sw_network_eigen))
+  set.seed(1)
+  plot(sw_network_eigen, edge.arrow.mode=0, layout=l, main=layout, vertex.size=7, vertex.label=NA, cex.main=2) }
+```
+
+# Code snippets
+
+## Comparing two vectors
+
+Writing the chunks of code above, I made a mistake and loaded unsplit edges data into the variable for split edges data. As a result, when I tried to create an `igraph` object, R threw an error complaining that there are more nodes in the edges data than there are in the vertices data. I did not know where exactly I made a mistake, so I needed to figure that out so that I could fix it, for this I needed to know what are the values that are missing. Function `setdiff(X1, x2)` is very helpful as it can compare vectors and dataframes and show distinct values.
+
+Let's compare nodes in two slightly different vectors: let's take our vector with nodes for the prequel and create another version of it with an extra node that does not fit:
+
+```{r}
+n_prequel <- unique(c(sw_e_prequel$source, sw_e_prequel$target))
+n_prequel1 <- c(n_prequel, "Thanos")
+```
+
+Now, we can compare them. The following code will show us distinct values in `n_prequel` vs. `n_prequel1`:
+
+```{r}
+setdiff(n_prequel, n_prequel1)
+```
+
+... and vice versa:
+
+```{r}
+setdiff(n_prequel1, n_prequel)
+```
+
+... and this is how we can check if two vectors are exactly the same:
+
+```{r}
+v1 <- n_prequel
+v2 <- n_prequel
+
+setdiff(v1, v2)
+setdiff(v2, v1)
+```
+
+# References
+
+* On communities:
+  - <http://networksciencebook.com/chapter/9>.
+  - <https://www.r-bloggers.com/summary-of-community-detection-algorithms-in-igraph-0-6/>
+  - <https://stackoverflow.com/questions/9471906/what-are-the-differences-between-community-detection-algorithms-in-igraph/>
+
+* Jesse Sadler. 2017. *Introduction to Network Analysis with R: Creating static and interactive network graphs*, <https://www.jessesadler.com/post/network-analysis-with-r/>.
+* Katherine Ognyanova (2017-2018). *Static and dynamic network visualization with R*. <https://kateto.net/network-visualization>.
+* *Chapter 6* in: Arnold, Taylor, and Lauren Tilton. 2015. *Humanities Data in R*. New York, NY: Springer Science+Business Media.
+
+# Data
+
+* Evelina Gabasova. 2015. *The Start Wars Social Network.* <http://evelinag.com/blog/2015/12-15-star-wars-social-network/index.html>.
+* Evelina Gabasova. 2016. *Star Wars social network (Version 1.0.1) [Data set]*. Zenodo. <http://doi.org/10.5281/zenodo.1411479>.
+* Star Wars: <https://en.wikipedia.org/wiki/List_of_Star_Wars_characters>.

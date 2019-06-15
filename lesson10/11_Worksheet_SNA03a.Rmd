@@ -1,0 +1,403 @@
+---
+title: "L10 — Social Network Analysis with R (03): SNA Data Reuse (a)"
+author: ''
+output:
+  html_document:
+    df_print: paged
+    toc: true
+    highlight: tango
+    number_sections: yes
+---
+
+**NB:** The worksheet has beed developed and prepared by Maxim Romanov for the course "R for Historical Research" (U Vienna, Spring 2019).
+
+# Social Network Analysis with R (02)
+
+The main goal of this workbook is to demonstrate how data produced with `igraph` library can be reused creatively.
+
+# Libraries
+
+The following are the librsries that we will need for this section. Install those that you do not have yet.
+
+```{r message=FALSE}
+# General ones 
+library(tidyverse)
+library(readr)
+library(stringr)
+library(RColorBrewer)
+
+# SNA Specific
+library(igraph)
+library(ggraph)
+library(ggrepel)
+library(ggalt)
+
+# mapping
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(ggalt)
+library(grid) # grid library cuts out the plot from the graph
+```
+
+**NB:** `igraph` is the main SNA library. There are other packages we can use to visualize graphs (`ggraph`, for example), but most calculations and the overall analysis is still to be performed with `igraph`. You can get an overview of its contents with `library(help="igraph")`. More information: <https://igraph.org/r/>; full documentation: <https://igraph.org/r/doc/igraph.pdf>
+
+# Data
+
+Our practice datasets will include two data sets on Islamic history: 1) the route network of the islamic world around 9-10th centuries (<https://althurayya.github.io/>); and bio-geographical data collected from 30,000 medieval biographies (Source: "The History of Islam" (*Taʾrīḫ al-islām*)  of al-Ḏahabī (748/1348 CE)). 
+
+* [Islamic_World_Data.zip](https://univie-histr-2019.github.io/files/Islamic_World_Data.zip)
+
+# Route Networks
+
+Steps:
+
+- load edges
+- load nodes
+- create a network object
+- run analyses
+- extract results into additional dataframes for reuse
+- reuse
+
+```{r message=FALSE}
+althurayyaE <- read_delim("althurayya_edges.csv", "\t", escape_double = FALSE, trim_ws = TRUE)
+mapLayer <- read_delim("topMicroUPD.csv", "\t", escape_double = FALSE, trim_ws = TRUE)
+
+althurayyaE
+mapLayer
+
+```
+
+Before we create a network object, let's take a moment to think about the weight of our edges. How do you think we should use these distances to create "weights"?
+
+```{r}
+althurayyaE <- althurayyaE %>%
+  mutate(weight = signif(1/length*10000, digits=2))
+hist(althurayyaE$weight)
+althurayyaE
+```
+
+There are more "nodes" in edges than in the nodes table, so, let's skip the nodes table for now:
+
+```{r}
+althurayyaNetwork <- graph_from_data_frame(d=althurayyaE, directed=F)
+althurayyaNetwork <- simplify(althurayyaNetwork)
+```
+
+Now, let's run analyses: 1) centrality measures; 2) cliques (network components); and 3) clusters;
+
+```{r}
+V(althurayyaNetwork)$degree <- degree(althurayyaNetwork, mode="all")
+V(althurayyaNetwork)$eigenvector <- eigen_centrality(althurayyaNetwork)$vector
+V(althurayyaNetwork)$betweenness <- betweenness(althurayyaNetwork, directed=F)
+#vertex_attr(althurayyaNetwork)
+```
+
+Now, let's generate cliques (network components):
+
+```{r}
+althurayyaCliques <- cliques(althurayyaNetwork, min=2)
+althurayyaCliquesL <- largest.cliques(althurayyaNetwork)
+```
+
+And, clusters (this may take a minute or two to run!):
+
+```{r}
+V(althurayyaNetwork)$cl_walktrap <- as.character(cluster_walktrap(althurayyaNetwork)$membership)
+#---#V(althurayyaNetwork)$cluster_spinglass <- as.character(cluster_spinglass(althurayyaNetwork)) # Cannot work with unconnected graph, Invalid value
+V(althurayyaNetwork)$cl_leading_eigen <- as.character(cluster_leading_eigen(althurayyaNetwork)$membership)
+V(althurayyaNetwork)$cl_edge_betweenness <- as.character(cluster_edge_betweenness(althurayyaNetwork)$membership)
+V(althurayyaNetwork)$cl_fast_greedy <- as.character(cluster_fast_greedy(althurayyaNetwork)$membership)
+V(althurayyaNetwork)$cl_louvain <- as.character(cluster_louvain(althurayyaNetwork)$membership)
+V(althurayyaNetwork)$cl_label_prop <- as.character(cluster_label_prop(althurayyaNetwork)$membership)
+V(althurayyaNetwork)$cl_infomap <- as.character(cluster_infomap(althurayyaNetwork)$membership) # for directed graphs
+```
+
+Now, we simply need to extract all the vertices data into a data frame, add the mapping data, and we can put all our results on the map:
+
+```{r}
+althurayyaNetwork_extracted <- as_data_frame(althurayyaNetwork, what="vertices")
+
+althurayyaNetwork_extracted <- althurayyaNetwork_extracted %>%
+  rename(URI = name) %>%
+  left_join(mapLayer, by="URI") %>%
+  filter(!is.na(aRegion))
+
+althurayyaNetwork_extracted
+```
+
+Let's map this data now:
+
+```{r}
+RDSfolder = "./map.objects/"
+rivers_df <- readRDS(paste0(RDSfolder,"rivers_df.rds"))
+aral_sea_df <- readRDS(paste0(RDSfolder,"aral_sea_df.rds"))
+routes_df <- readRDS(paste0(RDSfolder,"routes_df.rds"))
+
+regions_file <- "top_aRegions_VizCenters.csv"
+#regions_url <- "https://univie-histr-2019.github.io/files/08/top_aRegions_VizCenters.csv"
+#download.file(regions_url, regions_file)
+aRegions <- read_delim(regions_file, "\t", escape_double = FALSE, trim_ws = TRUE)
+
+mapLayer_Filtered <- mapLayer %>%
+  #left_join(aRegions, by="aRegion") %>%
+  filter(!is.na(aRegion))
+
+```
+
+Preparing base layer for our maps:
+
+```{r}
+world <- ne_countries(scale = "medium", returnclass = "sf")
+
+colWater = "grey80"
+colLand  = "white"
+
+xlim=c(-12,80); ylim=c(10,50)
+practiceGraphBase_NoReg <- ggplot(data = world) +
+    geom_sf(fill=colLand, color=colLand) +
+  # rivers, aral sea, and routes
+    geom_path(data = rivers_df,aes(x=long, y=lat, group=group), color=colWater, alpha=1, size=.2) +
+    geom_polygon(data = aral_sea_df,aes(x = long, y = lat, group = group), color = colWater, fill=colWater, size = .2) +
+    geom_path(data=routes_df, aes(x=long, y=lat, group=id), color="black", alpha=.1, size=.1)+
+    #geom_label(data=aRegions, aes(x=LON, y=LAT, label=Label), size=2)+
+  # map limits and theme
+    coord_sf(xlim = xlim, ylim = ylim, expand = FALSE) +
+    theme(panel.grid.major = element_line(color = colWater, linetype = "dotted", size = 0.5), panel.background = element_rect(fill = colWater),legend.position="none", panel.border = element_blank())
+
+
+# ANNOTATION VARIABLES - START
+
+colWater = "grey80"
+colLand  = "white"
+fontVal = "Baskerville"
+
+mainAlpha = .75
+headColor = "grey30"
+textColor = "grey10"
+
+Title = "Analytical Regions"
+Subtitle = "Classical Islamic World"
+src = expression("Based on: Cornu G."~italic("Atlas du monde arabo-islamique ...")~"(Leiden: Brill, 1983)")
+tech = "cl_louvain"
+
+# ANNOTATION LAYERS
+
+# TL (Top-Left) - Descriptions
+X = -11; Y = 49.25; Ystep = 3
+practiceGraphBase_NoReg <- practiceGraphBase_NoReg+
+  annotate("text",label=src, x=X,y=Y,angle=0,hjust=0,vjust=1,size=4,col=textColor,alpha=mainAlpha, family=fontVal)
+
+# TR (Top-Right) - Descriptions
+X = 79; Y = 49.25; Ystep = 3
+practiceGraphBase_NoReg <- practiceGraphBase_NoReg+
+  annotate("text",label="https://althurayya.github.io/", x=X,y=Y,angle=0,hjust=1,vjust=1,size=4,col=textColor,alpha=mainAlpha, family=fontVal)
+
+# BL (Bottom-Left) - Descriptions
+X = -11; Y = 10.5; Ystep = 2.5; hj=0; vj=0
+practiceGraphBase_NoReg <- practiceGraphBase_NoReg+
+  annotate("text",label=Subtitle,x=X,y=Y,angle=0,hjust=hj,vjust=vj,size=6,col=headColor,alpha=mainAlpha,family=fontVal, fontface="italic")+
+  annotate("text",label=Title,x=X,y=Y+Ystep,angle=0,hjust=hj,vjust=vj,size=8,col=headColor,alpha=mainAlpha,family=fontVal)
+
+
+practiceGraphBase <- practiceGraphBase_NoReg +
+    geom_encircle(data=mapLayer_Filtered, s_shape=.1, expand=0.01, alpha=.25, aes(x=LON, y=LAT,
+                                                                                  col=aRegion,
+                                                                                  fill=aRegion,
+                                                                                  group=aRegion))
+```
+
+
+```{r}
+# cl_walktrap, cl_leading_eigen, cl_edge_betweenness, cl_fast_greedy, cl_louvain, cl_label_prop, cl_infomap
+
+tech = "cl_louvain"
+
+# BR (Bottom-Right) - Descriptions
+X = 79; Y = 10.5; Ystep = 2.5; hj=0; vj=0
+practiceGraph <- practiceGraphBase+
+  geom_point(data=althurayyaNetwork_extracted, aes(x=LON, y=LAT, color=cl_louvain), size=1.5)+
+  annotate("text",label=tech,x=X,y=Y,angle=0,hjust=1,vjust=vj,size=4,col=headColor,alpha=1,family=fontVal, fontface="bold")
+
+# the following two lines help to strip off unnecessary elements, keeping only the graph itself
+gt <- ggplot_gtable(ggplot_build(practiceGraph))
+ge <- subset(gt$layout, name == "panel")
+
+practiceGraph
+
+ggsave(file=paste0("practiceGraph_regions_", tech,".png"),
+       # the following line focuses on the graph
+       plot=grid.draw(gt[ge$t:ge$b, ge$l:ge$r]),
+       # width and height should be experimentally adjusted to remove white space
+       dpi=300,width=8.85,height=4.45)
+
+```
+
+
+We can check how "cliques" appear on the map. (Since it is a route network, we actually should not expect anything interesting)
+
+```{r}
+#althurayyaCliquesL
+dataTable <- data.frame()
+
+for (i in seq(1, length(althurayyaCliquesL))){
+  temp <- cbind(althurayyaCliquesL[[i]], i)
+  dataTable <- rbind(dataTable, temp)
+}
+
+dataTable <- as.data.frame(cbind(as.character(dataTable$i), rownames(dataTable)))
+colnames(dataTable) <- c("clique", "URI")
+
+dataTable <- dataTable %>%
+  left_join(mapLayer, by="URI") %>%
+  filter(!is.na(aRegion))
+```
+
+
+```{r}
+tech = "lCliques"
+
+# BR (Bottom-Right) - Descriptions
+X = 79; Y = 10.5; Ystep = 2.5; hj=0; vj=0
+practiceGraph <- practiceGraphBase+
+  #geom_encircle(data=dataTable, s_shape=.1, expand=0.01, alpha=.5, aes(x=LON, y=LAT, group=clique), col="black", fill="black")+
+  geom_point(data=dataTable, alpha=0.5, aes(x=LON, y=LAT, color=clique), size=2)+
+  annotate("text",label=tech,x=X,y=Y,angle=0,hjust=1,vjust=vj,size=4,col=headColor,alpha=1,family=fontVal, fontface="bold")
+
+# the following two lines help to strip off unnecessary elements, keeping only the graph itself
+gt <- ggplot_gtable(ggplot_build(practiceGraph))
+ge <- subset(gt$layout, name == "panel")
+
+practiceGraph
+
+ggsave(file=paste0("practiceGraph_regions_", tech,".png"),
+       # the following line focuses on the graph
+       plot=grid.draw(gt[ge$t:ge$b, ge$l:ge$r]),
+       # width and height should be experimentally adjusted to remove white space
+       dpi=300,width=8.85,height=4.45)
+
+
+```
+
+More interesting should be centrality measures
+
+We'll need to update the base layer though
+
+```{r}
+
+# eigenvector, betweenness, degree
+
+althurayyaNetwork_extracted <- althurayyaNetwork_extracted %>%
+  arrange(desc(betweenness))
+
+althurayyaNetwork_extracted
+
+```
+
+```{r}
+
+# eigenvector
+
+lowColor = "darkgreen"
+highColor = "red"
+fontVal = "Brill"
+
+tech = "eigenvector"
+
+minVal = min(althurayyaNetwork_extracted$eigenvector)
+maxVal = max(althurayyaNetwork_extracted$eigenvector)
+
+althurayyaNetwork_extracted <- althurayyaNetwork_extracted %>%
+  arrange(eigenvector)
+
+# BR (Bottom-Right) - Descriptions
+X = 79; Y = 10.5; Ystep = 2.5; hj=0; vj=0
+practiceGraph <- practiceGraphBase_NoReg+
+  geom_point(data=althurayyaNetwork_extracted, aes(x=LON, y=LAT, color=eigenvector, size=eigenvector, alpha=eigenvector))+
+  geom_label_repel(data=subset(althurayyaNetwork_extracted, eigenvector >= min(tail(sort(althurayyaNetwork_extracted$eigenvector),15))), aes(x=LON, y=LAT, label=TR), size=1.5, seed=786, segment.size=0.25, family=fontVal)+
+  annotate("text",label=tech,x=X,y=Y,angle=0,hjust=1,vjust=vj,size=4,col=headColor,alpha=1,family=fontVal, fontface="bold")+
+  scale_colour_gradient(low=lowColor, high=highColor) +
+  scale_size_continuous(range=c(0.3,3), limits=c(minVal,maxVal))
+
+
+# the following two lines help to strip off unnecessary elements, keeping only the graph itself
+gt <- ggplot_gtable(ggplot_build(practiceGraph))
+ge <- subset(gt$layout, name == "panel")
+
+practiceGraph
+
+ggsave(file=paste0("practiceGraph_regions_", tech,".png"),
+       # the following line focuses on the graph
+       plot=grid.draw(gt[ge$t:ge$b, ge$l:ge$r]),
+       # width and height should be experimentally adjusted to remove white space
+       dpi=300,width=8.85,height=4.45)
+
+```
+
+```{r}
+
+# betweenness
+
+tech = "betweenness"
+
+minVal = min(althurayyaNetwork_extracted$betweenness)
+maxVal = max(althurayyaNetwork_extracted$betweenness)
+
+althurayyaNetwork_extracted <- althurayyaNetwork_extracted %>%
+  arrange(betweenness)
+
+# BR (Bottom-Right) - Descriptions
+X = 79; Y = 10.5; Ystep = 2.5; hj=0; vj=0
+practiceGraph <- practiceGraphBase_NoReg+
+  geom_point(data=althurayyaNetwork_extracted, aes(x=LON, y=LAT, color=betweenness, size=betweenness, alpha=betweenness))+
+  geom_label_repel(data=subset(althurayyaNetwork_extracted, betweenness >= min(tail(sort(althurayyaNetwork_extracted$betweenness),15))), aes(x=LON, y=LAT, label=TR), size=1.5, seed=786, segment.size=0.25, family=fontVal)+
+  annotate("text",label=tech,x=X,y=Y,angle=0,hjust=1,vjust=vj,size=4,col=headColor,alpha=1,family=fontVal, fontface="bold")+
+  scale_colour_gradient(low=lowColor, high=highColor) +
+  scale_size_continuous(range=c(0.1,3), limits=c(minVal,maxVal))
+
+# the following two lines help to strip off unnecessary elements, keeping only the graph itself
+gt <- ggplot_gtable(ggplot_build(practiceGraph))
+ge <- subset(gt$layout, name == "panel")
+
+practiceGraph
+
+ggsave(file=paste0("practiceGraph_regions_", tech,".png"),
+       # the following line focuses on the graph
+       plot=grid.draw(gt[ge$t:ge$b, ge$l:ge$r]),
+       # width and height should be experimentally adjusted to remove white space
+       dpi=300,width=8.85,height=4.45)
+
+```
+
+```{r}
+# degree
+
+tech = "degree"
+
+minVal = min(althurayyaNetwork_extracted$degree)
+maxVal = max(althurayyaNetwork_extracted$degree)
+
+althurayyaNetwork_extracted <- althurayyaNetwork_extracted %>%
+  arrange(degree)
+
+# BR (Bottom-Right) - Descriptions
+X = 79; Y = 10.5; Ystep = 2.5; hj=0; vj=0
+practiceGraph <- practiceGraphBase_NoReg+
+  geom_point(data=althurayyaNetwork_extracted, aes(x=LON, y=LAT, color=degree, size=degree, alpha=degree))+
+  geom_label_repel(data=subset(althurayyaNetwork_extracted, degree >= min(tail(sort(althurayyaNetwork_extracted$degree),15))), aes(x=LON, y=LAT, label=TR), size=1.5, seed=786, segment.size=0.25, family=fontVal)+
+  annotate("text",label=tech,x=X,y=Y,angle=0,hjust=1,vjust=vj,size=4,col=headColor,alpha=1,family=fontVal, fontface="bold")+
+  scale_colour_gradient(low=lowColor, high=highColor) +
+  scale_size_continuous(range=c(0.05,3), limits=c(minVal,maxVal))
+
+# the following two lines help to strip off unnecessary elements, keeping only the graph itself
+gt <- ggplot_gtable(ggplot_build(practiceGraph))
+ge <- subset(gt$layout, name == "panel")
+
+practiceGraph
+
+ggsave(file=paste0("practiceGraph_regions_", tech,".png"),
+       # the following line focuses on the graph
+       plot=grid.draw(gt[ge$t:ge$b, ge$l:ge$r]),
+       # width and height should be experimentally adjusted to remove white space
+       dpi=300,width=8.85,height=4.45)
+
+```

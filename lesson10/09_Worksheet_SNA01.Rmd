@@ -1,0 +1,410 @@
+---
+title: "L09 — Social Network Analysis with R"
+author: ''
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+**NB:** The worksheet has beed developed and prepared by Maxim Romanov for the course "R for Historical Research" (U Vienna, Spring 2019); Code snippets, data, and descriptions reused from: 1) <https://kateto.net/network-visualization>; 2) <http://doi.org/10.5281/zenodo.1411479> (modified).
+
+# Social Network Analysis with R
+
+- basics: nodes (vertices), edges (links), graphs (networks)
+- R: creating and modifying graph objects, plotting networks.
+
+In the next lesson we'll talk more about analysis (network metrics and measures) and reuse of SNA data.
+
+# Libraries
+
+```{r message=FALSE}
+# General ones 
+library(tidyverse)
+library(readr)
+
+# SNA Specific
+library(igraph)
+#library(qgraph)
+```
+
+# Data
+
+Download and unzip this file: [sw_network_data.zip](https://univie-histr-2019.github.io/files/09/sw_network_data.zip).
+
+# Loading Network Data: Star Wars :)
+
+# Edges / Links
+
+Let's load `edges` data—using a network of *Star Wars* characters (Episodes 1-7; based on [Gabasova 2016], modified). Edges data is usually stored in tables with at least *two* columns, which are usually called `source` and `target`, and very often `weight` is also included. Other columns are optional and may vary on the configuration of your data and your research goals. 
+
+```{r}
+library(tidyverse)
+library(readr)
+sw_edges <- read_delim("sw_network_edges_allCharacters.csv", "\t", escape_double = FALSE, trim_ws = TRUE)
+head(sw_edges)
+```
+
+So, the following data includes the above mentioned required columns, plus the column `episode`. In this specific network configuration `weight` is the number of scenes in which characters are talking to each other. (This particular network is *undirected*—we are just registering the fact of communication, but not who addresses whom; *directed* network example would be a network of correspondence).
+
+**NB:** Check Ognyanova's tutorial for more options of how the network data can be created and loaded in R (see, References below).
+
+We can use what we have learned before to modify this data and calculate the overall weights for all episodes—a cumulative network might be an easier point to start. (We can return to the initial data later).
+
+```{r}
+library(tidyverse)
+sw_edges_all <- sw_edges %>%
+  group_by(source, target) %>%
+  summarize(weight=sum(weight))
+
+head(sw_edges_all)
+```
+
+## Nodes / Vertices
+
+Nodes (vertices) can be provided in a separate file, which must have `ID` column—these IDs are used to form edges in the edges table; other columns are optional and provide detailed information on nodes, which might be of use in the analysis to follow. Our Star-Wars data is rather simple: we can use the values from `source` and `target` from the edges table to form the table with our nodes.
+
+```{r}
+sw_nodes <- as.data.frame(unique(c(sw_edges$source,sw_edges$target)))
+colnames(sw_nodes) <- "ID"
+head(sw_nodes)
+```
+
+We, however, do have a file with a bit more information on each node. We can load it and `left_join` to our nodes. This will be convenient for cases when we analyze only a set of nodes (for example, only a particular episode). 
+
+```{r message=FALSE}
+sw_nodes_data <- read_delim("sw_network_nodes_allCharacters.csv", "\t", escape_double = FALSE, trim_ws = TRUE)
+head(sw_nodes_data)
+
+sw_nodes <- sw_nodes %>%
+  left_join(sw_nodes_data, by="ID")
+
+head(sw_nodes)
+```
+
+(@) Using the examples above, create data for your favorite episode (or just pick one), and for either the original trilogy or the prequel one (just in case: the original trilogy is Episodes 4-6, the prequel one is Episodes 1-3). Make sure to store this new data in distinct variables.
+
+```{r}
+# your code
+
+```
+
+## Graph / Network Object
+
+Now that we have both necessary components, we can start with our analysis. First, we need to create a graph object, using `igraph` library.
+
+```{r}
+library(igraph)
+sw_network <- graph_from_data_frame(d=sw_edges_all, vertices=sw_nodes, directed=F)
+sw_network
+```
+
+The description of an `igraph` object starts with four letters (in our case: `UNW-`):
+
+* `D` or `U`, for a directed or undirected graph
+* `N` for a named graph (where nodes have a name attribute)
+* `W` for a weighted graph (where edges have a weight attribute)
+* `B` for a bipartite (two-mode) graph (where nodes have a type attribute)
+
+In our case, it is `UNW-`, i.e.: undirected, named, weighted, and not bipartite.
+
+The two numbers that follow (`110 444`) refer to the number of nodes and edges in the graph. The description also lists node & edge attributes, for example:
+
+* `(g/c)` - graph-level character attribute
+* `(v/c)` - vertex-level character attribute
+* `(e/n)` - edge-level numeric attribute
+
+`igraph` objects provide us with an easy access to to nodes, edges, and their attributes with the following commands:
+
+
+```{r}
+E(sw_network) # edges
+```
+
+
+```{r}
+V(sw_network) # vertices 
+```
+
+
+```{r}
+E(sw_network)$weight # edges attribute `weights`
+```
+
+
+```{r}
+V(sw_network)$name # vertices attribute `names`
+```
+
+We can enrich the description of our vertices (and readjust them) for visualizations.
+
+```{r}
+V(sw_network)$size <- 4
+V(sw_network)$label <- ""
+#V(sw_network)$label <- V(sw_network)$name # we can assign names into the labels, but let's wait a bit
+```
+
+Let's also color our nodes based on the `SIDE` that our characters are on: they are either asctively participating in the fight between the "light" and the "dark" side of the Force, or they have nothing to do with this cosmic struggle ("neutral"); Anakin Skywalker/Darth Vader is a complicated case.
+
+```{r}
+# Generate colors based on `type the `SIDE` value:
+cols <- c("red", "blue", "gold", "lightblue")
+rowF <- as.factor(V(sw_network)$SIDE)
+V(sw_network)$color <- cols[rowF]
+```
+
+We can also extract information from the `igraph` object into a data frame for reuse:
+
+```{r}
+sw_vertices_extracted <- as_data_frame(sw_network, what="vertices")
+head(sw_vertices_extracted)
+```
+
+Now, we can plot our network ("darksiders" are blue, "lightsiders" are gold, neutral characters are light blue, Anakin Skywalker/Darth Vader is red):
+
+```{r}
+plot(sw_network, vertex.labels=NA)
+```
+
+The network can be simplified by removing loops (when a node is connected to itself) and duplicate edges. Our data does not have any of these, but you might still want to have this line of code for your reference:
+
+```{r}
+sw_network_simple <- simplify(sw_network, remove.multiple=FALSE, remove.loops=TRUE) 
+plot(sw_network_simple)
+```
+
+You can see that networks look different, but this is simply because of a certain element of randomness during the process of the layout generation. This is not convenient for *reproducable* research, nor simply for cases when you want the network to maintain the same shape. For this we can use the following command: `set.seed(x)` where `x` is a number (using the same number generates the same results). Let's take a look at our graphs again:
+
+```{r}
+set.seed(1)
+plot(sw_network)
+```
+
+
+```{r}
+sw_network_simple <- simplify(sw_network, remove.multiple=FALSE, remove.loops=TRUE)
+set.seed(1)
+plot(sw_network_simple)
+```
+
+# Network layouts
+
+We can use a random layout (which is probably not the best option).
+
+```{r}
+#set.seed(10)
+plot(sw_network, layout=layout_randomly)
+```
+
+`igraph` has a number of built inlayouts that we can use. Change the layout parameter in the code snippet below, using the following parameters for the layout: `layout_in_circle`, `layout_on_sphere`, `layout_with_fr`, `layout_as_tree`, `layout_as_star` (*do not forget to make necessary corrections!*) For more information on layouts, check <https://igraph.org/r/doc/layout_.html>.
+
+* `layout_with_fr`: Fruchterman-Reingold is one of the most used force-directed layout algorithms. Force-directed layouts try to get a nice-looking graph where edges are similar in length and cross each other as little as possible. They simulate the graph as a physical system. Nodes are electrically charged particles that repulse each other when they get too close. The edges act as springs that attract connected nodes closer together. As a result, nodes are evenly distributed through the chart area, and the layout is intuitive in that nodes which share more connections are closer to each other. The disadvantage of these algorithms is that they are rather slow and therefore less often used in graphs larger than ~1000 vertices. You can set the “weight” parameter which increases the attraction forces among nodes connected by heavier edges.
+* `layout_with_kk`: Kamada Kawai, another force-directed algorithm that produces nice results for connected graphs. Like Fruchterman Reingold, it attempts to minimize the energy in a spring system.
+* `layout_with_lgl`: the LGL algorithm is meant for large, connected graphs. Here you can also specify a root: a node that will be placed in the middle of the layout.
+* `layout_with_mds`: The MDS (multidimensional scaling) algorithm tries to place nodes based on some measure of similarity or distance between them. More similar nodes are plotted closer to each other. By default, the measure used is based on the shortest paths between nodes in the network. We can change that by using our own distance matrix (however defined) with the parameter dist. MDS layouts are nice because positions and distances have a clear interpretation. The problem with them is visual clarity: nodes often overlap, or are placed on top of each other.
+
+```{r}
+set.seed(2)
+plot(sw_network, layout=layout_with_lgl)
+```
+
+Choosing a correct layout is a tricky thing, especially when you do not know what to expect from your network. For such cases `igraph ` has an option `layout_nicely(igraph_object)` (or: `layout=layout_nicely`), which is supposed to pick a most suitable layout automatically.
+
+```{r}
+set.seed(2)
+plot(sw_network, layout=layout_nicely)
+
+#plot(sw_network, layout=layout_with_fr)
+```
+
+The graph may appear too condensed or spread out, so we can tweak the scale of the layout to our liking. By default, the coordinates of the plots are rescaled to the `[-1,1]` interval for both `x` and `y`. This parameter can be changed with parameter `rescale=FALSE` and the plot can be rescaled manually by multiplying the coordinates by a scalar. You can use `norm_coords` to normalize the plot with the boundaries you want. This way you can create more compact or spread out layout versions.
+
+**Comment:** # Saving your layout into a variable makes it easier to reuse it and consumes less resources, which is particularly important for large graphs.
+
+```{r}
+set.seed(1)
+l <- layout_with_mds(sw_network)
+l <- norm_coords(l, ymin=-1, ymax=1, xmin=-1, xmax=1)
+
+par(mfrow=c(2,2), mar=c(0,0,0,0)) # creates a 2x2 grid for plots
+plot(sw_network, rescale=F, layout=l*0.4)
+plot(sw_network, rescale=F, layout=l*0.6)
+plot(sw_network, rescale=F, layout=l*0.8)
+plot(sw_network, rescale=F, layout=l*1.0)
+
+```
+
+We can take a look at all available layouts in `igraph`:
+
+```{r message=FALSE}
+
+layouts <- grep("^layout_", ls("package:igraph"), value=TRUE)[-1] 
+# Remove layouts that do not apply to our graph.
+layouts <- layouts[!grepl("bipartite|merge|norm|sugiyama", layouts)]
+
+par(mfrow=c(1,2), mar=c(1,1,1,1))
+for (layout in layouts) {
+  #print(layout)
+  l <- do.call(layout, list(sw_network)) 
+  plot(sw_network, edge.arrow.mode=0, layout=l, main=layout) }
+
+```
+
+# Adding more information into the graph
+
+We can add more information to our `igraph` object to make the plot of our network more informative: for example, we can assign various sizes to nodes, based on their degree, and modify the thickness (width) of edges based on their weights. Last but not least, we can display the labels to all the nodes (we can also modify the size of the labels based on the degree of each node).
+
+```{r}
+# since some degrees are too high, we can scale them
+library(plyr)
+sw_network_temp <- sw_network
+
+# Compute node degrees (#links) and use that to set node size:
+deg <- degree(sw_network_temp, mode="all")
+
+# SCALING (using plyr library)
+V(sw_network_temp)$label.cex <- round_any(deg/30, .2, f = ceiling)
+#V(sw_network_temp)$label.cex <- round_any(deg/30, .2, f = ceiling)
+#V(sw_network_temp)$label.cex <- 0.5
+V(sw_network_temp)$size <- round_any(deg/5, 2, f = ceiling)
+
+# Set edge width based on weight:
+E(sw_network_temp)$width <- E(sw_network_temp)$weight/5
+
+# Let's add labels
+V(sw_network_temp)$label <- V(sw_network_temp)$name
+
+# plotting the graph
+set.seed(2)
+l <- layout.fruchterman.reingold(sw_network_temp, niter=10000)
+plot(sw_network_temp, layout=l)
+
+detach("package:plyr") # attached `plyr` package conflicts with `tidyverse`, so we need to detach it after use
+library(tidyverse) # reload dplyr
+```
+
+This is how our updated vertices looks like after the transformations we have done above:
+
+```{r}
+sw_vertices_temp_extracted <- as_data_frame(sw_network_temp, what="vertices")
+head(sw_vertices_temp_extracted)
+```
+
+(@) Generate graphs, where only the following group is highlighted with a different color: 1) Rebel Alliance; 2) Jedi Order; 3) Droids.
+
+```{r}
+
+# your code goes here
+
+```
+
+# Improving network plots
+
+Notice that our network plot is still not too helpful. We can identify the type and size of nodes, but cannot see much about the structure since the links we’re examining are so dense. One way to approach this is to see if we can sparsify the network, keeping only the most important ties and discarding the rest.
+
+```{r}
+hist(E(sw_network_temp)$weight)
+mean(E(sw_network_temp)$weight)
+sd(E(sw_network_temp)$weight)
+```
+
+There are more sophisticated ways to extract the key edges, but for the purposes of this exercise we’ll only keep ones that have weight higher than the mean for the network. In igraph, we can delete edges using `delete_edges(network, edges)`:
+
+```{r}
+cut.off <- mean(E(sw_network_temp)$weight) 
+sw_network_sparse <- delete_edges(sw_network_temp, E(sw_network)[weight < cut.off])
+
+# plotting the graph
+set.seed(2)
+l <- layout.fruchterman.reingold(sw_network_sparse, niter=1000)
+plot(sw_network_sparse, layout=l)
+
+```
+
+We can also try quartiles, like so:
+
+```{r}
+quantile((E(sw_network_temp)$weight))
+
+q3 <- quantile((E(sw_network_temp)$weight))[3]
+sw_network_sparse <- delete_edges(sw_network_temp, E(sw_network)[weight <= q3])
+
+# plotting the graph
+set.seed(2)
+l <- layout.fruchterman.reingold(sw_network_sparse, niter=1000)
+plot(sw_network_sparse, layout=l)
+```
+
+(@) How different would the graph be for Episode 1 and Episode 6? What can you observe?
+
+```{r}
+
+# your code goes here
+
+```
+
+
+(@) If your final project involves network data, try to use it now and adapt all code chunks to your data. Generate a separate notebook.
+
+
+# Some Code Snippets
+
+1. `round_any()` from `library(plyr)` is a convenient function to manipulate numbers. The example below rounds up numbers to the next multiple of 5. You can change 5 to change the multiple parameter. Unfortunately, `plyr` conflicts with `tidyverse`, so we need to detach it.
+
+```{r message=FALSE}
+library(plyr)
+round_any(c(1,2,3,4,5,6,7,8,9,10), 5, f=ceiling)
+detach("package:plyr") # attached `plyr` package conflicts with `tidyverse`, so we need to detach it after use
+library(tidyverse) # reload dplyr
+```
+
+2. The following code snippet allows to replace a set of values in one vector with a set of values from another one. In the example above we used this to replace `SIDE` values (*light*, *dark*, and *neutral*) with colors (gold, lightblue, blue, and red—for Anakin). There is no explicit control over what coler get assigned to what value, but you can change the order of colors in the color vector and get a desirable assignment.
+
+```{r}
+cols <- c("red", "blue", "gold", "lightblue")
+rowF <- as.factor(V(sw_network)$SIDE)
+V(sw_network)$color <- cols[rowF]
+```
+
+For better control, we can merge data frames in the following manner (the position of the color in vector corresponds to the position of the value!):
+
+```{r}
+
+SIDE <- c("anakin", "dark", "light", "neutral")
+color <- c("red", "blue", "gold", "lightblue")
+colTable <- data.frame(SIDE, color)
+
+colTable
+
+colVals <- data.frame(V(sw_network_temp)$SIDE)
+colnames(colVals) <- "SIDE"
+
+colVals <- colVals %>%
+  left_join(colTable, by="SIDE")
+
+colVals
+```
+
+Now let's regenerate the network data and check the nodes table:
+
+```{r}
+
+sw_network_temp <- sw_network
+
+# Generate colors based on `type the `SIDE` value:
+V(sw_network_temp)$color <- as.vector(colVals$color)
+
+sw_vertices_temp_extracted <- as_data_frame(sw_network_temp, what="vertices")
+head(sw_vertices_temp_extracted)
+
+```
+
+
+# References
+
+* Evelina Gabasova. 2015. *The Start Wars Social Network.* <http://evelinag.com/blog/2015/12-15-star-wars-social-network/index.html>.
+* Evelina Gabasova. 2016. *Star Wars social network (Version 1.0.1) [Data set]*. Zenodo. <http://doi.org/10.5281/zenodo.1411479>.
+* Star Wars: <https://en.wikipedia.org/wiki/List_of_Star_Wars_characters>.
+* Jesse Sadler. 2017. *Introduction to Network Analysis with R: Creating static and interactive network graphs*, <https://www.jessesadler.com/post/network-analysis-with-r/>.
+* Katherine Ognyanova (2017-2018). *Static and dynamic network visualization with R*. <https://kateto.net/network-visualization>.
+* *Chapter 6* in: Arnold, Taylor, and Lauren Tilton. 2015. *Humanities Data in R*. New York, NY: Springer Science+Business Media.

@@ -1,0 +1,1424 @@
+---
+title: "L08 Mapping"
+author: "Daniel Stoxreiter"
+subtitle: Creating more robust maps
+toc: yes
+---
+
+# Tasks:
+
+We will look into the following:
+
+- adding vector layers (rivers, routes, lakes)
+- highlighting complex elements on maps
+- creating publishable maps
+- drawing connections between points (itineraries and networks)
+
+# Necessary libraries
+
+We will need some new libraries that are developed for working with maps. You may want to install those libraries outside of the notebook, so that it does not try to reinstall them everytime you `knit` it.
+
+```{r}
+#install.packages(c("cowplot", "googleway", "ggplot2", "ggrepel", "ggspatial", "libwgeom", "sf", "rnaturalearth", "rnaturalearthdata", "rnaturalearthhires"))
+library(tidyverse)
+library(sf)
+```
+
+The libraries below have the necessary geographical data, so let's load them and create a working variable.
+
+```{r}
+library(rnaturalearth)
+library(rnaturalearthdata)
+
+#worldHR <- ne_countries(scale = "large", returnclass = "sf")
+world <- ne_countries(scale = "medium", returnclass = "sf")
+```
+
+So, here is our base map. Something is missing...
+
+```{r}
+theme_set(theme_bw())
+
+xlim=c(-12,80); ylim=c(10,50)
+ggplot(data = world) +
+    geom_sf(fill="white", color="white") +
+    coord_sf(xlim = xlim, ylim = ylim, expand = FALSE) +
+    theme(panel.background = element_rect(fill = "grey90"))
+```
+
+Let's try to add rivers... and the Aral Sea, which almost completely disappeared in the past 40 years of so. For this, we will need to get relevant data filesâmost likely in `shape` format used in GIS applications like ArcGIS and QGIS. Googling usually works for finding relevant data. Files for the Aral Sea: <http://www.marineregions.org/gazetteer.php?p=details&id=4281>. Working with `shape` files is a bit tricky and we need some extra steps to convert `shape` files into something that R understands, namely, dataframes.
+
+```{r}
+library(rgdal)     # R wrapper around GDAL/OGR
+library(ggmap)    # for fortifying shapefiles (converting GIS files into data frames)
+
+```
+
+We need `ggmap` library, because it has a functionâ`fortify()`âthat converts GIS data (`*.shp` files) into data frames with which R works. If you try to install `ggmap` library, you will most likely get an error, as the CRAN `ggmap` version is for an older version of R; we can try to install the latest version directly from the developer. Such practice has its advantages and disadvantages, keep this in mind! `ggmap` developer version is hosted at <https://github.com/dkahle/ggmap>. 
+
+```{r}
+#install.packages("devtools")
+#devtools::install_github("dkahle/ggmap")
+library(ggmap) # for fortifying shapefiles
+
+```
+
+Now, let's read in the shapefile, using the path to the shapefile and the shapefile name minus the extension as arguments. Keep in mind, that the first argumentâthe pathâshould not have the trailing `/`. (See, [readOGR](https://www.rdocumentation.org/packages/rgdal/versions/1.4-3/topics/readOGR))
+
+First, download the following two files and unzip them (change paths to files if necessary!):
+
+* [layer.riverData.zip](https://univie-histr-2019.github.io/files/08/layer.riverData.zip)
+* [layer.aral_sea.zip](https://univie-histr-2019.github.io/files/08/layer.aral_sea.zip)
+
+```{r shape_data}
+# Rivers
+rivers <- readOGR("./layer.riverData", "ne_50m_rivers_lake_centerlines")
+rivers_df <- fortify(rivers)
+
+# adding the Aral sea -- historical basin
+aral_sea <- readOGR("./layer.aral_sea", "worldglwd1")
+aral_sea_df <- fortify(aral_sea)
+```
+
+Let's try to save these as rData objects (`*.rds`) and load them, instead of preprocessing `shape` files everytime, which may take a while. Loading RDS files is just a jiffy. Keep in mind, that you can save any data into RDS file! This might be particularly valuable for storing intermediate results that you do not want to regenerate too often.
+
+```{r RDS_files}
+#saveRDS(rivers_df, "./map.objects/rivers_df.rds")
+#saveRDS(aral_sea_df, "./map.objects/aral_sea_df.rds")
+
+rivers_df <- readRDS("./map.objects/rivers_df.rds")
+aral_sea_df <- readRDS("./map.objects/aral_sea_df.rds")
+
+library("ggspatial")
+```
+
+You can now comment out code in `shape_data` chunk and `saveRDS()` lines in `RDS_files` chunk. The entire script will work much faster this way.
+
+```{r}
+
+xlim=c(-12,80); ylim=c(10,50)
+ggplot(data = world) +
+    geom_sf(fill="white", color="white") +
+  # rivers and the aral sea
+    geom_path(data = rivers_df,aes(x = long, y = lat, group = group), color = 'grey90', size = .2) +
+    geom_polygon(data = aral_sea_df,aes(x = long, y = lat, group = group), color = 'grey90', fill="grey90", size = .2) +
+  # map limits and theme
+    coord_sf(xlim = xlim, ylim = ylim, expand = FALSE) +
+    theme(panel.background = element_rect(fill = "grey90"))
+```
+
+We can add data in geojson format as well. (For polygons and paths/lines, see: <https://randomjohn.github.io/r-geojson-gardens/>; for points, see: <https://randomjohn.github.io/r-geojson-srt/>)
+
+```{r}
+library(geojsonio)
+
+data_fileR <- "althurayya_routes_full.json"
+data_fileP <- "althurayya_places_full.json"
+
+# uncomment the following four lines, if files are not on your computer yet 
+
+# data_urlR <- "https://raw.githubusercontent.com/althurayya/althurayya.github.io/master/master/routes_full.json"
+# download.file(data_urlR, data_fileR)
+# data_urlP <- "https://github.com/althurayya/althurayya.github.io/raw/master/master/places_full.geojson"
+# download.file(data_urlP, data_fileP)
+
+dataR <- geojson_read(data_fileR, what = "sp")
+dataP <- geojson_read(data_fileP, what = "sp")
+```
+
+We can quickly plot this data with `plot()`, just to get a general idea:
+
+```{r}
+plot(dataR)
+points(dataP, col="red", pch=20)
+```
+
+To use this data with `ggplot` we also need to convert it into data frames. Depending on the contents of geojson files, different procedures have to be applied. Thus, for polygons/paths/lines, we will need to use `fortify()`, while for points `as.data.frame()` will work.
+
+```{r}
+dataR_F <- fortify(dataR)
+dataP_F <- as.data.frame(dataP)
+```
+
+Ww can now add these two layers on our map, but, unfortunately, we will not be able to do much with this data. Take a look at the initial geojson file and the `dataR_F` and `dataP_F`. Can you explain why?
+
+```{r}
+
+xlim=c(-12,80); ylim=c(10,50)
+ggplot(data = world) +
+    geom_sf(fill="white", color="white") +
+  # rivers + aral sea
+    geom_path(data = rivers_df,aes(x=long, y=lat, group=group), color='lightblue', alpha=1, size=.2) +
+    geom_polygon(data = aral_sea_df,aes(x = long, y = lat, group = group), color = 'lightblue', fill="lightblue", size = .2) +
+  # routes
+    geom_path(data=dataR_F, aes(x=long, y=lat, group=id), color="black", alpha=.25, size=.1)+
+  # settlements
+    geom_point(data=dataP_F, aes(x=coords.x1, y=coords.x2), color="black", alpha=.25, size=.1)+
+    coord_sf(xlim = xlim, ylim = ylim, expand = FALSE) +
+    theme(panel.grid.major = element_line(color = "lightblue", linetype = "dotted", size = 0.5), panel.background = element_rect(fill = "lightblue"))
+
+```
+
+Since such conversions often lead to loss of data, it is always better to prepare your data in table format before loading it into R. Let's load `csv` data on settlements and regions:
+
+```{r}
+# Better version of points
+library(readr)
+
+places_file <- "topMicroUPD.csv"
+#places_url <- "https://univie-histr-2019.github.io/files/08/topMicroUPD.csv"
+#download.file(places_url, places_file)
+topMicroUPD <- read_delim(places_file, "\t", escape_double = FALSE, trim_ws = TRUE)
+
+regions_file <- "top_aRegions_VizCenters.csv"
+#regions_url <- "https://univie-histr-2019.github.io/files/08/top_aRegions_VizCenters.csv"
+#download.file(regions_url, regions_file)
+aRegions <- read_delim(regions_file, "\t", escape_double = FALSE, trim_ws = TRUE)
+
+```
+
+All places in this file are categorized into regions (`REG_MESO` or, alternatively, `aRegion`). We can use this parameter to color them all differently (*categorically*). Let's also, for convenience, save colors for waters and landmasses into variablesâthis will help us easily change those when we want to adjust the map.
+
+```{r}
+
+colWater = "lightblue"
+colLand  = "white"
+
+xlim=c(-12,80); ylim=c(10,50)
+ggplot(data = world) +
+    geom_sf(fill=colLand, color=colLand) +
+  # rivers
+    geom_path(data = rivers_df,aes(x=long, y=lat, group=group), color=colWater, alpha=1, size=.2) +
+  # aral sea
+    geom_polygon(data = aral_sea_df,aes(x = long, y = lat, group = group), color = colWater, fill=colWater, size = .2) +
+  # routes
+    geom_path(data=dataR_F, aes(x=long, y=lat, group=id), color="black", alpha=.25, size=.1)+
+  # settlements
+    geom_point(data=topMicroUPD, aes(x=LON, y=LAT, color=aRegion), alpha=.75, size=1)+
+  # map limits and theme
+    coord_sf(xlim = xlim, ylim = ylim, expand = FALSE) +
+    theme(panel.grid.major = element_line(color = colWater, linetype = "dotted", size = 0.5), panel.background = element_rect(fill = colWater))
+
+```
+
+We can improve this map further by removing the legend (which does not look nice anyway) and adding, instead, labels for the regions right on our map. Can you find those changes in the code?
+
+```{r}
+
+colWater = "lightblue"
+colLand  = "white"
+
+xlim=c(-12,80); ylim=c(10,50)
+practiceGraph <- ggplot(data = world) +
+    geom_sf(fill=colLand, color=colLand) +
+  # rivers
+    geom_path(data = rivers_df,aes(x=long, y=lat, group=group), color=colWater, alpha=1, size=.2) +
+  # aral sea
+    geom_polygon(data = aral_sea_df,aes(x = long, y = lat, group = group), color = colWater, fill=colWater, size = .2) +
+  # routes
+    geom_path(data=dataR_F, aes(x=long, y=lat, group=id), color="black", alpha=.25, size=.1)+
+  # settlements
+    geom_point(data=topMicroUPD, aes(x=LON, y=LAT, color=aRegion), alpha=.75, size=1)+
+  # regions
+    geom_label(data=aRegions, aes(x=LON, y=LAT, label=Label), size=2)+
+  # map limits and theme
+    coord_sf(xlim = xlim, ylim = ylim, expand = FALSE) +
+    theme(panel.grid.major = element_line(color = colWater, linetype = "dotted", size = 0.5), panel.background = element_rect(fill = colWater), legend.position="none")
+
+practiceGraph
+#ggsave(file="practiceGraph_regions.png",plot=practiceGraph,dpi=300,width=9,height=5)
+
+```
+
+One other improvement we can make is to draw polygons around regions in the following manner. We will need `ggalt` library, with which we can add polygons using `geom_encircle()`, where `s_shape=` and `expand=` can be tweaked to adjust the shape of polygons. This function is convenient to draw a polygon around any points that share a particular characteristic. More details: <https://github.com/hrbrmstr/ggalt>.
+
+(Remember that layers added later can completely cover those that were added before!)
+
+```{r}
+library(ggalt)
+
+colWater = "lightblue"
+colLand  = "white"
+
+topMicroUPD_Filtered <- topMicroUPD %>%
+    filter(!is.na(aRegion))
+
+xlim=c(-12,80); ylim=c(10,50)
+practiceGraph <- ggplot(data = world) +
+    geom_sf(fill=colLand, color=colLand) +
+  # rivers
+    geom_path(data = rivers_df,aes(x=long, y=lat, group=group), color=colWater, alpha=1, size=.2) +
+  # aral sea
+    geom_polygon(data = aral_sea_df,aes(x = long, y = lat, group = group), color = colWater, fill=colWater, size = .2) +
+  # routes
+    geom_path(data=dataR_F, aes(x=long, y=lat, group=id), color="black", alpha=.25, size=.1)+
+  # settlements
+    geom_point(data=topMicroUPD, aes(x=LON, y=LAT, color=aRegion), alpha=.75, size=1)+
+  # regions
+    geom_encircle(data=topMicroUPD_Filtered, s_shape=.1, expand=0.02, alpha=.5, col="black", aes(x=LON, y=LAT, group=aRegion, fill=aRegion))+
+    geom_label(data=aRegions, aes(x=LON, y=LAT, label=Label), size=2)+
+  # map limits and theme
+    coord_sf(xlim = xlim, ylim = ylim, expand = FALSE) +
+    theme(panel.grid.major = element_line(color = colWater, linetype = "dotted", size = 0.5), panel.background = element_rect(fill = colWater),legend.position="none")
+
+practiceGraph
+#ggsave(file="practiceGraph_regionsPolygons.png",plot=practiceGraph,dpi=300,width=9,height=5)
+
+```
+
+# Publishable Maps
+
+## Medieval Islamic World
+
+To generate a publishable map you will need to change parameters in such a way that the *saved* version of your graph is in satisfactory condition: it should be at least 300 dpi, large enough (width, height), and use fonts that you are using in publication. It makes sense to create variables for the *annotation* layer and put them somewhere in the beginning of your code so that they are easier to edit.
+
+```{r}
+library(ggalt) # https://github.com/hrbrmstr/ggalt
+
+# ANNOTATION VARIABLES - START
+
+colWater = "grey"
+colLand  = "white"
+fontVal = "Century"
+
+mainAlpha = .75
+headColor = "grey30"
+textColor = "grey10"
+
+Title = "Analytical Regions"
+Subtitle = "Classical Islamic World"
+src = expression("Based on: Cornu G."~italic("Atlas du monde arabo-islamique ...")~"(Leiden: Brill, 1983)")
+
+# ANNOTATION VARIABLES - END
+
+topMicroUPD_Filtered <- topMicroUPD %>%
+    filter(!is.na(aRegion))
+
+myTheme <- theme_bw()+
+  theme(panel.grid.major = element_line(color = colWater, linetype = "dotted", size = 0.5),
+        panel.background = element_rect(fill = colWater),
+        legend.position="none"
+        )
+
+xlim=c(-11,71); ylim=c(12,48)
+conns <- ggplot(data = world) +
+    geom_sf(fill=colLand, color=colLand) +
+    # rivers + aral sea
+    geom_path(data = rivers_df,aes(x=long, y=lat, group=group), color=colWater, alpha=1, size=.2) +
+    geom_polygon(data=aral_sea_df, aes(x=long, y=lat, group=group), color=colWater, fill=colWater, size=.2) +
+    # al-Thurayya
+    # routes
+    geom_path(data=dataR_F, aes(x=long, y=lat, group=id), color="black", alpha=.25, size=.2)+
+    # settlements
+    geom_point(data=topMicroUPD, aes(x=LON, y=LAT, color=aRegion), alpha=.75, size=1)+
+    geom_encircle(data=topMicroUPD_Filtered, s_shape=.1, expand=0.01, alpha=.5, col="black",
+                  aes(x=LON, y=LAT, group=aRegion,fill=aRegion)) +
+    # labels for regions
+    geom_label(family = fontVal, fontface="bold",
+               data=aRegions, aes(x=LON, y=LAT, label=Label),
+               nudge_x=0, nudge_y=1, color="black", alpha=.75, size=5) +
+    # scales
+    coord_sf(xlim = xlim, ylim = ylim, expand = FALSE)
+
+# ANNOTATION LAYERS
+
+# TL (Top-Left) - Descriptions
+X = -10.25; Y = 47.45; Ystep = 3
+conns <- conns+
+  annotate("text",label=src, x=X,y=Y,angle=0,hjust=0,vjust=1,size=6,col=textColor,alpha=mainAlpha, family=fontVal)
+
+# TR (Top-Right) - Descriptions
+X = 70; Y = 47.45; Ystep = 3
+conns <- conns+
+  annotate("text",label="https://althurayya.github.io/", x=X,y=Y,angle=0,hjust=1,vjust=1,size=6,col=textColor,alpha=mainAlpha, family=fontVal)
+
+# BL (Bottom-Left) - Descriptions
+X = -10.25; Y = 13; Ystep = 3; hj=0; vj=0
+conns <- conns+
+  annotate("text",label=Subtitle,x=X,y=Y,angle=0,hjust=hj,vjust=vj,size=16,col=headColor,alpha=mainAlpha,family=fontVal, fontface="italic")+
+  annotate("text",label=Title,x=X,y=Y+Ystep,angle=0,hjust=hj,vjust=vj,size=18,col=headColor,alpha=mainAlpha,family=fontVal)
+    
+conns <- conns + myTheme
+conns
+
+#ggsave(file="practiceGraph_althurayya_2.png",plot=conns,dpi=300,width=15,height=9)
+
+```
+
+
+## Inhabited Earth
+
+(Or: *Earth at Night*: <https://www.nasa.gov/mission_pages/NPP/news/earth-at-night.html>).
+
+Data source: <http://geonames.nga.mil/gns/html/namefiles.html>. Specifically, this fileâ<http://geonames.nga.mil/gns/html/cntyfile/geonames_20190506.zip>âwith all the data; description of the data: <http://geonames.nga.mil/gns/html/gis_countryfiles.html>. The initial file is *very* largeâapproximately 566MB compressed (~2.42GB uncompressed). You can download a file from which I removed everything irrelevant for our practice to minimize its size and make it more easily downloadable.
+
+```{r}
+# cleaning procedure --- just FYI
+# THE SIZE OF THE FILE IS ~2.5GB, SO BE CAREFUL LOADING IT INTO MEMORY!
+library(ggalt)
+library(readr)
+#Countries <- read_delim("./nga_mil_geonames/Countries.txt", "\t", escape_double = FALSE, trim_ws = TRUE)
+
+# populatedPlaces <- Countries %>%
+#   filter(FC=="P") %>%
+#   select(LAT, LONG, FULL_NAME_ND_RO)
+# 
+# write.table(populatedPlaces, file="nga_mil_data_popPlaces_only_light.csv", row.names=FALSE, na="", sep="\t", quote=FALSE) # 145 MB
+
+# populatedPlaces <- Countries %>%
+#   filter(FC=="P") %>%
+#   select(LAT, LONG)
+ 
+# write.table(populatedPlaces, file="nga_mil_data_popPlaces_only_coordinates.csv", row.names=FALSE, na="", sep="\t", quote=FALSE) # 66 MB
+
+nga_mil_popPlaces_File <- "nga_mil_data_popPlaces_only_coordinates.rds"
+#nga_mil_popPlaces_Url <- "https://univie-histr-2019.github.io/files/08/nga_mil_data_popPlaces_only_coordinates.rds"
+#download.file(nga_mil_popPlaces_Url, nga_mil_popPlaces_File)
+nga_mil_popPlaces <- readRDS(nga_mil_popPlaces_File)
+```
+
+There are almost 6 mln places, which will make it really difficult to map. We can remove them by keeping only unique rows:
+
+```{r}
+nrow(nga_mil_popPlaces)
+
+nga_mil_popPlaces_Simplified <- unique(nga_mil_popPlaces)
+
+nrow(nga_mil_popPlaces_Simplified)
+```
+
+We need to find relevant colors. For colors in R, see, for example: <http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf>. Careful, it may take a while to plot these maps! Try it at home :)
+
+```{r}
+
+water = "black" # "black"
+land  = "midnightblue" # "navy" # navyblue, midnightblue, navy
+pop   = "khaki1" # ""
+
+populatedPlacesFiltered <- nga_mil_popPlaces_Simplified
+
+ean <- ggplot(data = world) +
+    geom_sf(fill=land, color=land) +
+  # rivers
+    geom_path(data = rivers_df,aes(x=long, y=lat, group=group), color=water, alpha=.1, size=.1) +
+  # aral sea
+    geom_polygon(data = aral_sea_df,aes(x = long, y = lat, group = group),
+          color = water, fill=water, size = .1) +
+  # points
+    geom_point(data=populatedPlacesFiltered, aes(x=LONG, y=LAT), color=pop, alpha=.05, size=.01)+
+  # final layers
+    theme(panel.grid.major = element_line(color = water, linetype = "dotted", size = 0.5), panel.background = element_rect(fill = water))
+
+ean
+
+#ggsave(file="practiceGraph_earthAtNight.png",plot=ean,dpi=300,width=15,height=9)
+```
+
+Not the best looking graph, I agree... Well...  we can zoom on a any region to take a closer look. Let's look at the Middle East. We may need to change several parameters to make the map look nice. 
+
+```{r}
+water = "black" # "black"
+land  = "midnightblue" # "navy" # navyblue, midnightblue, navy
+pop   = "khaki1" # ""
+
+# select the area
+xlim=c(24.0,40.0); ylim=c(21.0,33.0) # Egypt
+#xlim=c(29,33); ylim=c(28,31.5) # Delta
+#xlim=c(-11,71); ylim=c(12,48) # Middle East
+
+#filtering data with coordinate limits
+populatedPlacesFiltered <- as.data.frame(nga_mil_popPlaces_Simplified) %>%
+  filter(LONG >= xlim[1] & LONG <= xlim[2]) %>%
+  filter(LAT >= ylim[1] & LAT <= ylim[2])
+
+# popFilt <- as.data.frame(nga_mil_popPlaces_Simplified)
+# popFilt <- popFilt[popFilt$LONG >= xlim[1] & popFilt$LONG <= xlim[2],]
+# popFilt <- popFilt[popFilt$LAT >= ylim[1] & popFilt$LAT <= ylim[2],]
+
+ean <- ggplot(data = world) +
+    geom_sf(fill=land, color=water) +
+  # rivers
+    geom_path(data = rivers_df,aes(x=long, y=lat, group=group), color=water, alpha=.1, size=.2) +
+  # aral sea
+    geom_polygon(data = aral_sea_df,aes(x = long, y = lat, group = group),
+          color = water, fill=water, size = .2) +
+  # points
+    geom_point(data=nga_mil_popPlaces, aes(x=LONG, y=LAT), color=pop, alpha=.25, size=.1)+
+  # final layers
+    coord_sf(xlim = xlim, ylim = ylim, expand = FALSE) +
+    theme(panel.grid.major = element_line(color = water), panel.background = element_rect(fill = water))
+
+ean
+
+#ggsave(file="practiceGraph_earthAtNight_Zoom.png",plot=ean,dpi=300,width=15,height=9)
+```
+
+**NB:** There is some issue with the coordinates data, which, for some reason, get simplified (floats are rounded automatically to the tenths) and the maps---when you zoom down to a country level---do not look as interesting as they should. [EXAMPLE].
+
+## Image cropping
+
+It seems like the easiest way to post process images for the book would be to crop them with `imagemagick`. Details can be found here: <https://deparkes.co.uk/2015/04/30/batch-crop-images-with-imagemagick/>, and more on the <https://www.imagemagick.org/>.
+
+For example, with current settings, the following command will crop the image nicely (`morgify` can be used for batch processing):
+
+```
+# sample command
+convert -crop 4280x2170+190+210 practiceGraph_althurayya.png practiceGraph_althurayya_cropped.png
+
+# mogrify sample command
+mogrify -crop 4280x2170+190+210 -path ../cropped *.png
+
+# animated gif sample command <http://www.linux-magazine.com/Online/Blogs/Productivity-Sauce/Create-Animated-GIFs-with-ImageMagick>
+
+convert -delay 120 -loop 0 *.png animated.gif
+
+# before animating > perhaps, make them smaller
+mogrify -resize 1000x -path ./small *.png
+
+```
+
+# Analytical Elements: Connections
+
+So far we have been playing mostly with the base layer. Let's add some analytical data on it. For instance, if we have relevant data, we can visualize connections. Let's start with a made-up example. This should make it easier to understand the process. First we need to generate a small dataframe with cities.
+
+```{r}
+Nishapur=c(58.7,36.1)
+Baghdad=c(44.3,33.3)
+Damascus=c(36.3,33.5)
+Cairo=c(31.2,30.0)
+Qayrawan=c(10.1, 35.7)
+Cordoba=c(-4.7,37.9)
+
+cities=rbind(Nishapur, Baghdad, Damascus, Cairo, Qayrawan, Cordoba) %>% as.data.frame()
+colnames(cities)=c("LON","LAT")
+cities$names <- rownames(cities)
+
+
+```
+
+Let's add them to our base map. 
+
+```{r}
+colWater = "lightblue"
+colLand  = "white"
+
+xlim=c(-12,80); ylim=c(10,50)
+ggplot(data = world) +
+    geom_sf(fill=colLand, color=colLand) +
+  # rivers & aral sea 
+    geom_path(data = rivers_df,aes(x=long, y=lat, group=group), color=colWater, alpha=1, size=.2) +
+    geom_polygon(data = aral_sea_df,aes(x = long, y = lat, group = group), color = colWater, fill=colWater, size = .2) +
+  # points
+    geom_point(data=cities, aes(x=LON, y=LAT), color="black", alpha=.75, size=.5)+
+    geom_label(data=cities, aes(x=LON, y=LAT, label=names), color="black", alpha=.75, size=3)+
+  # map limits and theme
+    coord_sf(xlim = xlim, ylim = ylim, expand = FALSE) +
+    theme(panel.grid.major = element_line(color = colWater, linetype = "dotted", size = 0.5), panel.background = element_rect(fill = colWater),legend.position="none")
+
+```
+
+As you can see, the labels are not looking very good. Damascus and Baghdad are sitting on top of each other. In such cases it is convenient to use `geom_label_repel()` from `ggrepel` library (instead of `geom_label` from `ggplot` library). This functions makes sure that all points and all labels are visible. While this is a nice option, it does not assign a "constant" location for the labels and they will shift slightly each time you generate the same map. This will not be convenient if you are interested in creating slides for animating.
+
+```{r}
+library(ggrepel)
+
+colWater = "lightblue"
+colLand  = "white"
+
+xlim=c(-12,80); ylim=c(10,50)
+ggplot(data = world) +
+    geom_sf(fill=colLand, color=colLand) +
+  # rivers & aral sea 
+    geom_path(data = rivers_df,aes(x=long, y=lat, group=group), color=colWater, alpha=1, size=.2) +
+    geom_polygon(data = aral_sea_df,aes(x = long, y = lat, group = group), color = colWater, fill=colWater, size = .2) +
+  # points
+    geom_point(data=cities, aes(x=LON, y=LAT), color="black", alpha=.75, size=.5)+
+    geom_label_repel(data=cities, aes(x=LON, y=LAT, label=names), color="black", alpha=.75, size=3)+
+  # map limits and theme
+    coord_sf(xlim = xlim, ylim = ylim, expand = FALSE) +
+    theme(panel.grid.major = element_line(color = colWater, linetype = "dotted", size = 0.5), panel.background = element_rect(fill = colWater),legend.position="none")
+
+```
+
+Let's now generate some random connections. This part is a bit tricky. We can use `combn()` function to generate these connections, but there are a couple of things to consider. Let's limit ourselves with anexample where direction of connections is not important, for whatever reason. Let's say we have three citiesâBaghdad, Qayrawan, and Cordobaâand we want to generate connections among them. In practical terms we need to generate all possible `edges` for these cities, i.e. `Baghdad > Qayrawan`, `Baghdad > Cordoba`, `Qayrawan>Cordoba`. The problem is that we need to ensure that the edge between the same two cities is always the same (`Baghdad > Qayrawan` and `Qayrawan > Baghdad` are differen and it will be impossible to get accurate frequencies for edges, if we need them). Luckily, we can ensure that generated edges conform to a specific pattern: 1) by making sure that `nodes` are not repeated in our vector by applying function `unique()`; 2) by making sure that our vector is sorted by applying function `sort()`. After that we can apply function `combn()` to generate out connections. Compare different versions of code and their results below. 
+
+```{r}
+library(ggrepel)
+testVector = c("Baghdad", "Qayrawan", "Cordoba", "Baghdad")
+
+cbind(t(combn(testVector, 2))) %>% as.data.frame()
+cbind(t(combn(sort(testVector), 2))) %>% as.data.frame()
+cbind(t(combn(sort(unique(testVector)), 2))) %>% as.data.frame()
+
+```
+
+
+```{r}
+
+# connections
+all_pairs=cbind(t(combn(sort(unique(cities$names)), 2))) %>% as.data.frame()
+colnames(all_pairs) = c("NAME1", "NAME2")
+
+cities1 <- cities
+colnames(cities1) = c("LON1", "LAT1", "NAME1")
+
+cities2 <- cities
+colnames(cities2) = c("LON2", "LAT2", "NAME2")
+
+# add coordinates (join)
+connectionsTest <- all_pairs %>%
+  left_join(cities1, by="NAME1") %>%
+  left_join(cities2, by="NAME2")
+
+```
+
+Before we plot these connections, let's randomize them a little bit: 1) let's add random frequencies; and 2) sample a half of connections from the final dataframe.
+
+```{r}
+connectionsTest$FREQS <- runif(n = nrow(all_pairs), min = 1, max = 50)
+connectionsTestSample <- sample_n(connectionsTest, 8)
+
+connectionsTestSample <- connectionsTestSample %>%
+  arrange(by=FREQS)
+
+```
+
+Now, let's map these connections. We can use `geom_curve()` for that. You can tweak `angle=` and `curvature=` to adjust the appearance of curves.
+
+```{r}
+
+colWater = "lightblue"
+colLand  = "white"
+
+xlim=c(-12,80); ylim=c(10,50)
+practiceGraph <- ggplot(data = world) +
+    geom_sf(fill=colLand, color=colLand) +
+  # rivers & aral sea 
+    geom_path(data = rivers_df,aes(x=long, y=lat, group=group), color=colWater, alpha=1, size=.2) +
+    geom_polygon(data = aral_sea_df,aes(x = long, y = lat, group = group), color = colWater, fill=colWater, size = .2) +
+  # connections
+    geom_curve(data=connectionsTestSample, aes(x=LON1, y=LAT1, xend=LON2, yend=LAT2, size=FREQS, color=FREQS), angle=49, curvature=-.3)+
+  # points
+    geom_point(data=cities, aes(x=LON, y=LAT), color="red", alpha=1, size=5)+
+    geom_label_repel(data=cities, aes(x=LON, y=LAT, label=names), color="black", alpha=.75, size=3)+
+  # scales
+    scale_colour_gradient(low="yellow", high="red")+
+    scale_size_continuous(range=c(0.01,4), limits=c(min(connectionsTestSample$FREQS), max(connectionsTestSample$FREQS))) +     
+  # map limits and theme
+    coord_sf(xlim = xlim, ylim = ylim, expand = FALSE) +
+    theme(panel.grid.major = element_line(color = colWater, linetype = "dotted", size = 0.5), panel.background = element_rect(fill = colWater))
+
+practiceGraph
+
+#ggsave(file="practiceGraph_connectionsTest.png",plot=practiceGraph,dpi=300,width=9,height=5)
+```
+
+These curves only show the fact of connection and its density and do not suggest a trajectory of travel. For this, *great circles* (or *great arcs*) are usually used, but unless we are actually *mapping* flights, these are not necessary, especially since they are rather complicated. `geom_curve()` is much easier to use and there is some control over the shapes of these curves, although, still quite limited: `angle=` and `curvature=` apply to all curves and cannot be varied; there is a bit of a workaround: changing source and destination coordinates will flip the curve, which can be helpful to avoid overplotting. Here, however, manual adjustments are requiredâwe'll address that in the next section. 
+
+## Some real historical data: Medieval Islamic World (600-1300)
+
+Let's first build a wireframe map and then add historical data. First, we load regional data and data on possible connections between all these regions.
+
+```{r message=FALSE}
+
+aRegions <- read_delim("top_aRegions_VizCenters.csv",  "\t", escape_double = FALSE, trim_ws = TRUE)
+
+regional_connections_file <- "top_aRegions_Connections.csv"
+regional_connections_url <- "https://univie-histr-2019.github.io/files/08/top_aRegions_Connections.csv"
+#download.file(regional_connections_url, regional_connections_file)
+aRegionsConnBARE <- read_delim(regional_connections_file, "\t", escape_double = FALSE, trim_ws = TRUE)
+
+```
+
+We already worked with regions file; let's take a quick look at the connections data. Here we have region IDs (`aRegion1` and `aRegion2`), connection IDs (`connID`), and directionality (`Direction`). It is in this last column where we define the direction of every given curveâif any curve is covered by some other curve, we can change its `Direction` (`dir` for direct, `rev`âfor reverse) and thus improve our plot.
+
+We generate mappable connection layer by merging those two tables in the following manner:
+
+```{r createConnections}
+R1 <- aRegions %>% select(-Label)
+colnames(R1) <- c("aRegion1", "R1_Lon", "R1_Lat")
+R2 <- aRegions %>% select(-Label)
+colnames(R2) <- c("aRegion2", "R2_Lon", "R2_Lat")
+
+coord_dir <- aRegionsConnBARE %>%
+  left_join(R1, by="aRegion1") %>%
+  left_join(R2, by="aRegion2") %>%
+  select(-Direction, -aRegion1, -aRegion2)
+colnames(coord_dir) <- c("connID", "LON1", "LAT1", "LON2", "LAT2")
+
+coord_rev <- aRegionsConnBARE %>%
+  left_join(R2, by="aRegion2") %>%
+  left_join(R1, by="aRegion1") %>%
+  select(-Direction, -aRegion1, -aRegion2)
+colnames(coord_rev) <- c("connID", "LON1", "LAT1", "LON2", "LAT2")
+
+conn_dir <- aRegionsConnBARE %>%
+  filter(Direction=="dir") %>%
+  left_join(coord_dir, by="connID")
+
+conn_rev <- aRegionsConnBARE %>%
+  filter(Direction=="rev") %>%
+  left_join(coord_rev, by="connID")
+
+connections_coord <- rbind(conn_dir, conn_rev)
+```
+
+(@) Can you explain what is happening here?
+
+>> *The above code joins two databases "aRegions" and "aRegionsConnBARE". The first four lines (638, 639, 640, 641) select various columns and creates names for these columns. The next lines (643-647) select columns from the second dataset and joins them with the first database. Additionally line 647 replaces previous column names with new ones. Code lines 649 - 653 do the same as the previous ones but assign them to an additional variable. Lines 655 to 661 access the database ARegionsConnBARE and joins the Direction column with value "dir" and "rev" to one of the two new datasets in conn_dir and conn_rev. Finnaly the new two datasets are merged together. *
+
+*To summarise: The new dataset have now two regions with a connection ID and a Directon as well as coordinates for each of the regions. *
+
+
+```{r}
+
+colWater = "lightblue"
+colLand  = "white"
+
+xlim=c(-12,75); ylim=c(10,50)
+practiceGraph <- ggplot(data = world) +
+    geom_sf(fill=colLand, color=colLand) +
+  # rivers & aral sea 
+    geom_path(data = rivers_df,aes(x=long, y=lat, group=group), color=colWater, alpha=1, size=.2) +
+    geom_polygon(data = aral_sea_df,aes(x = long, y = lat, group = group), color = colWater, fill=colWater, size = .2) +
+  # curves
+    geom_curve(data=connections_coord, aes(x=LON1, y=LAT1, xend=LON2, yend=LAT2), angle=35, curvature=0.5, size=.5, color="red", alpha=.75)+
+    geom_point(data=aRegions, aes(x=LON, y=LAT), color="red", alpha=.75, size=1) +
+    geom_label_repel(data=aRegions, aes(x=LON, y=LAT, label=Label), size=2)+
+  # scales
+    scale_colour_gradient(low="yellow", high="red")+
+    scale_size_continuous(range=c(0.01,4), limits=c(min(connectionsTestSample$FREQS), max(connectionsTestSample$FREQS))) +     
+  # map limits and theme
+    coord_sf(xlim = xlim, ylim = ylim, expand = FALSE) +
+    theme(panel.grid.major = element_line(color = colWater, linetype = "dotted", size = 0.5), panel.background = element_rect(fill = colWater))
+
+practiceGraph
+
+#ggsave(file="practiceGraph_wireframe.png",plot=practiceGraph,dpi=300,width=9,height=5)
+
+```
+
+Now, let's add some real data into this wireframe of a network. First we need to download some data.
+
+```{r}
+TI_GeoData_for_R_File <- "TI_GeoData_for_R.csv"
+#TI_GeoData_for_R_url <- "https://univie-histr-2019.github.io/files/08/TI_GeoData_for_R.csv"
+#download.file(TI_GeoData_for_R_url, TI_GeoData_for_R_File)
+TI_GeoData_for_R <- read_delim(TI_GeoData_for_R_File, "\t", escape_double = FALSE, trim_ws = TRUE)
+```
+
+The structure of this data file is as follows: `BIO` â id of a biography (i.e., a person); `ITEM` includes a value of a data type defined in the column `TYPE`. `TYPE` includes the following values: 1) `DEATH_AH`âdecade of the death of a biographee, according to the Islamic *hijrÄ«* calendar (*anno hegirae*); `TOPO_PR`âa place with which a person is closely associated ("resident of ..."); `TOPO_SE`âa place with which a person is associated ("visitor of ...").
+
+Such organization is not exactly `tidy`, but it has quite a few advantages and can be `tidied up` quite easily.
+
+(@) How many biographies are there in the dataset?
+
+>> *The TI_GeoData_for_R dataset contains 29102 unique Biographies.* (use code if necessary!)
+
+We can split our data into two data frames: with dates and with toponyms.
+
+```{r}
+# split > ID_Dates and ID_TOPO
+TIdates <- TI_GeoData_for_R %>%
+  filter(TYPE=="DEATH_AH") %>%
+  rename(DEATH = ITEM)
+  
+TIdates$DEATH <- as.numeric(TIdates$DEATH)
+
+TIgeoData <- TI_GeoData_for_R %>%
+  filter(TYPE=="TOPO_PR" | TYPE=="TOPO_SE") %>%
+  rename(TOPO = ITEM)
+
+length(unique(TI_GeoData_for_R$BIO))
+
+```
+
+Now, we can use regional data ("analytical regions") to group all geographical data by regions.
+
+```{r}
+
+TIgeoDataRich <- TIgeoData %>%
+  left_join(topMicroUPD, by="TOPO") %>%
+  filter(!is.na(aRegion)) %>%
+  select(BIO, TYPE.x, aRegion) %>%
+  rename(TYPE = TYPE.x) %>%
+  unique()
+
+nrow(TIgeoDataRich)
+
+```
+
+(@) Please explain what is going on in the code above:
+
+>> *The earlier selected columns of the TI_GeoData_for_R of varialbe TIgeoDataRich are joined with the topMicroUPD dataset with the column "TOPO" of one dataset which is the column "AR" with the same values in the other. The filter removes all NA values from the "aRegion" column. Finnaly the needed three columns are selected and the Type.x comun renamed to TYPE. the nrow() function counts all rows.*
+
+Next, we need to generate geographical networks, which we do by generating pairs of connections from regional data associated with individual `BIO` identifiers. We will generate these "individual" networks for the entire dataset, which we can later filter in a variety of ways. The network generation process might take a few moments.
+
+```{r}
+NW_Data <- data.frame()
+idVector = unique(TIgeoDataRich$BIO)
+
+TIgeoDataRichUnique <- TIgeoData %>%
+  left_join(topMicroUPD, by="TOPO") %>%
+  filter(!is.na(aRegion)) %>%
+  select(BIO, aRegion) %>%
+  unique()
+
+for (ID in idVector){
+  temp <- TIgeoDataRichUnique %>%
+    filter(BIO==ID)
+  
+  if(nrow(temp) > 1){
+    
+    rows <- t(combn(sort(unique(temp$aRegion)), 2)) %>%
+      as.data.frame() %>%
+      mutate(BIO=ID) %>%
+      mutate(connID=paste0(V1, "-to-", V2)) %>%
+      select(BIO, connID)
+    
+    NW_Data <- rbind(NW_Data, rows)
+  }
+}
+
+```
+
+Now we can filter our data chronologically and generate a map of connections for some specific period. 
+
+```{r message=FALSE}
+
+# converting hijri calendar to CE
+AHCE <- function(ah){
+  ah = as.numeric(ah)
+  ce = round(ah-(ah/33)+622)
+  return(ce)
+}
+
+
+# filtering by IDs (chronology or something else)
+
+start  <- 650
+period <- 50
+end <- start+period
+
+startCE <- AHCE(start)
+endCE <- AHCE(start+period)
+
+TIdatesTEMP <- TIdates %>%
+  filter(DEATH > start & DEATH <= end)
+```
+
+Let's calculate people for each regions (`TOPO_PR` + `TOPO_SE`) and `residents` (`TOPO_PR`). 
+
+```{r message=FALSE}
+
+# data for points: residents
+TIpeople <- TIgeoDataRich %>%
+  filter(BIO %in% TIdatesTEMP$BIO) %>% group_by(aRegion) %>%
+  summarize(freqs=length(aRegion)) %>% left_join(aRegions, by="aRegion")
+
+sum(TIpeople$freqs)
+
+TIresidents <- TIgeoDataRich %>%
+  filter(TYPE=="TOPO_PR") %>%
+  filter(BIO %in% TIdatesTEMP$BIO) %>% group_by(aRegion) %>%
+  summarize(freqs=length(aRegion)) %>% left_join(aRegions, by="aRegion")
+
+sum(TIresidents$freqs)
+
+```
+
+The following chunk creates a mappable network data layer:
+
+```{r}
+
+# data for connections
+NW_Data_mappableTEMP <- NW_Data %>%
+  filter(BIO %in% TIdatesTEMP$BIO) %>%
+  group_by(connID) %>%
+  summarize(freqs=length(connID)) %>%
+  # add mappable layer
+  left_join(connections_coord, by="connID") %>%
+  select(-aRegion1, -aRegion2) %>%
+  filter(freqs > 1) %>%
+  arrange(freqs)
+
+```
+
+(@) Please explain what is going on in the code above:
+
+>> *Line 848 to 850 matches the BIO ID from both datasets and groups them by connID. In line 851 it summarizes the rows with the new length of column "connID". Line 853 accesses another dataset "connections_coord" and joins them by column "connID" with the data passed on before. Finnaly all column but "aRegion" and "2" are selected and filtered for valuese in "freqs" that are greater than one as well as arranged by "freqs".  *
+
+```{r}
+
+colWater = "grey"
+colLand  = "white"
+lowColor = "yellow"
+highColor = "darkred"
+fontVal = "Baskerville"
+
+myTheme <- theme_bw()+
+  theme(panel.grid.major = element_line(color = colWater, linetype = "dotted", size = 0.5),
+        panel.background = element_rect(fill = colWater),
+        legend.position="none"
+        )
+
+xlim=c(-11,71); ylim=c(12,48)
+conns <- ggplot(data = world) +
+    geom_sf(fill=colLand, color=colLand) +
+    # rivers + aral sea
+    geom_path(data = rivers_df,aes(x=long, y=lat, group=group), color=colWater, alpha=1, size=.2) +
+    geom_polygon(data=aral_sea_df, aes(x=long, y=lat, group=group), color=colWater, fill=colWater, size=.2) +
+    # curves of connections
+    geom_curve(data=NW_Data_mappableTEMP, aes(x=LON1, y=LAT1, xend=LON2, yend=LAT2, size=freqs, color=freqs), angle=45, curvature=0.5) +
+    # points: residents Vs. visitors
+    geom_point(data=TIpeople, aes(x=LON, y=LAT, size=freqs), color=highColor, alpha=1) +
+    geom_point(data=TIresidents, aes(x=LON, y=LAT, size=freqs), color=lowColor, alpha=1) +
+    # labels for regions
+    geom_label(family = fontVal, fontface="bold",
+               data=aRegions, aes(x=LON, y=LAT, label=Label),
+               nudge_x=0, nudge_y=1, color="black", alpha=.75, size=5) +
+    # scales
+    scale_colour_gradient(low=lowColor, high=highColor) +
+    scale_size_continuous(range=c(0.01,15), limits=c(min(NW_Data_mappableTEMP$freqs),max(TIpeople$freqs))) +
+    coord_sf(xlim = xlim, ylim = ylim, expand = FALSE)
+
+# plot annotations:
+mainAlpha = .75
+headColor = "grey30"
+textColor = "grey10"
+
+focusVar = "ALL"
+Title = paste("BIOGRAPHIES:",focusVar)
+Subtitle = "Interregional Connections"
+src = expression("SOURCE:"~italic("TaÊ¾rÄ«á¸« al-islÄm")~"of al-á¸ahabÄ« (d. 748/1348)")
+ADdates = paste0(startCE,"-",endCE)
+AHdates = paste0(start,"-",end)
+placeHolder=""
+
+# TL (Top-Left) - Descriptions
+X = -10.25; Y = 47.45; Ystep = 3
+conns <- conns+
+  annotate("text",label=src, x=X,y=Y,angle=0,hjust=0,vjust=1,size=6,col=textColor,alpha=mainAlpha, family=fontVal)
+
+# TR (Top-Right)
+X = 70; Y = 47.45; Ystep = 3
+conns <- conns+
+  annotate("text",label=placeHolder, x=X,y=Y,angle=0,hjust=1,vjust=1,size=6,col=textColor,alpha=mainAlpha, family=fontVal)
+
+# BL (Bottom-Left)
+X = -10.25; Y = 13; Ystep = 3; hj=0; vj=0
+conns <- conns+
+  annotate("text",label=Subtitle,x=X,y=Y,angle=0,hjust=hj,vjust=vj,size=16,col=headColor,alpha=mainAlpha,family=fontVal, fontface="italic")+
+  annotate("text",label=Title,x=X,y=Y+Ystep,angle=0,hjust=hj,vjust=vj,size=18,col=headColor,alpha=mainAlpha,family=fontVal)+
+  annotate("text",label="AH",x=X,y=Y+Ystep*2.2,angle=0,hjust=hj,vjust=vj,size=12,col=headColor,alpha=mainAlpha,family=fontVal)+
+  annotate("text",label=AHdates,x=X+Ystep*1.5,y=Y+Ystep*2.2,angle=0,hjust=hj,vjust=vj,size=18,col=headColor,alpha=mainAlpha,family=fontVal)
+
+# BR (Bottom-Right)
+X = 70; Y = 13.5; Ystep = 3
+conns <- conns+
+  annotate("text",label=ADdates,x=X,y=Y,angle=0,hjust=1,vjust=0,size=20,col=headColor,alpha=mainAlpha,family=fontVal)
+    
+conns <- conns + myTheme
+conns
+
+#ggsave(file=paste0("practiceGraph_conns_",AHdates,".png"),plot=conns,dpi=300,width=15,height=9)
+
+```
+
+(@) For the following assignment you will need to identify people who have the regions of al-Andalus and Hurasanian as their `TOPO_PR` characteristics. Other steps should be easy.
+
+(@) Create a map of Andalusian connections to the rest of the Islamic World. Create two maps for two different periods that would show the change in the connection pattern. 
+
+```{r}
+
+# converting hijri calendar to CE
+AHCE <- function(ah){
+  ah = as.numeric(ah)
+  ce = round(ah-(ah/33)+622)
+  return(ce)
+}
+
+# filtering by IDs (chronology or something else)
+
+start  <- 600
+period <- 50
+end <- start+period
+
+startCE <- AHCE(start)
+endCE <- AHCE(start+period)
+
+TIdatesTEMP <- TIdates %>%
+  filter(DEATH > start & DEATH <= end)
+
+# data for points: residents
+TIpeople <- TIgeoDataRich %>%
+  filter(BIO %in% TIdatesTEMP$BIO) %>% group_by(aRegion) %>%
+  summarize(freqs=length(aRegion)) %>% left_join(aRegions, by="aRegion")
+
+TIresidents <- TIgeoDataRich %>%
+  filter(TYPE=="TOPO_PR") %>%
+  filter(BIO %in% TIdatesTEMP$BIO) %>% group_by(aRegion) %>%
+  summarize(freqs=length(aRegion)) %>% left_join(aRegions, by="aRegion")
+
+
+# data for connections
+NW_Data_mappableTEMP <- NW_Data %>%
+  filter(BIO %in% TIdatesTEMP$BIO) %>%
+  filter(grepl("Andalus_MR", connID)) %>%
+  group_by(connID) %>%
+  summarize(freqs=length(connID)) %>%
+  # add mappable layer
+  left_join(connections_coord, by="connID") %>%
+  select(-aRegion1, -aRegion2) %>%
+  filter(freqs > 1) %>%
+  arrange(freqs)
+
+# Plotting
+
+colWater = "grey"
+colLand  = "white"
+lowColor = "yellow"
+highColor = "darkred"
+fontVal = "Baskerville"
+
+myTheme <- theme_bw()+
+  theme(panel.grid.major = element_line(color = colWater, linetype = "dotted", size = 0.5),
+        panel.background = element_rect(fill = colWater),
+        legend.position="none"
+        )
+
+xlim=c(-11,71); ylim=c(12,48)
+conns <- ggplot(data = world) +
+    geom_sf(fill=colLand, color=colLand) +
+    # rivers + aral sea
+    geom_path(data = rivers_df,aes(x=long, y=lat, group=group), color=colWater, alpha=1, size=.2) +
+    geom_polygon(data=aral_sea_df, aes(x=long, y=lat, group=group), color=colWater, fill=colWater, size=.2) +
+    # curves of connections
+    geom_curve(data=NW_Data_mappableTEMP, aes(x=LON1, y=LAT1, xend=LON2, yend=LAT2, size=freqs, color=freqs), angle=45, curvature=0.5) +
+    # points: residents Vs. visitors
+    geom_point(data=TIpeople, aes(x=LON, y=LAT, size=freqs), color=highColor, alpha=1) +
+    geom_point(data=TIresidents, aes(x=LON, y=LAT, size=freqs), color=lowColor, alpha=1) +
+    # labels for regions
+    geom_label(family = fontVal, fontface="bold",
+               data=aRegions, aes(x=LON, y=LAT, label=Label),
+               nudge_x=0, nudge_y=1, color="black", alpha=.75, size=5) +
+    # scales
+    scale_colour_gradient(low=lowColor, high=highColor) +
+    scale_size_continuous(range=c(0.01,15), limits=c(min(NW_Data_mappableTEMP$freqs),max(TIpeople$freqs))) +
+    coord_sf(xlim = xlim, ylim = ylim, expand = FALSE)
+
+# plot annotations:
+mainAlpha = .75
+headColor = "grey30"
+textColor = "grey10"
+
+focusVar = "al-Andalus"
+Title = paste("BIOGRAPHIES:",focusVar)
+Subtitle = "Interregional Connections from al-Andalus"
+src = expression("SOURCE:"~italic("...¸« al-islam")~"of al-...« (d. 748/1348)")
+ADdates = paste0(startCE,"-",endCE)
+AHdates = paste0(start,"-",end)
+placeHolder=""
+
+# TL (Top-Left) - Descriptions
+X = -10.25; Y = 47.45; Ystep = 3
+conns <- conns+
+  annotate("text",label=src, x=X,y=Y,angle=0,hjust=0,vjust=1,size=6,col=textColor,alpha=mainAlpha, family=fontVal)
+
+# TR (Top-Right)
+X = 70; Y = 47.45; Ystep = 3
+conns <- conns+
+  annotate("text",label=placeHolder, x=X,y=Y,angle=0,hjust=1,vjust=1,size=6,col=textColor,alpha=mainAlpha, family=fontVal)
+
+# BL (Bottom-Left)
+X = -10.25; Y = 13; Ystep = 3; hj=0; vj=0
+conns <- conns+
+  annotate("text",label=Subtitle,x=X,y=Y,angle=0,hjust=hj,vjust=vj,size=16,col=headColor,alpha=mainAlpha,family=fontVal, fontface="italic")+
+  annotate("text",label=Title,x=X,y=Y+Ystep,angle=0,hjust=hj,vjust=vj,size=18,col=headColor,alpha=mainAlpha,family=fontVal)+
+  annotate("text",label="AH",x=X,y=Y+Ystep*2.2,angle=0,hjust=hj,vjust=vj,size=12,col=headColor,alpha=mainAlpha,family=fontVal)+
+  annotate("text",label=AHdates,x=X+Ystep*1.5,y=Y+Ystep*2.2,angle=0,hjust=hj,vjust=vj,size=18,col=headColor,alpha=mainAlpha,family=fontVal)
+
+# BR (Bottom-Right)
+X = 70; Y = 13.5; Ystep = 3
+conns <- conns+
+  annotate("text",label=ADdates,x=X,y=Y,angle=0,hjust=1,vjust=0,size=20,col=headColor,alpha=mainAlpha,family=fontVal)
+    
+conns <- conns + myTheme
+conns
+
+#ggsave(file=paste0("practiceGraph_conns_",AHdates,"al-andalus.png"),plot=conns,dpi=300,width=15,height=9)
+```
+
+```{r}
+
+# converting hijri calendar to CE
+AHCE <- function(ah){
+  ah = as.numeric(ah)
+  ce = round(ah-(ah/33)+622)
+  return(ce)
+}
+
+# filtering by IDs (chronology or something else)
+
+start  <- 650
+period <- 50
+end <- start+period
+
+startCE <- AHCE(start)
+endCE <- AHCE(start+period)
+
+TIdatesTEMP <- TIdates %>%
+  filter(DEATH > start & DEATH <= end)
+
+# data for points: residents
+TIpeople <- TIgeoDataRich %>%
+  filter(BIO %in% TIdatesTEMP$BIO) %>% group_by(aRegion) %>%
+  summarize(freqs=length(aRegion)) %>% left_join(aRegions, by="aRegion")
+
+TIresidents <- TIgeoDataRich %>%
+  filter(TYPE=="TOPO_PR") %>%
+  filter(BIO %in% TIdatesTEMP$BIO) %>% group_by(aRegion) %>%
+  summarize(freqs=length(aRegion)) %>% left_join(aRegions, by="aRegion")
+
+
+# data for connections
+NW_Data_mappableTEMP <- NW_Data %>%
+  filter(BIO %in% TIdatesTEMP$BIO) %>%
+  filter(grepl("Andalus_MR", connID)) %>%
+  group_by(connID) %>%
+  summarize(freqs=length(connID)) %>%
+  # add mappable layer
+  left_join(connections_coord, by="connID") %>%
+  select(-aRegion1, -aRegion2) %>%
+  filter(freqs > 1) %>%
+  arrange(freqs)
+
+# Plotting
+
+colWater = "grey"
+colLand  = "white"
+lowColor = "yellow"
+highColor = "darkred"
+fontVal = "Baskerville"
+
+myTheme <- theme_bw()+
+  theme(panel.grid.major = element_line(color = colWater, linetype = "dotted", size = 0.5),
+        panel.background = element_rect(fill = colWater),
+        legend.position="none"
+        )
+
+xlim=c(-11,71); ylim=c(12,48)
+conns <- ggplot(data = world) +
+    geom_sf(fill=colLand, color=colLand) +
+    # rivers + aral sea
+    geom_path(data = rivers_df,aes(x=long, y=lat, group=group), color=colWater, alpha=1, size=.2) +
+    geom_polygon(data=aral_sea_df, aes(x=long, y=lat, group=group), color=colWater, fill=colWater, size=.2) +
+    # curves of connections
+    geom_curve(data=NW_Data_mappableTEMP, aes(x=LON1, y=LAT1, xend=LON2, yend=LAT2, size=freqs, color=freqs), angle=45, curvature=0.5) +
+    # points: residents Vs. visitors
+    geom_point(data=TIpeople, aes(x=LON, y=LAT, size=freqs), color=highColor, alpha=1) +
+    geom_point(data=TIresidents, aes(x=LON, y=LAT, size=freqs), color=lowColor, alpha=1) +
+    # labels for regions
+    geom_label(family = fontVal, fontface="bold",
+               data=aRegions, aes(x=LON, y=LAT, label=Label),
+               nudge_x=0, nudge_y=1, color="black", alpha=.75, size=5) +
+    # scales
+    scale_colour_gradient(low=lowColor, high=highColor) +
+    scale_size_continuous(range=c(0.01,15), limits=c(min(NW_Data_mappableTEMP$freqs),max(TIpeople$freqs))) +
+    coord_sf(xlim = xlim, ylim = ylim, expand = FALSE)
+
+# plot annotations:
+mainAlpha = .75
+headColor = "grey30"
+textColor = "grey10"
+
+focusVar = "al-Andalus"
+Title = paste("BIOGRAPHIES:",focusVar)
+Subtitle = "Interregional Connections"
+src = expression("SOURCE:"~italic("...¸« al-islam")~"of al-...« (d. 748/1348)")
+ADdates = paste0(startCE,"-",endCE)
+AHdates = paste0(start,"-",end)
+placeHolder=""
+
+# TL (Top-Left) - Descriptions
+X = -10.25; Y = 47.45; Ystep = 3
+conns <- conns+
+  annotate("text",label=src, x=X,y=Y,angle=0,hjust=0,vjust=1,size=6,col=textColor,alpha=mainAlpha, family=fontVal)
+
+# TR (Top-Right)
+X = 70; Y = 47.45; Ystep = 3
+conns <- conns+
+  annotate("text",label=placeHolder, x=X,y=Y,angle=0,hjust=1,vjust=1,size=6,col=textColor,alpha=mainAlpha, family=fontVal)
+
+# BL (Bottom-Left)
+X = -10.25; Y = 13; Ystep = 3; hj=0; vj=0
+conns <- conns+
+  annotate("text",label=Subtitle,x=X,y=Y,angle=0,hjust=hj,vjust=vj,size=16,col=headColor,alpha=mainAlpha,family=fontVal, fontface="italic")+
+  annotate("text",label=Title,x=X,y=Y+Ystep,angle=0,hjust=hj,vjust=vj,size=18,col=headColor,alpha=mainAlpha,family=fontVal)+
+  annotate("text",label="AH",x=X,y=Y+Ystep*2.2,angle=0,hjust=hj,vjust=vj,size=12,col=headColor,alpha=mainAlpha,family=fontVal)+
+  annotate("text",label=AHdates,x=X+Ystep*1.5,y=Y+Ystep*2.2,angle=0,hjust=hj,vjust=vj,size=18,col=headColor,alpha=mainAlpha,family=fontVal)
+
+# BR (Bottom-Right)
+X = 70; Y = 13.5; Ystep = 3
+conns <- conns+
+  annotate("text",label=ADdates,x=X,y=Y,angle=0,hjust=1,vjust=0,size=20,col=headColor,alpha=mainAlpha,family=fontVal)
+    
+conns <- conns + myTheme
+conns
+
+#ggsave(file=paste0("practiceGraph_conns_",AHdates,"al-andalus.png"),plot=conns,dpi=300,width=15,height=9)
+```
+
+
+(@) Create a map of á¸Hurasanian connections to the rest of the Islamic World. Create two maps for two different periods that would show the change in the connection pattern.
+
+```{r}
+
+# converting hijri calendar to CE
+AHCE <- function(ah){
+  ah = as.numeric(ah)
+  ce = round(ah-(ah/33)+622)
+  return(ce)
+}
+
+# filtering by IDs (chronology or something else)
+
+start  <- 600
+period <- 50
+end <- start+period
+
+startCE <- AHCE(start)
+endCE <- AHCE(start+period)
+
+TIdatesTEMP <- TIdates %>%
+  filter(DEATH > start & DEATH <= end)
+
+# data for points: residents
+TIpeople <- TIgeoDataRich %>%
+  filter(BIO %in% TIdatesTEMP$BIO) %>% group_by(aRegion) %>%
+  summarize(freqs=length(aRegion)) %>% left_join(aRegions, by="aRegion")
+
+TIresidents <- TIgeoDataRich %>%
+  filter(TYPE=="TOPO_PR") %>%
+  filter(BIO %in% TIdatesTEMP$BIO) %>% group_by(aRegion) %>%
+  summarize(freqs=length(aRegion)) %>% left_join(aRegions, by="aRegion")
+
+
+# data for connections
+NW_Data_mappableTEMP <- NW_Data %>%
+  filter(BIO %in% TIdatesTEMP$BIO) %>%
+  filter(grepl("NE_Iran_MR", connID)) %>%
+  group_by(connID) %>%
+  summarize(freqs=length(connID)) %>%
+  # add mappable layer
+  left_join(connections_coord, by="connID") %>%
+  select(-aRegion1, -aRegion2) %>%
+  filter(freqs > 1) %>%
+  arrange(freqs)
+
+
+# Plotting
+
+colWater = "grey"
+colLand  = "white"
+lowColor = "yellow"
+highColor = "darkred"
+fontVal = "Baskerville"
+
+myTheme <- theme_bw()+
+  theme(panel.grid.major = element_line(color = colWater, linetype = "dotted", size = 0.5),
+        panel.background = element_rect(fill = colWater),
+        legend.position="none"
+        )
+
+xlim=c(-11,71); ylim=c(12,48)
+conns <- ggplot(data = world) +
+    geom_sf(fill=colLand, color=colLand) +
+    # rivers + aral sea
+    geom_path(data = rivers_df,aes(x=long, y=lat, group=group), color=colWater, alpha=1, size=.2) +
+    geom_polygon(data=aral_sea_df, aes(x=long, y=lat, group=group), color=colWater, fill=colWater, size=.2) +
+    # curves of connections
+    geom_curve(data=NW_Data_mappableTEMP, aes(x=LON1, y=LAT1, xend=LON2, yend=LAT2, size=freqs, color=freqs), angle=45, curvature=0.5) +
+    # points: residents Vs. visitors
+    geom_point(data=TIpeople, aes(x=LON, y=LAT, size=freqs), color=highColor, alpha=1) +
+    geom_point(data=TIresidents, aes(x=LON, y=LAT, size=freqs), color=lowColor, alpha=1) +
+    # labels for regions
+    geom_label(family = fontVal, fontface="bold",
+               data=aRegions, aes(x=LON, y=LAT, label=Label),
+               nudge_x=0, nudge_y=1, color="black", alpha=.75, size=5) +
+    # scales
+    scale_colour_gradient(low=lowColor, high=highColor) +
+    scale_size_continuous(range=c(0.01,15), limits=c(min(NW_Data_mappableTEMP$freqs),max(TIpeople$freqs))) +
+    coord_sf(xlim = xlim, ylim = ylim, expand = FALSE)
+
+# plot annotations:
+mainAlpha = .75
+headColor = "grey30"
+textColor = "grey10"
+
+focusVar = "Ḫurāsānian"
+Title = paste("BIOGRAPHIES:",focusVar)
+Subtitle = "Interregional Connections"
+src = expression("SOURCE:"~italic("...¸« al-islam")~"of al-...« (d. 748/1348)")
+ADdates = paste0(startCE,"-",endCE)
+AHdates = paste0(start,"-",end)
+placeHolder=""
+
+# TL (Top-Left) - Descriptions
+X = -10.25; Y = 47.45; Ystep = 3
+conns <- conns+
+  annotate("text",label=src, x=X,y=Y,angle=0,hjust=0,vjust=1,size=6,col=textColor,alpha=mainAlpha, family=fontVal)
+
+# TR (Top-Right)
+X = 70; Y = 47.45; Ystep = 3
+conns <- conns+
+  annotate("text",label=placeHolder, x=X,y=Y,angle=0,hjust=1,vjust=1,size=6,col=textColor,alpha=mainAlpha, family=fontVal)
+
+# BL (Bottom-Left)
+X = -10.25; Y = 13; Ystep = 3; hj=0; vj=0
+conns <- conns+
+  annotate("text",label=Subtitle,x=X,y=Y,angle=0,hjust=hj,vjust=vj,size=16,col=headColor,alpha=mainAlpha,family=fontVal, fontface="italic")+
+  annotate("text",label=Title,x=X,y=Y+Ystep,angle=0,hjust=hj,vjust=vj,size=18,col=headColor,alpha=mainAlpha,family=fontVal)+
+  annotate("text",label="AH",x=X,y=Y+Ystep*2.2,angle=0,hjust=hj,vjust=vj,size=12,col=headColor,alpha=mainAlpha,family=fontVal)+
+  annotate("text",label=AHdates,x=X+Ystep*1.5,y=Y+Ystep*2.2,angle=0,hjust=hj,vjust=vj,size=18,col=headColor,alpha=mainAlpha,family=fontVal)
+
+# BR (Bottom-Right)
+X = 70; Y = 13.5; Ystep = 3
+conns <- conns+
+  annotate("text",label=ADdates,x=X,y=Y,angle=0,hjust=1,vjust=0,size=20,col=headColor,alpha=mainAlpha,family=fontVal)
+    
+conns <- conns + myTheme
+conns
+
+#ggsave(file=paste0("practiceGraph_conns_",AHdates,"hurasanian.png"),plot=conns,dpi=300,width=15,height=9)
+
+```
+
+```{r}
+
+# converting hijri calendar to CE
+AHCE <- function(ah){
+  ah = as.numeric(ah)
+  ce = round(ah-(ah/33)+622)
+  return(ce)
+}
+
+# filtering by IDs (chronology or something else)
+
+start  <- 650
+period <- 50
+end <- start+period
+
+startCE <- AHCE(start)
+endCE <- AHCE(start+period)
+
+TIdatesTEMP <- TIdates %>%
+  filter(DEATH > start & DEATH <= end)
+
+# data for points: residents
+TIpeople <- TIgeoDataRich %>%
+  filter(BIO %in% TIdatesTEMP$BIO) %>% group_by(aRegion) %>%
+  summarize(freqs=length(aRegion)) %>% left_join(aRegions, by="aRegion")
+
+TIresidents <- TIgeoDataRich %>%
+  filter(TYPE=="TOPO_PR") %>%
+  filter(BIO %in% TIdatesTEMP$BIO) %>% group_by(aRegion) %>%
+  summarize(freqs=length(aRegion)) %>% left_join(aRegions, by="aRegion")
+
+
+# data for connections
+NW_Data_mappableTEMP <- NW_Data %>%
+  filter(BIO %in% TIdatesTEMP$BIO) %>%
+  filter(grepl("NE_Iran_MR", connID)) %>%
+  group_by(connID) %>%
+  summarize(freqs=length(connID)) %>%
+  # add mappable layer
+  left_join(connections_coord, by="connID") %>%
+  select(-aRegion1, -aRegion2) %>%
+  filter(freqs > 1) %>%
+  arrange(freqs)
+
+# Plotting
+
+colWater = "grey"
+colLand  = "white"
+lowColor = "yellow"
+highColor = "darkred"
+fontVal = "Baskerville"
+
+myTheme <- theme_bw()+
+  theme(panel.grid.major = element_line(color = colWater, linetype = "dotted", size = 0.5),
+        panel.background = element_rect(fill = colWater),
+        legend.position="none"
+        )
+
+xlim=c(-11,71); ylim=c(12,48)
+conns <- ggplot(data = world) +
+    geom_sf(fill=colLand, color=colLand) +
+    # rivers + aral sea
+    geom_path(data = rivers_df,aes(x=long, y=lat, group=group), color=colWater, alpha=1, size=.2) +
+    geom_polygon(data=aral_sea_df, aes(x=long, y=lat, group=group), color=colWater, fill=colWater, size=.2) +
+    # curves of connections
+    geom_curve(data=NW_Data_mappableTEMP, aes(x=LON1, y=LAT1, xend=LON2, yend=LAT2, size=freqs, color=freqs), angle=45, curvature=0.5) +
+    # points: residents Vs. visitors
+    geom_point(data=TIpeople, aes(x=LON, y=LAT, size=freqs), color=highColor, alpha=1) +
+    geom_point(data=TIresidents, aes(x=LON, y=LAT, size=freqs), color=lowColor, alpha=1) +
+    # labels for regions
+    geom_label(family = fontVal, fontface="bold",
+               data=aRegions, aes(x=LON, y=LAT, label=Label),
+               nudge_x=0, nudge_y=1, color="black", alpha=.75, size=5) +
+    # scales
+    scale_colour_gradient(low=lowColor, high=highColor) +
+    scale_size_continuous(range=c(0.01,15), limits=c(min(NW_Data_mappableTEMP$freqs),max(TIpeople$freqs))) +
+    coord_sf(xlim = xlim, ylim = ylim, expand = FALSE)
+
+# plot annotations:
+mainAlpha = .75
+headColor = "grey30"
+textColor = "grey10"
+
+focusVar = "Ḫurāsānian"
+Title = paste("BIOGRAPHIES:",focusVar)
+Subtitle = "Interregional Connections"
+src = expression("SOURCE:"~italic("...¸« al-islam")~"of al-...« (d. 748/1348)")
+ADdates = paste0(startCE,"-",endCE)
+AHdates = paste0(start,"-",end)
+placeHolder=""
+
+# TL (Top-Left) - Descriptions
+X = -10.25; Y = 47.45; Ystep = 3
+conns <- conns+
+  annotate("text",label=src, x=X,y=Y,angle=0,hjust=0,vjust=1,size=6,col=textColor,alpha=mainAlpha, family=fontVal)
+
+# TR (Top-Right)
+X = 70; Y = 47.45; Ystep = 3
+conns <- conns+
+  annotate("text",label=placeHolder, x=X,y=Y,angle=0,hjust=1,vjust=1,size=6,col=textColor,alpha=mainAlpha, family=fontVal)
+
+# BL (Bottom-Left)
+X = -10.25; Y = 13; Ystep = 3; hj=0; vj=0
+conns <- conns+
+  annotate("text",label=Subtitle,x=X,y=Y,angle=0,hjust=hj,vjust=vj,size=16,col=headColor,alpha=mainAlpha,family=fontVal, fontface="italic")+
+  annotate("text",label=Title,x=X,y=Y+Ystep,angle=0,hjust=hj,vjust=vj,size=18,col=headColor,alpha=mainAlpha,family=fontVal)+
+  annotate("text",label="AH",x=X,y=Y+Ystep*2.2,angle=0,hjust=hj,vjust=vj,size=12,col=headColor,alpha=mainAlpha,family=fontVal)+
+  annotate("text",label=AHdates,x=X+Ystep*1.5,y=Y+Ystep*2.2,angle=0,hjust=hj,vjust=vj,size=18,col=headColor,alpha=mainAlpha,family=fontVal)
+
+# BR (Bottom-Right)
+X = 70; Y = 13.5; Ystep = 3
+conns <- conns+
+  annotate("text",label=ADdates,x=X,y=Y,angle=0,hjust=1,vjust=0,size=20,col=headColor,alpha=mainAlpha,family=fontVal)
+    
+conns <- conns + myTheme
+conns
+
+#ggsave(file=paste0("practiceGraph_conns_",AHdates,"hurasanian.png"),plot=conns,dpi=300,width=15,height=9)
+
+```
+
+# References
+
+* Mel Moreno, Mathieu Basille. *Drawing beautiful maps programmatically with R, sf and ggplot2 â Part 1: Basics*, October 25, 2018, <https://www.r-spatial.org/r/2018/10/25/ggplot2-sf.html>.
+* Robin Lovelace, Jakub Nowosad, Jannes Muenchow. *Geocomputation with R*, April 24, 2019, <https://geocompr.robinlovelace.net/>, *In particular, check:* Making maps in R, <https://geocompr.robinlovelace.net/adv-map.html>.
+* *R Graph Gallery: Maps*, <https://www.r-graph-gallery.com/map/>.
+* James Cheshire, *Spatial.ly*, 2016, <http://spatial.ly/r/>.
+* Kan Nishida. *Filtering Data with dplyr*, <https://blog.exploratory.io/filter-data-with-dplyr-76cf5f1a258e>

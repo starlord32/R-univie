@@ -1,0 +1,320 @@
+---
+title: "L10 — Social Network Analysis with R (03): SNA Data Reuse (b)"
+author: ''
+output:
+  html_document:
+    df_print: paged
+    toc: true
+    highlight: tango
+    number_sections: yes
+---
+
+**NB:** The worksheet has beed developed and prepared by Maxim Romanov for the course "R for Historical Research" (U Vienna, Spring 2019).
+
+# Social Network Analysis with R (02)
+
+The main goal of this workbook is to demonstrate how data produced with `igraph` library can be reused creatively.
+
+# Libraries
+
+The following are the librsries that we will need for this section. Install those that you do not have yet.
+
+```{r message=FALSE}
+# General ones 
+library(tidyverse)
+library(readr)
+library(stringr)
+library(RColorBrewer)
+
+# SNA Specific
+library(igraph)
+library(ggraph)
+library(ggrepel)
+library(ggalt)
+
+# mapping
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(ggalt)
+library(grid) # grid library cuts out the plot from the graph
+```
+
+**NB:** `igraph` is the main SNA library. There are other packages we can use to visualize graphs (`ggraph`, for example), but most calculations and the overall analysis is still to be performed with `igraph`. You can get an overview of its contents with `library(help="igraph")`. More information: <https://igraph.org/r/>; full documentation: <https://igraph.org/r/doc/igraph.pdf>
+
+# Data
+
+Our practice datasets will include two data sets on Islamic history: 1) the route network of the islamic world around 9-10th centuries (<https://althurayya.github.io/>); and bio-geographical data collected from 30,000 medieval biographies (Source: "The History of Islam" (*Taʾrīḫ al-islām*)  of al-Ḏahabī (748/1348 CE)). 
+
+* [Islamic_World_Data.zip](https://univie-histr-2019.github.io/files/Islamic_World_Data.zip)
+
+# Historical Data
+
+```{r message=FALSE}
+mapLayer <- read_delim("topMicroUPD.csv", "\t", escape_double = FALSE, trim_ws = TRUE)
+```
+
+Let's map this data now:
+
+```{r}
+RDSfolder = "./map.objects/"
+rivers_df <- readRDS(paste0(RDSfolder,"rivers_df.rds"))
+aral_sea_df <- readRDS(paste0(RDSfolder,"aral_sea_df.rds"))
+routes_df <- readRDS(paste0(RDSfolder,"routes_df.rds"))
+
+regions_file <- "top_aRegions_VizCenters.csv"
+#regions_url <- "https://univie-histr-2019.github.io/files/08/top_aRegions_VizCenters.csv"
+#download.file(regions_url, regions_file)
+aRegions <- read_delim(regions_file, "\t", escape_double = FALSE, trim_ws = TRUE)
+
+mapLayer_Filtered <- mapLayer %>%
+  #left_join(aRegions, by="aRegion") %>%
+  filter(!is.na(aRegion))
+
+```
+
+Preparing base layer for our maps:
+
+```{r}
+world <- ne_countries(scale = "medium", returnclass = "sf")
+
+colWater = "grey80"
+colLand  = "white"
+fontVal = "Baskerville"
+
+xlim=c(-12,80); ylim=c(10,50)
+practiceGraphBase_NoReg <- ggplot(data = world) +
+    geom_sf(fill=colLand, color=colLand) +
+  # rivers, aral sea, and routes
+    geom_path(data = rivers_df,aes(x=long, y=lat, group=group), color=colWater, alpha=1, size=.2) +
+    geom_polygon(data = aral_sea_df,aes(x = long, y = lat, group = group), color = colWater, fill=colWater, size = .2) +
+    geom_path(data=routes_df, aes(x=long, y=lat, group=id), color="black", alpha=.1, size=.1)+
+    #geom_label(data=aRegions, aes(x=LON, y=LAT, label=Label), size=2)+
+  # map limits and theme
+    coord_sf(xlim = xlim, ylim = ylim, expand = FALSE) +
+    theme(panel.grid.major = element_line(color = colWater, linetype = "dotted", size = 0.5), panel.background = element_rect(fill = colWater),legend.position="none", panel.border = element_blank())
+
+# ANNOTATION VARIABLES - START
+
+mainAlpha = .75
+headColor = "grey30"
+textColor = "grey10"
+
+Title = "Cumulative Geographical Networks"
+Subtitle = "Data: Taʾrīḫ al-islām of al-Ḏahabī (748/1348)"
+src = "" # expression("Based on: Cornu G."~italic("Atlas du monde arabo-islamique ...")~"(Leiden: Brill, 1983)")
+
+# ANNOTATION LAYERS
+
+# TL (Top-Left) - Descriptions
+X = -11; Y = 49.25; Ystep = 3
+practiceGraphBase_NoReg <- practiceGraphBase_NoReg+
+  annotate("text",label=src, x=X,y=Y,angle=0,hjust=0,vjust=1,size=4,col=textColor,alpha=mainAlpha, family=fontVal)
+
+# TR (Top-Right) - Descriptions
+X = 79; Y = 49.25; Ystep = 3
+practiceGraphBase_NoReg <- practiceGraphBase_NoReg+
+  annotate("text",label="https://althurayya.github.io/", x=X,y=Y,angle=0,hjust=1,vjust=1,size=4,col=textColor,alpha=mainAlpha, family=fontVal)
+
+# BL (Bottom-Left) - Descriptions
+X = -11; Y = 10.5; Ystep = 2.5; hj=0; vj=0
+practiceGraphBase_NoReg <- practiceGraphBase_NoReg+
+  annotate("text",label=Subtitle,x=X,y=Y,angle=0,hjust=hj,vjust=vj,size=6,col=headColor,alpha=mainAlpha,family=fontVal, fontface="italic")+
+  annotate("text",label=Title,x=X,y=Y+Ystep,angle=0,hjust=hj,vjust=vj,size=8,col=headColor,alpha=mainAlpha,family=fontVal)
+
+
+practiceGraphBase_NoReg
+```
+
+
+# Loading Historical Data
+
+- load historical data
+- generate a network
+- create a network object
+- analyze network
+- extract nodes layer
+- graph
+
+```{r message=FALSE}
+aRegions <- read_delim("top_aRegions_VizCenters.csv",  "\t", escape_double = FALSE, trim_ws = TRUE)
+TI_GeoData_for_R_File <- "TI_GeoData_for_R.csv"
+TI_GeoData_for_R_url <- "https://univie-histr-2019.github.io/files/08/TI_GeoData_for_R.csv"
+#download.file(TI_GeoData_for_R_url, TI_GeoData_for_R_File)
+TI_GeoData_for_R <- read_delim(TI_GeoData_for_R_File, "\t", escape_double = FALSE, trim_ws = TRUE)
+
+head(TI_GeoData_for_R)
+```
+
+The structure of this data file is as follows: `BIO` — id of a biography (i.e., a person); `ITEM` includes a value of a data type defined in the column `TYPE`. `TYPE` includes the following values: 1) `DEATH_AH`—decade of the death of a biographee, according to the Islamic *hijrī* calendar (*anno hegirae*); `TOPO_PR`—a place with which a person is closely associated ("resident of ..."); `TOPO_SE`—a place with which a person is associated ("visitor of ...").
+
+We can split our data into two data frames: with dates and with toponyms.
+
+```{r}
+# split > ID_Dates and ID_TOPO
+TIdates <- TI_GeoData_for_R %>%
+  filter(TYPE=="DEATH_AH") %>%
+  rename(DEATH = ITEM)
+  
+TIdates$DEATH <- as.numeric(TIdates$DEATH)
+
+TIgeoData <- TI_GeoData_for_R %>%
+  filter(TYPE=="TOPO_PR" | TYPE=="TOPO_SE") %>%
+  rename(TOPO = ITEM)
+
+```
+
+# On Local Level
+
+Let's generate a network on the level of primary toponyms (not regional):
+
+```{r}
+# NW_Data_Settl <- data.frame()
+# idVector = unique(TIgeoData$BIO)
+# 
+# TIgeoDataRichTOP <- TIgeoData %>%
+#   left_join(mapLayer, by="TOPO") %>%
+#   filter(!is.na(aRegion)) %>%
+#   select(BIO, URI) %>%
+#   unique()
+# 
+# 
+# for (ID in idVector){
+#   temp <- TIgeoDataRichTOP %>%
+#     filter(BIO==ID)
+#   
+#   if(nrow(temp) > 1){
+#     
+#     rows <- t(combn(sort(unique(temp$URI)), 2)) %>%
+#       as.data.frame() %>%
+#       mutate(BIO=ID) %>%
+#       rename(FROM=V1) %>%
+#       rename(TO=V2) %>%
+#       select(BIO, FROM, TO)
+#     
+#     NW_Data_Settl <- rbind(NW_Data_Settl, rows)
+#   }
+# }
+
+```
+
+Now we need to generate the network object and run all calculations as we did above:
+
+```{r}
+# data_settle_merged <- NW_Data_Settl %>%
+#   group_by(FROM, TO) %>%
+#   summarise(weight=n()) %>%
+#   filter(weight>1)
+# 
+# ti_local_nw <- graph_from_data_frame(d=data_settle_merged, directed=F)
+# ti_local_nw <- simplify(ti_local_nw)
+```
+
+Now, let's run analyses:
+
+# centrality measures
+
+```{r}
+# V(ti_local_nw)$degree <- degree(ti_local_nw, mode="all")
+# V(ti_local_nw)$eigenvector <- eigen_centrality(ti_local_nw)$vector
+# V(ti_local_nw)$betweenness <- betweenness(ti_local_nw, directed=F)
+```
+
+# cliques (network components)
+
+It takes very long time to generate cliques, so, let's skip them for now.
+
+```{r}
+#ti_Cliques <- cliques(ti_local_nw, min=30) # takes too long
+#ti_CliquesL <- largest.cliques(ti_local_nw)
+```
+
+# clusters
+
+```{r}
+# V(ti_local_nw)$cl_walktrap <- as.character(cluster_walktrap(ti_local_nw)$membership)
+# V(ti_local_nw)$cl_spinglass <- as.character(cluster_spinglass(ti_local_nw)$membership)
+# V(ti_local_nw)$cl_leading_eigen <- as.character(cluster_leading_eigen(ti_local_nw)$membership)
+# V(ti_local_nw)$cl_edge_betweenness <- as.character(cluster_edge_betweenness(ti_local_nw)$membership)
+# V(ti_local_nw)$cl_fast_greedy <- as.character(cluster_fast_greedy(ti_local_nw)$membership)
+# V(ti_local_nw)$cl_louvain <- as.character(cluster_louvain(ti_local_nw)$membership)
+# V(ti_local_nw)$cl_label_prop <- as.character(cluster_label_prop(ti_local_nw)$membership)
+# V(ti_local_nw)$cl_infomap <- as.character(cluster_infomap(ti_local_nw)$membership) # for directed graphs
+```
+
+Now, we simply need to extract all the vertices data into a data frame, add the mapping data, and we can put all our results on the map:
+
+```{r}
+# ti_local_nw_extracted <- as_data_frame(ti_local_nw, what="vertices")
+# 
+# ti_local_nw_extracted <- ti_local_nw_extracted %>%
+#   rename(URI = name) %>%
+#   left_join(mapLayer, by="URI") %>%
+#   filter(!is.na(aRegion))
+# 
+# #ti_local_nw_extracted
+# 
+# write.table(ti_local_nw_extracted, file="ti_local_nw_extracted.csv", row.names=FALSE, na="", sep="\t", quote=FALSE)
+# 
+# ti_local_nw_simple <- ti_local_nw_extracted %>%
+#   add_count(cl_walktrap)
+# 
+# ti_local_nw_simple
+```
+
+
+
+```{r}
+ti_local_nw_extracted <- read_delim("ti_local_nw_extracted.csv", "\t", escape_double = FALSE, trim_ws = TRUE)
+```
+
+
+```{r}
+# cl_walktrap, cl_spinglass, cl_leading_eigen, cl_edge_betweenness, cl_fast_greedy, cl_louvain, cl_label_prop, cl_infomap
+
+tech = "cl_walktrap"
+
+ti_local_nw_simple <- ti_local_nw_extracted %>%
+  rename(MAP = cl_walktrap) %>%
+  mutate_at(vars(MAP), as.character) %>%
+  group_by(MAP) %>%
+  mutate(COUNT=n()) %>%
+  filter(COUNT>3) %>%
+  select(URI,degree,LON,LAT,MAP,COUNT,TR)
+
+minVal = min(ti_local_nw_simple$degree)
+maxVal = max(ti_local_nw_simple$degree)
+minDegree = summary(ti_local_nw_simple$degree)[[5]] + max(ti_local_nw_simple$degree)/3
+
+# BR (Bottom-Right) - Descriptions
+X = 79; Y = 10.5; Ystep = 2.5; hj=0; vj=0
+
+#x_limits <- c(-10, 30); y_limits <- c(15,30)
+
+#practiceGraph <- practiceGraphBase+
+practiceGraph <- practiceGraphBase_NoReg+
+  geom_point(data=ti_local_nw_simple, aes(x=LON, y=LAT, color=MAP, size=degree), alpha=0.75)+
+  annotate("text",label=tech,x=X,y=Y,angle=0,hjust=1,vjust=vj,size=4,col=headColor,alpha=1,family=fontVal, fontface="bold")+
+  #geom_encircle(data=ti_local_nw_simple, s_shape=.1, expand=0.01, alpha=.25, aes(x=LON, y=LAT, col=MAP, fill=MAP, group=MAP))+
+  geom_label_repel(data=subset(ti_local_nw_simple, degree >= minDegree), aes(x=LON, y=LAT, label=TR), size=1.5, seed=786, segment.size=0.25,
+                   # xlim and ylim move labels to a specified area on the plot
+                   #xlim=x_limits, ylim=y_limits,
+                   family=fontVal
+                   )+
+  # scale_color_... can use a set of discrete colors, but if there is not enough colors in a set, some things will not be plotted!
+  scale_colour_brewer(palette = "Set1")+ # Set1, Set2, Dark2; more <http://www.cookbook-r.com/Graphs/Colors_(ggplot2)/>
+  scale_size_continuous(range=c(0.05,5), limits=c(minVal,maxVal))
+
+# the following two lines help to strip off unnecessary elements, keeping only the graph itself
+gt <- ggplot_gtable(ggplot_build(practiceGraph))
+ge <- subset(gt$layout, name == "panel")
+
+practiceGraph
+
+ggsave(file=paste0("TI_localNetworks_700Y_", tech,".png"),
+       # the following line focuses on the graph
+       plot=grid.draw(gt[ge$t:ge$b, ge$l:ge$r]),
+       # width and height should be experimentally adjusted to remove white space
+       dpi=300,width=8.85,height=4.45)
+
+```
+

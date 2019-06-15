@@ -1,0 +1,286 @@
+URI	degree	eigenvector	betweenness	cl_walktrap	cl_spinglass	cl_leading_eigen	cl_edge_betweenness	cl_fast_greedy	cl_louvain	cl_label_prop	cl_infomap	REG_MESO	aRegion	TR	SEARCH	EN	TYPE	LON	LAT	AR	AR_Alt	AR_Sort	AMBIG	TRUETOP	TOPO
+BASRA_477E304N_S	118	0.326424169056882	594.668903769904	2	1	1	1	2	5	1	1	Iraq_RE	Iraq_MR	al-Baṣraŧ	al-Basra		capitals	47.71735	30.40147	البصرة	البصرة	بصرة	0	0	البصرة
+HIJAZ_390E235N_R	104	0.270914750471977	693.165432574314	2	1	1	1	2	5	1	1	JaziratArab_RE	Central_Arabia_MR	al-Ḥiǧāz	al-Hijaz		regions	39.02138	23.51137	الحجاز	الحجاز	حجاز	0	0	الحجاز
+Rum_RE	123	0.144989150577515	987.199846383903	3	10	1	1	1	7	1	1	Rum_RE	Rum_MR	al-Rūm	al-Rum		MESO	33.991699	39.201611	الروم	الروم	روم	0	0	الروم
+Ifriqiyya_RE	63	0.054608089724254	264.980289621261	1	10	1	2	1	7	1	3	Ifriqiyya_RE	Ifriqiyya_MR	Ifriqiyyaŧ	Ifriqiyya		regions	9.624023	35.109125	إفريقية	افريقية|افريقيا	افريقية	0	1	افريقية
+Maghrib_RE	63	0.054608089724254	264.980289621261	1	10	1	3	1	7	1	3	Maghrib_RE	Ifriqiyya_MR	Ifriqiyyaŧ	Ifriqiyya		regions	9.624023	35.109125	إفريقية	افريقية|افريقيا	افريقية	0	1	افريقية
+KUFA_443E320N_S	115	0.289950786098917	565.101943949333	2	1	1	1	2	5	1	1	Iraq_RE	Iraq_MR	al-Kūfaŧ	al-Kufa		capitals	44.39355	32.03808	الكوفة	الكوفة	كوفة	0	1	الكوفة
+JIBAL_353E302N_R	67	0.0637124647944366	170.371129304234	2	12	1	1	5	1	1	1	Sham_RE	Sham_MR	al-Ǧibāl	al-Jibal		regions	35.32238	30.26155	الجبال	الجبال	جبال	0	0	الجبال
+JIBAL_416E362N_S	67	0.0637124647944366	170.371129304234	2	12	1	1	5	1	1	1	Aqur_RE	Jazira_MR	al-Ǧibāl	al-Jibal|Ayn al-Jibal		towns	41.62102	36.2374	الجبال	الجبال|عين الجبال	جبال	0	0	الجبال
+Jibal_RE	67	0.0637124647944366	170.371129304234	2	12	1	1	5	1	1	1	Jibal_RE	NW_Iran_MR	al-Ǧibāl	al-Jibal		MESO	48.449707	35.607292	الجبال	الجبال	جبال	0	0	الجبال
+MADINA_396E244N_S	147	0.251967661967793	1421.32086454788	2	1	1	1	2	5	1	1	JaziratArab_RE	Central_Arabia_MR	al-Madīnaŧ	al-Madina|Madinta al-Nabi|Yathrib		towns	39.60908	24.47782	المدينة	المدينة|مدينة النبي|يثرب	مدينة	0	0	المدينة
+MAKKA_398E213N_S	155	0.483622469118435	654.914215664465	2	1	1	1	2	5	1	1	JaziratArab_RE	Central_Arabia_MR	Makkaŧ	Makka		metropoles	39.83612	21.39132	مكة	مكة	مكة	0	1	مكة
+Khurasan_RE	132	0.368652384950896	1585.14113943919	2	1	1	1	2	5	1	1	Khurasan_RE	NE_Iran_MR	Ḫurāsān	Khurasan		MESO	58.831787	36.564365	خراسان	خراسان	خراسان	0	1	خراسان
+BARQA_208E323N_S	20	0.0121012586170776	86.0329194351112	3	6	1	4	3	6	1	1	Barqa_RE	Barqa_MR	Barqaŧ	Barqa		capitals	20.84475	32.37576	برقة	برقة	برقة	0	0	برقة
+HADRAMAWT_488E156N_R	6	0.00373303685963549	71.6935015913666	2	6	1	5	3	6	1	1	JaziratArab_RE	SW_Arabia_MR	Ḥaḍramawt	Hadramawt		regions	48.80405	15.64792	حضرموت	حضرموت	حضرموت	0	0	حضرموت
+DARA_409E371N_S	49	0.0422101025142985	142.324064119574	2	1	1	6	2	5	1	1	Aqur_RE	Jazira_MR	Dārā	Dara		towns	40.94689	37.18527	دارا	دارا	دارا	0	0	دارا
+HIMS_367E347N_S	98	0.151384063898799	1010.93626803681	3	6	1	7	3	6	1	1	Sham_RE	Sham_MR	Ḥimṣ	Hims		capitals	36.72425	34.73793	حمص	حمص	حمص	0	0	حمص
+DIMASHQ_363E335N_S	216	0.902748354278774	2228.44574835412	3	6	1	8	3	6	1	1	Sham_RE	Sham_MR	Dimašq	Dimashq		metropoles	36.30199	33.51843	دمشق	دمشق	دمشق	0	1	دمشق
+ISKANDARIYYA_299E311N_S	107	0.20652239474614	417.662053155067	3	6	1	7	3	6	1	1	Misr_RE	Misr_MR	al-Iskandariyyaŧ	al-Iskandariyya		capitals	29.90981	31.1949	الإسكندرية	الإسكندرية	اسكندرية	0	0	الاسكندرية
+Aqur_RE	127	0.164699350914246	842.681127288929	3	4	1	1	1	7	1	1	Aqur_RE	Jazira_MR	al-Jazīraŧ	al-Jazira		MESO	42.484131	36.582011	الجزيرة	الجزيرة|أقور	جزيرة	0	0	الجزيرة
+JAZIRA_312E300N_S	127	0.164699350914246	842.681127288929	3	4	1	1	1	7	1	1	Misr_RE	Misr_MR	al-Ǧazīraŧ	al-Jazira		quarters	31.21122	30.04436	الجزيرة	الجزيرة	جزيرة	0	0	الجزيرة
+AMMAN_359E319N_S	13	0.00656250955186198	64.6780805652628	2	2	1	9	2	5	1	1	Sham_RE	Sham_MR	ʿAmmān	Amman		towns	35.91903	31.93113	عمان	عمان	عمان	0	0	عمان
+Fars_RE	133	0.212471389944363	985.951301968883	2	1	1	1	2	5	1	1	Fars_RE	SW_Iran_MR	Fārs	Fars		MESO	52.756348	29.079216	فارس	فارس	فارس	0	0	فارس
+FILASTIN_351E317N_R	29	0.0246723464982801	174.143299025062	3	6	1	7	3	6	1	1	Sham_RE	Sham_MR	Filasṭīn	Filastin		regions	35.191956	31.756663	فلسطين	فلسطين	فلسطين	0	0	فلسطين
+Iraq_RE	165	0.525768021425344	1611.78483900714	2	1	1	1	2	5	1	1	Iraq_RE	Iraq_MR	al-ʿIrāq	al-Iraq		MESO	45.032959	32.270413	العراق	العراق	عراق	0	0	العراق
+Misr_RE	215	0.921628338967264	2840.51199402899	2	6	1	6	3	6	1	1	Misr_RE	Misr_MR	Miṣr	Misr		MESO	31.24964	30.04325	مصر	مصر	مصر	0	0	مصر
+Sham_RE	195	0.68780031061034	1524.50606102454	3	6	1	1	3	6	1	1	Sham_RE	Sham_MR	al-Šām	al-Sham		MESO	37.155762	34.672973	الشام	الشام	شام	0	0	الشام
+TAIF_404E212N_S	20	0.0215235719768427	31.9993613389962	2	1	1	10	2	5	1	1	JaziratArab_RE	Central_Arabia_MR	al-Ṭāʾif	al-Taif		towns	40.40566	21.21629	الطائف	الطائف	طائف	0	0	الطائف
+QADISIYYA_439E340N_S	10	0.00508442695227355	67.9525265385488	8	9	1	11	2	5	1	1	Iraq_RE	Iraq_MR	al-Qādisiyyaŧ	al-Qadisiyya		waystations	43.98259	34.09388	القادسية	القادسية	قادسية	0	0	القادسية
+HAMADHAN_485E347N_S	97	0.18749205093631	636.756446138635	2	1	1	1	2	5	1	1	Jibal_RE	NW_Iran_MR	Hamaḏān	Hamadhan		metropoles	48.57908	34.77554	همذان	همذان	همذان	0	0	همذان
+BAHRAYN_495E261N_R	14	0.0085068559777928	126.369410041988	2	1	1	12	2	5	1	1	JaziratArab_RE	SE_Arabia_MR	al-Baḥrayn	al-Bahrayn		province	49.592285	26.159383	البحرين	البحرين	بحرين	0	0	البحرين
+QADISIYYA_441E316N_S	10	0.00508442695227355	67.9525265385488	8	9	1	13	2	5	1	1	Iraq_RE	Iraq_MR	al-Qādisiyyaŧ	al-Qadisiyya		towns	44.18717	31.65292	القادسية	القادسية	قادسية	0	0	القادسية
+ISBAHAN_516E326N_S	122	0.396212060243286	894.602961035582	2	1	1	1	2	5	1	1	Jibal_RE	NW_Iran_MR	Iṣbahān	Isbahan|Isfahan|al-Yahudiyya		capitals	51.65	32.66855	إصبهان	إصبهان|إصفهان|اليهودية	اصبهان	0	1	اصبهان
+MIZZA_362E335N_S	16	0.0142175804665405	127.510409681499	3	6	1	14	3	6	1	1	Sham_RE	Sham_MR	al-Mizzaŧ	al-Mizza		villages	36.258333	33.503056	المزة	المزة	مزة	0	0	المزة
+BUST_643E313N_S	33	0.0265700822793088	125.776582647182	2	1	1	15	2	5	1	1	Sijistan_RE	SE_Iran_MR	Bust	Bust		capitals	64.39078	31.39108	بست	بست	بست	0	0	بست
+JUHFA_391E226N_S	3	0.00228470716319976	0	3	6	1	16	3	6	1	1	JaziratArab_RE	Central_Arabia_MR	al-Ǧuḥfaŧ	al-Juhfa		towns	39.12422	22.60833	الجحفة	الجحفة	جحفة	0	0	الجحفة
+TABARISTAN_526E363N_R	37	0.0257343257706694	47.0503021067366	2	1	1	17	2	5	1	1	Daylam_RE	NW_Iran_MR	Ṭabaristān	Tabaristan		regions	52.60329	36.34732	طبرستان	طبرستان	طبرستان	0	1	طبرستان
+BAGHDAD_443E333N_S	218	1	2592.68145866696	2	1	1	1	2	5	1	1	Iraq_RE	Iraq_MR	Baġdād	Baghdad		metropoles	44.35693	33.35932	بغداد	بغداد|بغذاد|مدينة السلام	بغداد	0	0	بغداد
+NAYSABUR_587E361N_S	116	0.374858052407212	886.835176717325	2	1	1	1	2	5	1	1	Khurasan_RE	NE_Iran_MR	Naysābūr	Naysabur		metropoles	58.79841	36.12138	نيسابور	نيسابور	نيسابور	0	1	نيسابور
+DARAYYA_362E334N_S	15	0.0121263135516234	170.153383769887	2	6	1	18	3	6	1	1	Sham_RE	Sham_MR	Dārayyā	Darayya		villages	36.23184	33.46544	داريا	داريا	داريا	0	0	داريا
+ANBAR_437E333N_S	43	0.0362695993363402	116.350365295736	2	1	1	6	2	5	1	1	Iraq_RE	Iraq_MR	al-Anbār	al-Anbar		towns	43.7015	33.39492	الأنبار	الأنبار	انبار	0	0	الانبار
+ANBAR_659E362N_S	43	0.0362695993363402	116.350365295736	2	1	1	6	2	5	1	1	Khurasan_RE	NE_Iran_MR	al-Anbār	al-Anbar		towns	65.94751	36.20578	الأنبار	الأنبار	انبار	0	0	الانبار
+SARIYA_531E365N_S	17	0.0108330261986128	47.9793415492651	2	1	1	19	2	5	1	1	Daylam_RE	NW_Iran_MR	Sāriyaŧ	Sariya		towns	53.11807	36.53215	سارية	سارية	سارية	0	0	سارية
+SANA_442E153N_S	16	0.0151020020152658	15.1353091662137	2	1	1	20	2	5	1	1	Yaman_RE	SW_Arabia_MR	Ṣanʿāʾ	Sana		capitals	44.20186	15.37373	صنعاء	صنعاء	صنعاء	0	0	صنعاء
+QUSTANTINIYYA_290E411N_S	37	0.0187712001315783	276.655751935219	2	1	1	21	2	5	1	1	Rum_RE	Rum_MR	al-Qusṭanṭīniyyaŧ	al-Qustantiniyya|Qustantiniyya		metropoles	29.029312	41.014206	القسطنطينية	القسطنطينية|القسطنطنية|قسطنطنية	قسطنطينية	0	0	القسطنطينية
+MARW_621E376N_S	95	0.211398445212511	998.992665329597	2	1	1	1	2	5	1	1	Khurasan_RE	NE_Iran_MR	Marw	Marw|Marw al-Shahijan		capitals	62.10386	37.67193	مرو	مرو|مرو الشاهجان	مرو	0	0	مرو
+BALKH_668E367N_S	59	0.0854809962647523	67.5793575115141	2	1	1	1	2	5	1	1	Khurasan_RE	NE_Iran_MR	Balḫ	Balkh		capitals	66.88305	36.78497	بلخ	بلخ	بلخ	0	0	بلخ
+ASQALAN_345E316N_S	52	0.0446806036719239	122.336273446576	3	6	1	7	3	6	1	1	Sham_RE	Sham_MR	ʿAsqalān	Asqalan		towns	34.55455	31.66572	عسقلان	عسقلان	عسقلان	0	0	عسقلان
+KARBALA_440E326N_S	9	0.00475158133140208	73.676617779186	3	3	1	22	4	2	1	1	Iraq_RE	Iraq_MR	Karbalāʾ	Karbala		towns	44.03706	32.61792	كربلاء	كربلاء	كربلاء	0	0	كربلاء
+QINNASRIN_370E359N_S	12	0.00831817574749726	66.0356037988149	3	6	1	23	3	6	1	1	Sham_RE	Sham_MR	Qinnasrīn	Qinnasrin		capitals	37.02701	35.99617	قنسرين	قنسرين	قنسرين	0	1	قنسرين
+BUKHARA_644E398N_S	68	0.114180778301223	182.069282768956	2	1	1	1	2	5	1	1	Mawarannahr_RE	Mawarannahr_MR	Buḫāraŧ	Bukhara		capitals	64.46489	39.85224	بخارى	بخارة|بخارى	بخارى	0	0	بخارى
+HIRA_443E320N_S	22	0.0140333373806371	94.9562282027306	3	10	1	24	1	7	1	1	Iraq_RE	Iraq_MR	al-Ḥīraŧ	al-Hira		towns	44.37232	32.01734	الحيرة	الحيرة	حيرة	0	0	الحيرة
+Daylam_RE	20	0.00847479070905709	140.952928135318	2	1	1	25	2	5	1	1	Daylam_RE	NW_Iran_MR	al-Daylam	al-Daylam		MESO	48.974304	36.853692	الديلم	الديلم	ديلم	0	1	الديلم
+QUMM_509E346N_S	76	0.0695483344836808	265.932537208513	2	1	1	1	2	5	1	1	Jibal_RE	NW_Iran_MR	Qumm	Qumm		capitals	50.90695	34.63354	قم	قم	قم	0	0	قم
+RAQQA_390E359N_S	65	0.0632997409143671	336.904467457179	3	6	1	7	3	6	1	1	Aqur_RE	Jazira_MR	al-Raqqaŧ	al-Raqqa		capitals	39.05128	35.9493	الرقة	الرقة|هرقلة	رقة	0	0	الرقة
+FAS_050W340N_S	56	0.0345841469907613	318.735134832587	1	10	1	26	1	7	1	2	Maghrib_RE	Maghrib_MR	Fās	Fas		capitals	-5.02852	34.06727	فاس	فاس	فاس	0	0	فاس
+RIBAT_068W339N_S	43	0.0594124975625652	24.4168390114828	2	1	1	1	2	5	1	1	Maghrib_RE	Maghrib_MR	Ribāṭ	Ribat		villages	-6.88943	33.99489	رباط	رباط	رباط	0	0	رباط
+WASIT_463E321N_S	84	0.197885884562337	690.656687719472	2	1	1	1	2	5	1	1	Iraq_RE	Iraq_MR	Wāsiṭ	Wasit		capitals	46.32308	32.19497	واسط	واسط	واسط	0	0	واسط
+HIND_717E255N_R	56	0.049150241422125	60.7519436420851	2	1	1	1	2	5	1	1	Sind_RE	SE_Iran_MR	al-Hind	al-Hind		regions	71.740723	25.526581	الهند	الهند	هند	0	0	الهند
+HILLA_444E324N_S	18	0.0207383289405447	36.5156962209043	3	3	1	27	4	2	1	1	Iraq_RE	Iraq_MR	al-Ḥillaŧ	al-Hilla		towns	44.41963	32.46367	الحلة	الحلة	حلة	0	0	الحلة
+HULA_356E329N_S	18	0.0207383289405447	36.5156962209043	3	3	1	28	4	2	1	1	Sham_RE	Sham_MR	al-Ḥulaŧ	al-Hula		towns	35.63816	32.97543	الحلة	الحلة	حلة	0	0	الحلة
+BISTAM_550E364N_S	44	0.0312359507208205	76.0955665898224	2	1	1	6	2	5	1	1	Daylam_RE	NW_Iran_MR	Bisṭām	Bistam		towns	55.07205	36.45952	بسطام	بسطام	بسطام	0	0	بسطام
+GHUTA_364E335N_W	7	0.00921166364652596	0	3	6	1	29	3	6	1	1	Sham_RE	Sham_MR	al-Ġūṭaŧ	al-Ghuta		waters	36.44363	33.50849	الغوطة	الغوطة	غوطة	0	0	الغوطة
+KHUWARIZM_599E416N_R	60	0.0686764746544965	88.881086837691	2	1	1	1	2	5	1	1	Mawarannahr_RE	Mawarannahr_MR	Ḫuwārizm	Khuwarizm		regions	59.97545	41.65733	خوارزم	خوارزم	خوارزم	0	0	خوارزم
+SAMARQAND_670E396N_S	62	0.0791538968828064	112.782161378953	2	1	1	1	2	5	1	1	Mawarannahr_RE	Mawarannahr_MR	Samarqand	Samarqand		metropoles	67.03225	39.67905	سمرقند	سمرقند	سمرقند	0	1	سمرقند
+FARGHANA_720E403N_R	10	0.00495314404558113	50.0327458185588	2	1	1	30	2	5	1	1	Mawarannahr_RE	Mawarannahr_MR	Farġānaŧ	Farghana		regions	72.02839	40.33989	فرغانة	فرغانة	فرغانة	0	0	فرغانة
+JUWAYN_566E368N_R	4	0.00219689323185234	3.31208495118094	4	3	1	31	10	8	2	5	Khurasan_RE	NE_Iran_MR	Ǧuwayn	Juwayn|Kuyan		regions	56.69972	36.86045	جوين	جوين|كويان	جوين	0	0	جوين
+QAYRAWAN_101E357N_S	53	0.0532616685947868	311.280859578915	1	10	1	32	1	7	1	3	Maghrib_RE	Ifriqiyya_MR	al-Qayrawān	al-Qayrawan		capitals	10.14137	35.70049	القيروان	القيروان	قيروان	0	1	القيروان
+AYLA_349E295N_S	8	0.00436906038471859	4.90614283129473	3	6	1	33	3	6	1	1	Sham_RE	Sham_MR	Aylaŧ	Ayla|Wayla		towns	34.94527	29.57226	أيلة	أيلة|ويلة	ايلة	0	0	ايلة
+DIMYAT_317E314N_S	43	0.0457597234343718	95.1568873246921	3	6	1	34	3	6	1	1	Misr_RE	Misr_MR	Dimyāṭ	Dimyat		towns	31.79125	31.43739	دمياط	دمياط	دمياط	0	0	دمياط
+HADR_426E357N_S	18	0.0115971024872381	97.0508785427887	2	1	1	35	2	5	1	1	Aqur_RE	Jazira_MR	al-Ḥaḍr	al-Hadr		towns	42.69628	35.79513	الحضر	الحضر	حضر	0	0	الحضر
+HARRAN_390E368N_S	81	0.169259052891499	376.375505105633	3	6	1	7	3	6	1	1	Aqur_RE	Jazira_MR	Ḥarrān	Harran		towns	39.08906	36.88438	حران	حران	حران	0	0	حران
+BALQA_359E320N_R	7	0.00488892809940023	3.28194191429486	10	7	1	36	8	4	1	1	Sham_RE	Sham_MR	al-Balqāʾ	al-Balqa		regions	35.96379	32.08487	البلقاء	البلقاء	بلقاء	0	0	البلقاء
+JIZA_312E300N_S	15	0.0122978030130856	39.1178961780792	3	6	1	37	3	6	1	1	Misr_RE	Misr_MR	al-Ǧīzaŧ	al-Jiza		towns	31.20183	30.00653	الجيزة	الجيزة	جيزة	0	0	الجيزة
+ISTAKHR_529E299N_S	6	0.00267359625914356	16.1375174341363	2	1	1	38	2	5	1	1	Fars_RE	SW_Iran_MR	Iṣṭaḫr	Istakhr		capitals	52.92548	29.97008	إصطخر	إصطخر	اصطخر	0	1	اصطخر
+MAWSIL_431E363N_S	127	0.304291748462746	1094.51595466039	3	6	1	1	3	6	1	1	Aqur_RE	Jazira_MR	al-Mawṣil	al-Mawsil		capitals	43.127	36.32809	الموصل	الموصل	موصل	0	0	الموصل
+Sijistan_RE	45	0.044004633610012	44.0985992478718	2	1	1	1	2	5	1	1	Sijistan_RE	SE_Iran_MR	Siǧistān	Sijistan		MESO	63.303223	31.244743	سجستان	سجستان	سجستان	0	1	سجستان
+QUBRUS_333E350N_R	6	0.00427781474906202	3.52373630879048	3	6	1	39	3	6	1	1	NO_RE	Rum_MR	Qubrus	Qubrus		regions	33.359985	35.021899	قبرس	قبرس	قبرس	0	0	قبرس
+HULWAN_312E298N_S	37	0.0238195103535162	79.0172655801648	2	5	1	40	11	3	1	1	Misr_RE	Misr_MR	Ḥulwān	Hulwan		towns	31.29831	29.86015	حلوان	حلوان	حلوان	0	0	حلوان
+HULWAN_459E344N_S	37	0.0238195103535162	79.0172655801648	2	5	1	40	11	3	1	1	Iraq_RE	Iraq_MR	Ḥulwān	Hulwan		capitals	45.93468	34.47862	حلوان	حلوان	حلوان	0	0	حلوان
+HULWAN_562E339N_S	37	0.0238195103535162	79.0172655801648	2	5	1	40	11	3	1	1	Mafaza_RE	SE_Iran_MR	Ḥulwān	Hulwan		waystations	56.22435	33.94771	حلوان	حلوان	حلوان	0	0	حلوان
+JUDDA_391E214N_S	11	0.01194911017365	37.7729411804695	3	6	1	41	3	6	1	1	JaziratArab_RE	Central_Arabia_MR	Ǧuddaŧ	Judda		towns	39.1779	21.46201	جدة	جدة	جدة	0	0	جدة
+RAYY_515E356N_S	91	0.169020497735344	321.976329045921	2	1	1	1	2	5	1	1	Jibal_RE	NW_Iran_MR	al-Rayy	al-Rayy		capitals	51.50831	35.62754	الري	الري	ري	0	0	الري
+Andalus_RE	97	0.143119241812701	764.756706464417	1	10	1	1	1	7	1	2	Andalus_RE	Andalus_MR	al-Andalus	al-Andalus|Andalusia		MESO	-3.735352	39.578597	الأندلس	الاندلس	اندلس	0	1	الاندلس
+ADHARBAYJAN_479E382N_R	72	0.0615812160746601	326.628065984067	2	4	1	1	2	5	1	1	Rihab_RE	Qabq_MR	Aḏarbayǧān	Adharbayjan		regions	47.95801	38.24076	أذربيجان	أذربيجان	اذربيجان	0	1	اذربيجان
+NIHAWAND_483E342N_S	34	0.0172663899017083	185.788928703355	2	1	1	42	2	5	1	1	Jibal_RE	NW_Iran_MR	Nihāwand	Nihawand|Mah al-Basra		capitals	48.39263	34.21512	نهاوند	نهاوند|ماه البصرة	نهاوند	0	0	نهاوند
+AMUL_524E364N_S	48	0.0398488874976025	96.6393573180456	2	1	1	6	2	5	1	1	Daylam_RE	NW_Iran_MR	Āmul	Amul		capitals	52.40859	36.42256	آمل	آمل	امل	0	0	امل
+AMUL_635E390N_S	48	0.0398488874976024	96.6393573180456	2	1	1	6	2	5	1	1	Khurasan_RE	NE_Iran_MR	Āmul	Amul		towns	63.51255	39.06795	آمل	آمل	امل	0	0	امل
+Sind_RE	38	0.0271176724442049	43.5902212371219	2	1	1	43	2	5	1	1	Sind_RE	SE_Iran_MR	al-Sind	al-Sind		MESO	68.444824	27.023899	السند	السند	سند	0	0	السند
+ASHIR_031E359N_S	10	0.00662014718107429	79.1482179826483	3	6	1	44	3	6	1	1	Maghrib_RE	Maghrib_MR	Ašīr	Ashir		towns	3.1403	35.97544	أشير	اشير	اشير	0	0	اشير
+JARJARAYA_453E327N_S	1	0.000185414303584651	0	13	3	1	45	2	5	1	1	Iraq_RE	Iraq_MR	Ǧarǧarāyā	Jarjaraya		towns	45.31987	32.74104	جرجرايا	جرجرايا	جرجرايا	0	0	جرجرايا
+ARDABIL_483E382N_S	3	0.00259673568508815	9.66279852174762	2	1	1	46	2	5	1	1	Rihab_RE	Qabq_MR	Ardabīl	Ardabil		metropoles	48.30651	38.23604	أردبيل	أردبيل	اردبيل	0	1	اردبيل
+TABARIYYA_355E327N_S	30	0.0211629770366752	35.1656118533795	3	6	1	7	3	6	1	1	Sham_RE	Sham_MR	Ṭabariyyaŧ	Tabariyya		capitals	35.51241	32.77755	طبرية	طبرية	طبرية	0	0	طبرية
+MISSISA_356E369N_S	15	0.0142139394019632	21.2790441123892	2	1	1	47	2	5	1	1	Sham_RE	Sham_MR	al-Miṣṣīṣaŧ	al-Missisa		waystations	35.66897	36.94067	المصيصة	المصيصة	مصيصة	0	0	المصيصة
+NA_Hamima	6	0.00351583345985785	4.48660478737092	10	7	1	48	8	4	1	1	Sham_RE	Sham_MR	LOW			loc	35.333	30	الحميمة	الحميمة	حميمة	0	0	الحميمة
+HALAB_371E361N_S	134	0.369979253572527	979.937450319655	3	6	1	1	3	6	1	1	Sham_RE	Sham_MR	Ḥalab	Halab		capitals	37.17518	36.19828	حلب	حلب	حلب	0	0	حلب
+HARA_544E301N_S	70	0.158268662332568	212.935103596217	2	1	1	1	2	5	1	1	Fars_RE	SW_Iran_MR	Harāŧ	Hara		towns	54.41315	30.11392	هراة	هراة	هراة	0	1	هراة
+HARA_621E343N_S	70	0.158268662332568	212.935103596217	2	1	1	1	2	5	1	1	Khurasan_RE	NE_Iran_MR	Harāŧ	Hara		capitals	62.15235	34.33419	هراة	هراة	هراة	0	1	هراة
+BAYRUT_355E339N_S	36	0.0214121409460075	144.510135062024	3	6	1	7	3	6	1	1	Sham_RE	Sham_MR	Bayrūt	Bayrut		towns	35.5091	33.90162	بيروت	بيروت	بيروت	0	0	بيروت
+Mawarannahr_RE	59	0.0726231652981762	127.456627845711	2	1	1	1	2	5	1	1	Mawarannahr_RE	Mawarannahr_MR	Mā warāʾ-l-nahr	Ma wara al-nahr|Mawarannahr		MESO	65.665283	39.573516	ما وراء النهر	ما وراء النهر	ما وراء النهر	0	1	ما وراء النهر
+AHWAZ_486E313N_S	53	0.0511970632993221	250.747646673439	2	1	1	1	2	5	1	1	Khuzistan_RE	SW_Iran_MR	al-Ahwāz	al-Ahwaz|Suq al-Ahwaz		metropoles	48.69059	31.32986	الأهواز	الأهواز|سوق الأهواز	اهواز	0	0	الاهواز
+JURJAN_549E373N_R	71	0.0851062556335041	265.805568139228	2	1	1	1	2	5	1	1	Daylam_RE	NW_Iran_MR	Ǧurǧān	Jurjan		regions	54.99028	37.33269	جرجان	جرجان	جرجان	0	0	جرجان
+QUNIYA_324E378N_S	6	0.00499324809073232	18.8114577460483	3	10	1	49	1	7	1	1	Rum_RE	Rum_MR	Qūniyaŧ	Quniya		loc	32.483333	37.866667	قونية	قونية	قونية	0	0	قونية
+SAID_330E241N_R	25	0.0254311178443486	152.375656914918	3	6	1	50	3	6	1	1	Misr_RE	Misr_MR	al-Saʿīd	al-Said		regions	33.019409	24.147756	الصعيد	الصعيد	صعيد	0	0	الصعيد
+NASIBIN_412E370N_S	36	0.026667739634953	166.221140380165	3	6	1	7	3	6	1	1	Aqur_RE	Jazira_MR	Naṣībīn	Nasibin		towns	41.22167	37.05514	نصيبين	نصيبين	نصيبين	0	1	نصيبين
+NA_Hashimiyya	8	0.00583593278823299	30.5340917210773	2	1	1	51	2	5	1	1	Iraq	Iraq_MR	ADD			locMan	44.65709	32.37447	الهاشمية	الهاشمية	هاشمية	0	1	الهاشمية
+QAZWIN_500E362N_S	42	0.0317089566176988	88.3807728569199	2	1	1	1	2	5	1	1	Jibal_RE	NW_Iran_MR	Qazwīn	Qazwin		towns	50.0011	36.27854	قزوين	قزوين	قزوين	0	1	قزوين
+Kirman_RE	55	0.0403439638370211	99.2624901224811	2	1	1	1	2	5	1	1	Kirman_RE	SW_Iran_MR	Kirmān	Kirman		MESO	57.06702	30.28027	كرمان	كرمان	كرمان	0	1	كرمان
+ADHANA_353E369N_S	10	0.00605142232050234	62.6817550255184	3	6	1	52	3	6	1	1	Sham_RE	Sham_MR	Aḏanaŧ	Adhana		waystations	35.34272	36.96023	أذنة	أذنة	اذنة	0	0	اذنة
+JUR_525E288N_S	7	0.005333042831619	89.9891831914612	2	1	1	53	2	5	1	1	Fars_RE	SW_Iran_MR	Ǧūr	Jur|Bayruzabadh		towns	52.58324	28.84797	جور	جور|بيروزاباذ	جور	0	0	جور
+BALABAKK_361E340N_S	76	0.106224999649086	495.203356918408	3	6	1	7	3	6	1	1	Sham_RE	Sham_MR	Baʿlabakk	Balabakk		towns	36.19213	34.01251	بعلبك	بعلبك	بعلبك	0	0	بعلبك
+BAYRUT_479E320N_S	36	0.0214121409460075	144.510135062024	3	6	1	7	3	6	1	1	Khuzistan_RE	SW_Iran_MR	Bayrūt	Bayrut		towns	47.90375	32.06082	بيروت	بيروت	بيروت	0	0	بيروت
+HAMA_367E351N_S	35	0.0545557304245333	115.867057817305	3	6	1	54	3	6	1	1	Sham_RE	Sham_MR	Ḥamāŧ	Hama		towns	36.76872	35.12587	حماة	حماة	حماة	0	0	حماة
+TARSUS_349E369N_S	33	0.0296620541003007	67.9550663318732	2	1	1	6	2	5	1	1	Sham_RE	Sham_MR	Ṭarsūs	Tarsus|Antarsus|Antartus		towns	34.95529	36.90807	طرسوس	طرسوس|أنطرسوس|أنطرطوس	طرسوس	0	0	طرسوس
+ABBADAN_482E303N_S	13	0.00676800479569735	140.409233970677	2	1	1	55	2	5	1	1	Iraq_RE	Iraq_MR	ʿAbbādān	Abbadan		towns	48.27394	30.33563	عبادان	عبادان	عبادان	0	0	عبادان
+IDHAJ_498E318N_S	4	0.00236231551233957	10.4439594307257	2	1	1	56	2	5	1	1	Khuzistan_RE	SW_Iran_MR	Īḏaǧ	Idhaj		towns	49.87086	31.85548	إيذج	إيذج	ايذج	0	0	ايذج
+ISHBILIYYA_059W374N_S	53	0.0439653761193481	189.693652140409	1	10	1	57	1	7	1	2	Andalus_RE	Andalus_MR	Išbīliyyaŧ	Ishbiliyya		towns	-5.96199	37.4079	إشبيلية	إشبيلية	اشبيلية	0	1	اشبيلية
+QURTUBA_047W379N_S	74	0.076372153566878	1007.65978642025	1	10	1	58	1	7	1	2	Andalus_RE	Andalus_MR	Qurṭubaŧ	Qurtuba		metropoles	-4.78135	37.91898	قرطبة	قرطبة	قرطبة	0	1	قرطبة
+MAYYAFARIQIN_410E381N_S	42	0.0286150233325067	96.0704957618676	3	6	1	7	3	6	1	1	Aqur_RE	Jazira_MR	Mayyāfāriqīn	Mayyafariqin		towns	41.00798	38.14322	ميافارقين	ميافارقين	ميافارقين	0	1	ميافارقين
+RAFIQA_307E306N_S	3	0.00143296448876751	4.79409365772642	9	8	1	59	7	11	3	10	Misr_RE	Misr_MR	al-Rāfiqaŧ	al-Rafiqa		villages	30.73593	30.6947	الرافقة	الرافقة	رافقة	0	0	الرافقة
+HIT_428E336N_S	9	0.0060551709243889	24.576534948042	2	1	1	60	2	5	1	1	Iraq_RE	Iraq_MR	Hīt	Hit		towns	42.80628	33.6437	هيت	هيت	هيت	0	0	هيت
+MANBIJ_379E365N_S	35	0.0253005490463417	63.2708211490761	3	6	1	7	3	6	1	1	Aqur_RE	Jazira_MR	Manbiǧ	Manbij		towns	37.98957	36.54651	منبج	منبج	منبج	0	0	منبج
+Yaman_RE	103	0.22149959950626	805.876747455865	3	6	1	1	3	6	1	1	Yaman_RE	SW_Arabia_MR	al-Yaman	al-Yaman		MESO	44.868164	14.953277	اليمن	اليمن	يمن	0	0	اليمن
+ABIWARD_595E372N_S	6	0.00216894413577034	65.7125217008725	2	1	1	61	2	5	1	1	Khurasan_RE	NE_Iran_MR	Abīward	Abiward		towns	59.59733	37.27	أبيورد	أبيورد	ابيورد	0	0	ابيورد
+SARAKHS_611E365N_S	45	0.0353525552129294	133.186229358367	2	1	1	1	2	5	1	1	Khurasan_RE	NE_Iran_MR	Saraḫs	Sarakhs		towns	61.18671	36.51694	سرخس	سرخس	سرخس	0	1	سرخس
+FAYD_425E270N_S	12	0.00680385687462247	58.6783347648121	2	1	1	62	2	5	1	1	BadiyatArab_RE	Central_Arabia_MR	Fayd	Fayd		towns	42.50815	27.06977	فيد	فيد	فيد	0	0	فيد
+QASHAN_515E339N_S	5	0.00287331321334077	12.0459912172725	2	1	1	63	2	5	1	1	Jibal_RE	NW_Iran_MR	Qāšān	Qashan		capitals	51.50468	33.96762	قاشان	قاشان	قاشان	0	0	قاشان
+TUSTAR_488E320N_S	32	0.0214145221763876	211.822468180353	2	1	1	64	2	5	1	1	Khuzistan_RE	SW_Iran_MR	Tustar	Tustar|Shushtar		capitals	48.85461	32.0511	تستر	تستر|ششتر	تستر	0	0	تستر
+MASHHAD_595E361N_S	23	0.0204075544355136	66.7681218748009	2	1	1	65	2	6	1	1	Khurasan_RE	NE_Iran_MR	al-Mašhad	Mashhad		towns	59.56796	36.31559	المشهد	المشهد	مشهد	0	0	المشهد
+RAMLA_348E319N_S	51	0.0660901522674809	162.40723955293	3	6	1	7	3	6	1	1	Sham_RE	Sham_MR	al-Ramlaŧ	al-Ramla		capitals	34.86436	31.92484	الرملة	الرملة	رملة	0	0	الرملة
+FAYYUM_306E294N_S	10	0.00928950389507609	18.2475919314789	5	6	1	66	3	6	1	7	Misr_RE	Misr_MR	al-Fayyūm	al-Fayyum		capitals	30.69978	29.43447	الفيوم	الفيوم	فيوم	0	0	الفيوم
+TUS_594E364N_S	45	0.0459367629684898	67.5829313728922	2	1	1	1	2	5	1	1	Khurasan_RE	NE_Iran_MR	Ṭūs	Tus|Tabaran		capitals	59.49915	36.42208	طوس	طوس|طابران	طوس	0	0	طوس
+NA_Talaqan1	2	0.0005195881215442	0	11	13	1	67	9	10	4	6		NE_Iran_MR	?			locMan	64.879761	36.351412	الطالقان	الطالقان	طالقان	0	1	الطالقان
+SAMARRA_438E342N_S	38	0.0371946289860364	199.320179544687	2	1	1	6	2	5	1	1	Iraq_RE	Iraq_MR	Sāmarrāʾ	Samarra		capitals	43.88134	34.20964	سامراء	سامراء	سامراء	0	1	سامراء
+DALAS_311E292N_S	3	0.0017332253274019	24.3711529945443	3	6	1	68	3	6	1	1	Misr_RE	Misr_MR	Dalāṣ	Dalas|Dilas		towns	31.16142	29.21524	دلاص	دلاص	دلاص	0	0	دلاص
+FAYYUM_308E293N_R	10	0.00928950389507608	18.2475919314789	5	6	1	69	3	6	1	7	Misr_RE	Misr_MR	al-Fayyūm	al-Fayyum		regions	30.84266	29.35921	الفيوم	الفيوم	فيوم	0	0	الفيوم
+SALAMIYYA_370E350N_S	10	0.00624157138010756	4.82295934240894	3	6	1	70	3	6	1	1	Sham_RE	Sham_MR	Salamiyyaŧ	Salamiyya		towns	37.07106	35.00401	سلمية	سلمية	سلمية	0	0	سلمية
+ANTAKIYYA_361E361N_S	46	0.0371182764819536	332.158278074352	3	6	1	7	3	6	1	1	Sham_RE	Sham_MR	Anṭākiyyaŧ	Antakiyya		towns	36.18418	36.19718	أنطاكية	أنطاكية	انطاكية	0	0	انطاكية
+FIRABR_636E391N_S	5	0.00139643602632043	32.1577394378025	2	1	1	71	2	5	1	1	Mawarannahr_RE	Mawarannahr_MR	Firabr	Firabr		towns	63.61874	39.17015	فربر	فربر	فربر	0	0	فربر
+BALANSIYYA_004W394N_S	54	0.0255369077470417	433.785996552448	1	10	1	72	1	7	1	2	Andalus_RE	Andalus_MR	Balansiyyaŧ	Balansiyya		towns	-0.41486	39.43516	بلنسية	بلنسية	بلنسية	0	0	بلنسية
+NASAF_658E388N_S	28	0.0189098396821964	71.8525377464934	2	1	1	73	2	5	1	1	Mawarannahr_RE	Mawarannahr_MR	Nasaf	Nasaf		capitals	65.8104	38.86245	نسف	نسف	نسف	0	0	نسف
+QAYSARIYYA_354E387N_S	37	0.0247238863002017	189.118877448317	3	6	1	7	3	6	1	1	Rum_RE	Rum_MR	Qaysariyyaŧ	Qaysariyya		towns	35.48528	38.73222	قيسارية	قيسارية	قيسارية	0	0	قيسارية
+QUMIS_541E361N_R	13	0.00688732782304767	140.605801758339	2	1	1	74	2	5	1	1	Daylam_RE	NW_Iran_MR	Qūmis	Qumis		regions	54.13205	36.11206	قومس	قومس	قومس	0	0	قومس
+QAFSA_088E344N_S	14	0.00399645727923404	30.2386729608284	1	10	1	75	1	7	1	3	Maghrib_RE	Ifriqiyya_MR	Qafṣaŧ	Qafsa		towns	8.82032	34.40681	قفصة	قفصة	قفصة	0	0	قفصة
+Khuzistan_RE	28	0.0137948236874583	371.330993725747	2	1	1	1	2	5	1	1	Khuzistan_RE	SW_Iran_MR	Ḫūzistān	Khuzistan		MESO	48.944092	31.16769	خوزستان	خوزستان	خوزستان	0	1	خوزستان
+SHIRAZ_525E296N_S	59	0.058453110476477	162.0459949706	2	1	1	1	2	5	1	1	Fars_RE	SW_Iran_MR	Šīrāz	Shiraz		metropoles	52.52867	29.61884	شيراز	شيراز	شيراز	0	0	شيراز
+JAYYAN_038W377N_S	26	0.00695291560775469	180.837319891715	1	10	1	76	1	7	1	2	Andalus_RE	Andalus_MR	Ǧayyān	Jayyan		towns	-3.80302	37.78977	جيان	جيان	جيان	0	0	جيان
+LIBIRA_036W372N_S	19	0.00692822993303931	137.096710431224	1	10	1	77	1	7	1	2	Andalus_RE	Andalus_MR	Libīraŧ	Libira|Ilbira		towns	-3.66814	37.22734	إلبيرة	لبيرة|إلبيرة	لبيرة	0	0	البيرة
+GHAZZA_344E314N_S	29	0.0236682438006737	57.6496823682459	3	6	1	7	3	6	1	1	Sham_RE	Sham_MR	Ġazzaŧ	Ghazza		towns	34.45664	31.49664	غزة	غزة	غزة	0	0	غزة
+QABIS_100E338N_S	6	0.00019039060077009	7.41732807759345	1	10	1	78	1	7	1	3	Barqa_RE	Ifriqiyya_MR	Qābis	Qabis		towns	10.08563	33.86603	قابس	قابس	قابس	0	0	قابس
+SABTA_053W358N_S	43	0.0176769266442025	163.811209205972	1	10	1	79	1	7	1	2	Maghrib_RE	Maghrib_MR	Sabtaŧ	Sabta		towns	-5.33338	35.86107	سبتة	سبتة	سبتة	0	0	سبتة
+SIJILMASA_042W312N_S	18	0.00631464598900568	96.0447834874069	1	10	1	80	1	7	1	3	Maghrib_RE	Maghrib_MR	Siǧilmāsaŧ	Sijilmasa		capitals	-4.23723	31.27819	سجلماسة	سجلماسة	سجلماسة	0	1	سجلماسة
+Siqiliyya_RE	24	0.00472145550471029	139.804858958002	1	10	1	81	1	7	1	3	Siqiliyya_RE	Siqiliyya_MR	Ṣiqiliyyaŧ	Siqiliyya		regions	14.25	37.75	صقلية	صقلية	صقلية	0	0	صقلية
+KHUSRAWJIRD_574E361N_S	6	0.0026646328282405	49.8763656412068	2	1	1	82	2	5	1	1	Khurasan_RE	NE_Iran_MR	Ḫusrawǧird	Khusrawjird		towns	57.47851	36.18956	خسروجرد	خسروجرد	خسروجرد	0	1	خسروجرد
+BURUJIRD_488E339N_S	4	0.00681651717587864	0	2	1	1	83	2	5	1	1	Jibal_RE	NW_Iran_MR	Burūǧird	Burujird		capitals	48.8094	33.90164	بروجرد	بروجرد	بروجرد	0	1	بروجرد
+SADA_437E169N_S	1	0.000207539785253328	0	14	6	1	84	3	6	1	1	Yaman_RE	SW_Arabia_MR	Ṣaʿdaŧ	Sada		towns	43.76442	16.9453	صعدة	صعدة	صعدة	0	0	صعدة
+NA_Tabaran	10	0.00893783351338071	44.3555003933475	2	1	1	85	2	5	1	1		NE_Iran_MR				loc	59.638939	36.41747	الطابران	الطابران	طابران	0	0	الطابران
+QAHIRA_312E300N_S	103	0.230146595897618	1384.75866351337	3	6	1	86	3	6	1	1	Misr_RE	Misr_MR	al-Qāhiraŧ	Qahira|Cairo	Cairo	metropoles	31.2357	30.0444	القاهرة	القاهرة	قاهرة	0	0	القاهرة
+QAHIRA_312E300N_S	103	0.230146595897618	1384.75866351337	3	6	1	86	3	6	1	1	Misr_RE	Misr_MR	al-Qāhiraŧ	al-Qahira		quarters	31.24168	30.05778	القاهرة	القاهرة	قاهرة	0	0	القاهرة
+JUWAYN_616E317N_S	4	0.00219689323185234	3.31208495118094	4	3	1	87	10	8	2	5	Sijistan_RE	SE_Iran_MR	Ǧuwayn	Juwayn|Kuwayn		towns	61.60731	31.72221	جوين	جوين|كوين	جوين	0	0	جوين
+GHUZZA_019W350N_S	29	0.0236682438006737	57.6496823682459	3	6	1	7	3	6	1	1	Maghrib_RE	Maghrib_MR	Ġuzzaŧ	Ghuzza		towns	-1.92701	35.06747	غزة	غزة	غزة	0	0	غزة
+BATALYUS_069W388N_S	13	0.00219516225710059	100.557201030465	1	10	1	88	1	7	1	2	Andalus_RE	Andalus_MR	Baṭalyūs	Batalyus|Batalyuth		towns	-6.99606	38.835	بطليوس	بطليوس|بطليوث	بطليوس	0	0	بطليوس
+NA_Farghana	2	0.00219128159616895	0	15	6	1	89	3	6	1	1	Farghana	Mawarannahr_MR	LOW			loc	72.222748	40.442976	الشبلية	الشبلية	شبلية	0	0	الشبلية
+JIL_496E371N_R	3	0.00385988552216412	7.73177368356923	2	1	1	90	2	5	1	1	Daylam_RE	NW_Iran_MR	Ǧīl	Jil|Jilan		regions	49.65635	37.13924	جيلان	جيل|جيلان	جيلان	0	0	جيلان
+ASADABADH_481E348N_S	6	0.00184376334308435	20.8515078295261	12	14	1	91	6	9	5	4	Jibal_RE	NW_Iran_MR	Asadābāḏ	Asadabadh		towns	48.15134	34.80031	أسداباذ	أسداباذ	اسداباذ	0	0	اسداباذ
+ASADABADH_564E363N_S	6	0.00184376334308435	20.8515078295261	12	14	1	92	6	9	5	4	Khurasan_RE	NE_Iran_MR	Asadābāḏ	Asadabadh		towns	56.45362	36.32897	أسداباذ	أسداباذ	اسداباذ	0	1	اسداباذ
+BAJA_078W380N_S	4	0.000920610456267694	5.53347338935574	7	10	1	93	1	7	6	8	Andalus_RE	Andalus_MR	Bāǧaŧ	Baja		towns	-7.80444	38.00689	باجة	باجة	باجة	0	0	باجة
+SARUJ_384E369N_S	8	0.00425338770468133	87.5584942352919	3	6	1	94	3	6	1	1	Aqur_RE	Jazira_MR	Sarūǧ	Saruj		villages	38.43806	36.9791	سروج	سروج	سروج	0	0	سروج
+BAJJANA_024W369N_S	4	0.000578509195080059	0.666666666666667	1	10	1	95	1	7	1	2	Andalus_RE	Andalus_MR	Baǧǧānaŧ	Bajjana		towns	-2.41826	36.95657	بجانة	بجانة	بجانة	0	0	بجانة
+NA_Harasta	5	0.00447816961166694	8.1131875434507	3	6	1	96	3	6	1	1	Sham_RE	Sham_MR	LOW			loc	36.36515	33.55869	حرستا	حرستا	حرستا	0	0	حرستا
+BUSANJ_614E343N_S	2	0.000593175685482976	0	16	1	1	97	2	5	1	1	Khurasan_RE	NE_Iran_MR	Būsanǧ	Busanj|Fushanj|Bushank		capitals	61.47787	34.35023	بوسنج	بوسنج|فشنج|بوشنك|بوشنج	بوسنج	0	1	بوسنج
+SUR_352E332N_S	66	0.0617129426489733	410.287502655832	2	6	1	1	3	6	1	1	Sham_RE	Sham_MR	Ṣūr	Sur		towns	35.20796	33.26921	صور	صور	صور	0	0	صور
+AWANA_439E340N_S	2	0.00309604171483353	0	17	1	1	98	2	5	1	1	Iraq_RE	Iraq_MR				loc	43.921967	34.093838	أوانا	اوانا	اوانا	0	0	اوانا
+BAJA_092E366N_S	4	0.000920610456267692	5.53347338935574	7	10	1	99	1	7	6	8	Maghrib_RE	Ifriqiyya_MR	Bāǧaŧ	Baja		towns	9.20563	36.67738	باجة	باجة	باجة	0	0	باجة
+TALABIRA_048W399N_S	2	0.000463746844953813	0.880952380952381	18	10	1	100	1	7	1	1	Andalus_RE	Andalus_MR	Ṭalābiraŧ	Talabira		towns	-4.82541	39.97062	طلبيرة	طلابرة|طلبيرة	طلبيرة	0	0	طلبيرة
+DIYARBAKR_406E378N_R	38	0.0201786893909819	93.7496270934905	3	6	1	101	3	6	1	1	Aqur_RE	Jazira_MR	Diyār Bakr	Diyar Bakr		regions	40.67909	37.84795	ديار بكر	ديار بكر	ديار بكر	0	0	ديار بكر
+FASA_536E289N_S	8	0.00532709646384994	61.709588030762	2	6	1	102	3	6	1	1	Fars_RE	SW_Iran_MR	Fasā	Fasa		towns	53.63181	28.92193	فسا	فسا	فسا	0	0	فسا
+DIHISTAN_556E390N_R	20	0.00806253884287951	153.963585096815	2	1	1	40	2	5	1	1	Daylam_RE	NW_Iran_MR	Dihistān	Dihistan		regions	55.63466	39.09457	دهستان	دهستان	دهستان	0	0	دهستان
+DIHISTAN_629E346N_S	20	0.00806253884287952	153.963585096815	2	1	1	40	2	5	1	1	Khurasan_RE	NE_Iran_MR	Dihistān	Dihistan		capitals	62.95057	34.6968	دهستان	دهستان	دهستان	0	1	دهستان
+LADHIQIYYA_358E355N_S	11	0.00757554872303212	15.2256023418134	3	6	1	103	3	6	1	1	Sham_RE	Sham_MR	al-Lāḏiqiyyaŧ	al-Ladhiqiyya		towns	35.80763	35.51961	اللاذقية	اللاذقية	لاذقية	0	0	اللاذقية
+BAJAYA_050E367N_S	42	0.0183206738079364	280.72989295885	1	10	1	104	1	7	1	2	Maghrib_RE	Ifriqiyya_MR	Baǧāyaŧ	Bajaya		towns	5.04769	36.70199	بجاية	بجاية	بجاية	0	0	بجاية
+BILBAYS_315E304N_S	21	0.0175554777585897	36.9309374464831	3	6	1	7	3	6	1	1	Misr_RE	Misr_MR	Bilbays	Bilbays		capitals	31.57097	30.41776	بلبيس	بلبيس	بلبيس	0	0	بلبيس
+GHAZNA_684E335N_S	46	0.037415505765624	43.7812841567551	2	1	1	1	2	5	1	1	Khurasan_RE	NE_Iran_MR	Ġaznaŧ	Ghazna|Ghaznin		capitals	68.40733	33.56409	غزنة	غزنة|غزنين	غزنة	0	0	غزنة
+ASADABADH_626E362N_S	6	0.00184376334308435	20.8515078295261	12	14	1	105	6	9	5	4	Khurasan_RE	NE_Iran_MR	Asadābāḏ	Asadabadh		waystations	62.67861	36.29294	أسداباذ	أسداباذ	اسداباذ	0	0	اسداباذ
+ABHAR_492E361N_S	8	0.00553936556760875	29.4263223975669	2	1	1	106	2	5	1	1	Jibal_RE	NW_Iran_MR	Abhar	Abhar		towns	49.23473	36.15722	أبهر	أبهر	ابهر	0	0	ابهر
+MADINASALIM_024W411N_S	1	7.15588668599645e-05	0	19	10	1	107	1	7	1	2	Andalus_RE	Andalus_MR	Madīnaŧ Sālim	Madina Salim		towns	-2.41736	41.13714	مدينة سالم	مدينة سالم	مدينة سالم	0	0	مدينة سالم
+TULAYTILA_040W398N_S	24	0.011317526623487	319.475983655489	1	10	1	108	1	7	1	2	Andalus_RE	Andalus_MR	Ṭulayṭilaŧ	Tulaytila		towns	-4.0521	39.88926	طليطلة	طليطلة	طليطلة	0	1	طليطلة
+SARAQUSA_009W416N_S	21	0.00595443352849398	261.876090421494	1	10	1	109	1	7	1	2	Andalus_RE	Andalus_MR	Saraqūsaŧ	Saraqusa|Saraqusta		towns	-0.9292	41.63368	سرقسطة	سرقوسة|سرقوسطة|سرقسطة	سرقسطة	0	1	سرقسطة
+MALIQA_044W367N_S	26	0.0132315864723755	41.7036518575527	1	10	1	110	1	7	1	2	Andalus_RE	Andalus_MR	Māliqaŧ	Maliqa		towns	-4.43066	36.74791	مالقة	مالقة	مالقة	0	0	مالقة
+MARIYYA_025W368N_S	40	0.0201147320101242	578.359000799951	1	10	1	111	1	7	1	2	Andalus_RE	Andalus_MR	al-Mariyyaŧ	al-Mariyya		towns	-2.50099	36.86202	المرية	المرية	مرية	0	0	المرية
+DANIYA_001E388N_S	24	0.00897786624344356	106.149273679681	1	10	1	112	1	7	1	2	Andalus_RE	Andalus_MR	Dāniyaŧ	Daniya|Dénia	Dénia	towns	0.105056	38.838799	دانية	دانية	دانية	0	0	دانية
+MURSIYA_011W379N_S	40	0.0198221139505951	139.633393824782	1	10	1	113	1	7	1	2	Andalus_RE	Andalus_MR	Mursiyaŧ	Mursiya		towns	-1.11443	37.99945	مرسية	مرسية	مرسية	0	0	مرسية
+GHARNATA_035W372N_S	42	0.018660483109811	41.3322910244402	1	10	1	114	1	7	1	2	Andalus_RE	Andalus_MR	Ġarnāṭaŧ	Gharnata		towns	-3.5998	37.20621	غرناطة	غرناطة	غرناطة	0	1	غرناطة
+SALAMAS_448E382N_S	17	0.00769586410322572	144.231475270968	2	12	1	115	5	1	1	1	Rihab_RE	Qabq_MR	Salamās	Salamas		towns	44.82832	38.22277	سلماس	سلماس	سلماس	0	0	سلماس
+ABARQUH_532E311N_S	6	0.00606258051865618	0	2	6	1	116	3	6	1	1	Fars_RE	SW_Iran_MR	Abarqūh	Abarquh		towns	53.25737	31.15094	أبرقوه	أبرقوه	ابرقوه	0	0	ابرقوه
+KARAJ_495E338N_S	49	0.0290703672045301	176.179037049303	3	6	1	117	3	6	1	1	Jibal_RE	NW_Iran_MR	al-Karaǧ	al-Karaj|Karaj Abu Dulaf		capitals	49.54697	33.88116	الكرج	الكرج|كرج أبو دلف	كرج	0	0	الكرج
+LABLA_066W373N_S	6	0.00233918539562314	11.6227416233068	1	10	1	118	1	7	1	2	Andalus_RE	Andalus_MR	Lablaŧ	Labla		towns	-6.66965	37.38969	لبلة	لبلة	لبلة	0	0	لبلة
+BASTA_314E305N_R	4	0.0017339302800921	35.2270503580503	6	9	1	119	1	7	7	9	Misr_RE	Misr_MR	Basṭaŧ	Basta		regions	31.49925	30.56736	بسطة	بسطة	بسطة	0	0	بسطة
+MAYURQA_299E395N_R	25	0.00828861679703538	211.40715405636	1	10	1	120	1	7	1	2	Andalus_RE	Andalus_MR	Mayūrqaŧ	Mayurqa		regions	2.999268	39.539634	ميورقة	ميورقة	ميورقة	0	0	ميورقة
+NA_Shalab	4	0.00136111952136065	0	1	10	1	121	1	7	1	2	Andalus_RE	Andalus_MR	LOW			loc	-8.43822	37.18921	شلب	شلب	شلب	0	0	شلب
+NA_Shaqura	6	0.00106184003067986	0.423809523809524	1	10	1	122	1	7	1	2	Andalus_RE	Andalus_MR	LOW	Shaqura		loc	-2.749329	38.225667	شقورة	شقورة	شقورة	0	0	شقورة
+RUNDA_051W367N_S	15	0.00179261455007197	46.5232164754091	1	10	1	123	1	7	1	2	Andalus_RE	Andalus_MR	Rundaŧ	Runda|Ronda		towns	-5.16709	36.74231	رندة	رندة	رندة	0	0	رندة
+MARDIN_407E373N_S	23	0.0189430382047371	139.92489758639	3	6	1	124	3	6	1	1	Aqur_RE	Jazira_MR	Mārdīn	Mardin		towns	40.71117	37.30186	ماردين	ماردين	ماردين	0	1	ماردين
+AGHMAT_078W314N_S	29	0.00446230079506401	98.6296580596032	1	10	1	125	1	7	1	2	Maghrib_RE	Maghrib_MR	Aġmāt	Aghmat		towns	-7.801111	31.4225	أغمات	اغمات	اغمات	0	0	اغمات
+KASHGHAR_759E394N_S	4	0.00229779892020591	15.114675739386	2	1	1	126	2	5	1	1	NO_RE	Mawarannahr_MR	Kašġār	Kashghar		towns	75.97972	39.45472	كاشغر	كاشغر	كاشغر	0	0	كاشغر
+NA_Hakariyya	5	0.0025604166029585	5.26468475210954	3	6	1	127	3	6	1	1	Aqur_RE	Jazira_MR	LOW			loc	43.643188	37.60357	الهكارية	الهكارية	هكارية	0	0	الهكارية
+MARRAKISH_079W316N_S	49	0.0269715049839355	183.461506181704	1	10	1	128	1	7	1	2	Maghrib_RE	Maghrib_MR	Marrākish	Marrakish		towns	-7.99994	31.63416	مراكش	مراكش	مراكش	0	0	مراكش
+NABULUS_352E322N_S	46	0.0335387657675317	511.998591955087	3	6	1	7	3	6	1	1	Sham_RE	Sham_MR	Nābulus	Nabulus		towns	35.24238	32.22047	نابلس	نابلس	نابلس	0	0	نابلس
+KAFARTAB_366E355N_S	21	0.00725593402045536	225.903195613999	3	6	1	129	3	6	1	1	Sham_RE	Sham_MR	Kafarṭāb	Kafartab		villages	36.61239	35.50744	كفرطاب	كفرطاب	كفرطاب	0	0	كفرطاب
+TAKRIT_436E345N_S	32	0.0220631176140218	302.490048176316	3	6	1	7	3	6	1	1	Iraq_RE	Iraq_MR	Takrīt	Takrit		towns	43.69617	34.59215	تكريت	تكريت	تكريت	0	0	تكريت
+TILIMSAN_013W348N_S	30	0.00971681366806588	139.618954446216	1	10	1	130	1	7	1	2	Maghrib_RE	Maghrib_MR	Tilimsān	Tilimsan		towns	-1.32364	34.88186	تلمسان	تلمسان	تلمسان	0	1	تلمسان
+NA_Bawazij	3	0.00138531955283181	9.58636363636364	3	6	1	131	3	6	1	1	Iraq_RE	Iraq_MR	LOW			loc	43.507233	35.270402	البوازيج	البوازيج	بوازيج	0	0	البوازيج
+BAGHSHUR_625E356N_S	4	0.000670338621952175	15.3363122576064	2	1	1	132	2	5	1	1	Khurasan_RE	NE_Iran_MR	Baġšūr	Baghshur		towns	62.54722	35.60846	بغشور	بغشور	بغشور	0	0	بغشور
+KANJA_463E406N_S	5	0.00343916278118679	0.209401709401709	2	4	1	133	2	5	1	1	Rihab_RE	Qabq_MR	Kanjaŧ	Kanja		loc	46.360556	40.682778	كنجة	كنجة	كنجة	0	0	كنجة
+BALIS_380E360N_S	9	0.00501320341993878	30.7879566698302	3	6	1	134	3	6	1	1	Sham_RE	Sham_MR	Bālis	Balis		towns	38.09005	36.02806	بالس	بالس	بالس	0	0	بالس
+MARAGHA_462E373N_S	26	0.0144009977363726	45.3677234277793	2	4	1	135	5	1	1	1	Rihab_RE	Qabq_MR	Marāġaŧ	Maragha		towns	46.24758	37.34276	مراغة	مراغة	مراغة	0	0	مراغة
+QUS_327E259N_S	14	0.016031713996038	31.089653383284	3	6	1	136	3	6	1	1	Misr_RE	Misr_MR	Qūṣ	Qus		towns	32.74342	25.91848	قوص	قوص	قوص	0	0	قوص
+ARRAN_471E406N_R	21	0.00839964996171352	166.1390541044	2	4	1	137	2	5	1	1	Rihab_RE	Qabq_MR	Arrān	Arran		regions	47.14761	40.60291	أران	أران	اران	0	0	اران
+NA_Jacbar	21	0.0127030482316733	43.2788703810852	3	6	1	138	3	6	1	1	Aqur_RE	Jazira_MR				loc	38.481191	35.897064	جعبر	جعبر	جعبر	0	0	جعبر
+SINJAR_418E363N_S	41	0.0331424640370017	75.7453234805894	3	6	1	7	3	6	1	1	Aqur_RE	Jazira_MR	Sinǧār	Sinjar		towns	41.89101	36.32446	سنجار	سنجار	سنجار	0	0	سنجار
+SHAHRAZUR_460E352N_R	13	0.00810013359377865	54.5312220985774	3	6	1	139	3	6	1	1	Jibal_RE	NW_Iran_MR	Šahrazūr	Shahrazur		towns	46.01676	35.25767	شهرزور	شهرزور	شهرزور	0	1	شهرزور
+NA_Dvin	13	0.0058923937370443	72.3959839261921	3	6	1	140	3	6	1	1	Rihab_RE	Qabq_MR	LOW			locMan	45.131836	41.394943	دوين	دوين	دوين	0	0	دوين
+SARKHAD_367E324N_S	26	0.0168616925816427	120.911640801426	3	6	1	7	3	6	1	1	Sham_RE	Sham_MR	Ṣarḫad	Sarkhad|Salkhad		loc	36.711111	32.491667	صرخد	صرخد|صلخد	صرخد	0	1	صرخد
+SHARISH_061W366N_S	16	0.00123988248653216	37.5212511371168	1	10	1	141	1	7	1	2	Andalus_RE	Andalus_MR	Šarīš	Sharish		towns	-6.10856	36.69169	شريش	شريش	شريش	0	0	شريش
+DUNAYSIR_405E371N_S	9	0.00678461963396889	15.9479145922439	3	6	1	142	3	6	1	1	Aqur_RE	Jazira_MR	Dunaysīr	Dunaysir		villages	40.58146	37.16749	دنيسر	دنيسير|دنيسر	دنيسر	0	0	دنيسر
+ASYUT_311E271N_S	6	0.00474462232049116	17.7440476190476	3	6	1	143	3	6	1	1	Misr_RE	Misr_MR	Asyūṭ	Asyut		towns	31.18485	27.17922	أسيوط	أسيوط	اسيوط	0	0	اسيوط
+USWAN_329E241N_S	10	0.00687285077592299	54.3084524899097	3	6	1	144	3	6	1	1	Misr_RE	Misr_MR	Uswān	Uswan		capitals	32.98286	24.10701	أسوان	أسوان	اسوان	0	0	اسوان
+JAWBAR_363E335N_S	4	0.00100836273836904	32.4439461829061	1	10	1	145	1	7	1	2	Sham_RE	Sham_MR	Ǧawbar	Jawbar		villages	36.33266	33.52032	جوبر	جوبر	جوبر	0	0	جوبر
+KAFARBATNA_369E334N_S	8	0.00802294268428067	0.15522077670842	3	6	1	146	3	6	1	1	Sham_RE	Sham_MR	Kafarbaṭnā	Kafarbatna		loc	36.396503	33.488755	كفربطنا	كفربطنا	كفربطنا	0	1	كفربطنا
+NA_Zamalika	9	0.00798184404026442	40.4125426142609	3	6	1	147	3	6	1	1	Sham_RE	Sham_MR				loc	36.35385	33.5261	زملكا	زملكا	زملكا	0	0	زملكا
+QASIYUN_362E335N_R	42	0.0818035779217365	419.480007688565	3	6	1	7	3	6	1	1	Sham_RE	Sham_MR	Qāsiyūn	Qasiyun		regions	36.28335	33.54038	قاسيون	قاسيون	قاسيون	0	0	قاسيون
+NA_Barin	9	0.00364386995690456	92.5003512926401	3	6	1	148	3	6	1	1	Sham_RE	Sham_MR	LOW			loc	36.41064	34.94535	بارين	بارين	بارين	0	0	بارين
+NA_Marda	6	0.0110489938363037	0	3	6	1	149	3	6	1	1	Sham_RE	Sham_MR	Mardā	Marda		loc	35.19536	32.11381	مردا	مردا	مردا	0	0	مردا
+NA_Mankab	7	0.000442804881784981	4.40952380952381	1	10	1	150	1	7	1	2	Andalus_RE	Andalus_MR	LOW	Mankab		loc	-3.69072	36.73393	المنكب	المنكب	منكب	0	0	المنكب
+NA_Siwas	1	0.000135851338973051	0	20	10	1	151	1	7	1	1	Rum_RE	Rum_MR	LOW			loc	37.01611	39.74833	سيواس	سيواس	سيواس	0	0	سيواس
+SAFAD_355E329N_S	18	0.0142482683119672	93.4445444263265	3	6	1	152	3	6	1	1	Sham_RE	Sham_MR	Ṣafad	Safad		towns	35.5194	32.972106	صفد	صفد	صفد	0	0	صفد
+SAHYUN_360E355N_S	8	0.00498461062007213	44.777920818239	3	6	1	153	3	6	1	1	Sham_RE	Sham_MR	Ṣahyūn	Sahyun		sites [castle]	36.027002	35.596614	صهيون	صهيون	صهيون	0	0	صهيون
+MANSURA_688E258N_S	17	0.0189503331956771	12.821292902147	3	6	1	154	3	6	1	1	Sind_RE	SE_Iran_MR	al-Manṣūraŧ	al-Mansura		capitals	68.87697	25.8651	المنصورة	المنصورة	منصورة	0	0	المنصورة
+JAMAIL_352E321N_S	11	0.0100623897472878	14.8586946711534	3	6	1	155	3	6	1	1	Sham_RE	Sham_MR	Ǧamāʿīl	Jamail		towns	35.237961	32.136199	جماعيل	جماعيل	جماعيل	0	0	جماعيل
+BAHANSA_306E285N_S	1	0.00021564181242696	0	21	6	1	156	3	6	1	1	Misr_RE	Misr_MR	al-Bahansā	al-Bahansa		loc	30.65955	28.53564	البهنسا	البهنسا	بهنسا	0	0	البهنسا
+SHATIBA_005W389N_S	19	0.00478405650498906	146.444731640736	1	10	1	157	1	7	1	2	Andalus_RE	Andalus_MR	Šāṭibaŧ	Shatiba		towns	-0.52276	38.96551	شاطبة	شاتبة|شاطبة	شاطبة	0	0	شاطبة
+NA_Zabadani	5	0.00387486760434161	25.489624943988	3	6	1	158	3	6	1	1	Sham_RE	Sham_MR				loc	36.1005	33.72488	الزبداني	الزبداني	زبداني	0	0	الزبداني
+UMAN_564E238N_R	13	0.00656250955186196	64.6780805652628	2	2	1	159	2	5	1	1	JaziratArab_RE	SE_Arabia_MR	ʿUmān	Uman		regions	56.45284	23.82088	عمان	عمان	عمان	0	0	عمان
+YAMAMA_467E240N_R	10	0.00749652412093275	18.7306028659421	2	1	1	160	2	5	1	1	JaziratArab_RE	Central_Arabia_MR	al-Yamāmaŧ	al-Yamama		regions	46.73506	24.08674	اليمامة	اليمامة	يمامة	0	0	اليمامة
+TINNIS_322E312N_S	25	0.0195297330850705	225.445002828917	3	6	1	161	3	6	1	1	Misr_RE	Misr_MR	Tinnīs	Tinnis		towns	32.22755	31.21262	تنيس	تنيس	تنيس	0	0	تنيس
+YAZD_543E319N_S	16	0.0104778202412949	114.471713206854	2	1	1	162	2	5	1	1	Fars_RE	SW_Iran_MR	Yazd	Yazd|Katha		towns	54.34286	31.90975	يزد	يزد|كثة	يزد	0	0	يزد
+NA_Sakha	3	0.00257485895528259	6.23023122476337	2	11	1	163	2	5	1	1	Misr	Misr_MR	LOW			loc	30.94636	31.09338	سخا	سخا	سخا	0	0	سخا
+ZANJAN_485E366N_S	16	0.0110732021000421	16.5585058748631	2	1	1	164	2	5	1	1	Rihab_RE	Qabq_MR	Zanǧān	Zanjan		towns	48.5053	36.66235	زنجان	زنجان	زنجان	0	0	زنجان
+YANBU_381E241N_S	5	0.00482758339355177	0	3	1	1	165	2	5	1	1	JaziratArab_RE	Central_Arabia_MR	Yanbuʿ	Yanbu		towns	38.12512	24.1082	ينبع	ينبع	ينبع	0	0	ينبع
+TARAZ_714E428N_S	10	0.00513147671551422	23.0453188210951	2	1	1	166	2	5	1	1	Mawarannahr_RE	Mawarannahr_MR	Ṭarāz	Taraz		towns	71.44044	42.83695	طراز	طراز	طراز	0	0	طراز
+TIFLIS_448E420N_S	26	0.0126319442064853	177.828053416559	2	1	1	167	2	5	1	1	Rihab_RE	Qabq_MR	Tiflīs	Tiflis		towns	44.83734	42.0841	تفليس	تفليس	تفليس	0	0	تفليس
+TADMUR_382E345N_S	15	0.0119889826020497	21.6135158958688	3	6	1	168	3	6	1	1	Sham_RE	Sham_MR	Tadmur	Tadmur		towns	38.28754	34.54735	تدمر	تدمر	تدمر	0	0	تدمر
+TUNIS_101E367N_S	35	0.0169748840012964	137.208831074017	1	10	1	169	1	7	1	2	Maghrib_RE	Ifriqiyya_MR	Tūnis	Tunis		towns	10.17736	36.77071	تونس	تونس	تونس	0	0	تونس
+SUMAYSAT_385E375N_S	5	0.00301468482977821	5.65494329649279	3	6	1	170	3	6	1	1	Aqur_RE	Jazira_MR	Sumaysāṭ	Sumaysat		towns	38.54365	37.54334	سميساط	سميساط	سميساط	0	1	سميساط
+ZAHRA_048W379N_S	6	0.00221371056029261	14.3459357391642	1	10	1	171	1	7	1	2	Andalus_RE	Andalus_MR	al-Zahrāʾ	al-Zahra		towns	-4.85328	37.96011	الزهراء	الزهراء	زهراء	0	0	الزهراء
+SHAYZAR_365E352N_S	12	0.0111718464512253	11.4528274369361	3	6	1	172	3	6	1	1	Sham_RE	Sham_MR	Šayzar	Shayzar		towns	36.55938	35.25585	شيزر	شيزر	شيزر	0	0	شيزر
+TABRIZ_463E380N_S	8	0.00711856295850412	19.3885970077204	3	6	1	173	3	6	1	1	Rihab_RE	Qabq_MR	Tabrīz	Tabriz		towns	46.33121	38.06387	تبريز	تبريز	تبريز	0	0	تبريز
+WAHRAN_006W357N_S	10	0.00154634239576271	113.050720265195	1	10	1	174	1	7	1	2	Maghrib_RE	Maghrib_MR	Wahrān	Wahran		towns	-0.61866	35.70565	وهران	وهران	وهران	0	0	وهران
+SUSA_106E358N_S	6	0.00250178800804333	10.5786592634419	1	10	1	175	1	7	1	3	Maghrib_RE	Ifriqiyya_MR	Sūsaŧ	Susa		towns	10.6156	35.81044	سوسة	سوسة	سوسة	0	0	سوسة
+QATRABBUL_442E333N_S	1	0.000271676897001804	0	22	1	1	176	2	5	1	1	Iraq_RE	Iraq_MR	Qaṭrabbul	Qatrabbul		towns	44.24636	33.39714	قطربل	قطربل	قطربل	0	1	قطربل
+TABUK_365E283N_S	4	0.00421284852656582	2.73423469749039	3	6	1	177	3	6	1	1	BadiyatArab_RE	Central_Arabia_MR	Tabūk	Tabuk		towns	36.5062	28.37114	تبوك	تبوك	تبوك	0	0	تبوك
+URDUNN_355E321N_W	9	0.00782048926953002	11.259357717446	3	6	1	178	3	6	1	1	Sham_RE	Sham_MR	al-Urdunn	al-Urdunn		waters	35.56271	32.15774	الأردن	الأردن	اردن	0	0	الاردن
+TIRMIDH_673E372N_S	10	0.00460314680617817	54.2996015055728	2	1	1	179	2	5	1	1	Mawarannahr_RE	Mawarannahr_MR	Tirmiḏ	Tirmidh|Termez		towns	67.32394	37.27697	ترمذ	الترميذ|ترمذ	ترميذ	0	1	ترمذ
+SHANTARIN_087W392N_S	7	0.00181229194872908	12.9360171148205	1	10	1	180	1	7	1	2	Andalus_RE	Andalus_MR	Šantarīn	Shantarin		towns	-8.71712	39.22337	شنترين	شنترين	شنترين	0	1	شنترين
+NA_Talaqan2	2	0.0005195881215442	0	11	13	1	67	9	10	4	6		NW_Iran_MR	?			locMan	50.38823	36.39373	الطالقان	الطالقان	طالقان	0	0	الطالقان
+USTUWA_578E370N_R	8	0.00632293580776499	34.1242616474181	2	1	1	181	2	5	1	1	Khurasan_RE	NE_Iran_MR	Ustuwā	Ustuwa		regions	57.870483	37.091116	أستوا	استوا	استوا	0	0	استوا
+MAYHANA_604E368N_S	2	0.00175088223884065	2.08095238095238	23	1	1	182	2	5	1	1	Khurasan_RE	NE_Iran_MR	Mayhanaŧ	Mayhana|Mahana		towns	60.44076	36.85569	ميهنة	ميهنة|مهنة	ميهنة	0	0	ميهنة
+NA_Duma	2	0.001761412131248	0	24	6	1	183	3	6	1	1	Sham_RE	Sham_MR	LOW			locMan	36.4027	33.57175	دومة	دومة	دومة	0	0	دومة
+RAYYA_044W369N_R	4	0.00205553712634598	33.4386803961515	1	10	1	184	1	7	1	2	Andalus_RE	Andalus_MR	Rayyaŧ	Rayya|Rayyuh		regions	-4.40368	36.98351	رية	رية|ريه	رية	0	0	رية
+UKBARA_442E338N_S	8	0.00799600642374916	4.79542510158535	2	4	1	185	3	7	1	1	Iraq_RE	Iraq_MR	ʿUkbarā	Ukbara		towns	44.22504	33.85526	عكبرا	عكبرا	عكبرا	0	0	عكبرا
+YAFA_347E320N_S	1	0.00126878016937125	0	25	6	1	186	3	6	1	1	Sham_RE	Sham_MR	Yāfā	Yafa|Yafa		towns	34.75362	32.06237	يافا	يافا|يافة	يافا	0	0	يافا
+SAYDA_353E335N_S	4	0.00476872251928187	6.77642322417864	3	6	1	187	3	6	1	1	Sham_RE	Sham_MR	Ṣaydāʾ	Sayda		towns	35.37475	33.56642	صيداء	صيداء	صيداء	0	0	صيداء
+NA_Busta	4	0.00173393028009211	35.2270503580503	6	9	1	188	1	7	7	9	Andalus_RE	Andalus_MR	LOW			loc	-2.77259	37.49073	بسطة	بسطة	بسطة	0	0	بسطة
+SARMIN_367E358N_S	2	0.00119251508810053	5.04938061938062	26	6	1	189	3	6	1	1	Sham_RE	Sham_MR	Sarmīn	Sarmin		villages	36.7225	35.89492	سرمين	سرمين	سرمين	0	0	سرمين
+TAHIRT_013E353N_S	4	0.00206558480300667	61.4199832490272	3	10	1	190	3	6	1	1	Maghrib_RE	Maghrib_MR	Tāhirt	Tahirt		capitals	1.36504	35.36971	تاهرت	تاهرت	تاهرت	0	1	تاهرت
+RAFIQA_390E359N_S	3	0.00143296448876751	4.79409365772642	9	8	1	59	7	11	3	10	Aqur_RE	Jazira_MR	al-Rāfiqaŧ	al-Rafiqa		quarters	39.07703	35.94235	الرافقة	الرافقة	رافقة	0	0	الرافقة
+ZAWILA_147E257N_S	2	0.00193976761604966	0	27	6	1	191	3	6	1	1	Barqa_RE	Barqa_MR	Zawīlaŧ	Zawila|Zawila b. al-Khattab		villages	14.78841	25.78099	زويلة	زويلة|زويلة بن الخطاب	زويلة	0	0	زويلة
+URYULA_009W380N_S	2	0.000900689222655481	0	28	10	1	192	1	7	1	2	Andalus_RE	Andalus_MR	Uryūlaŧ	Uryula		towns	-0.94401	38.08483	أوريولة	اوريولة	اوريولة	0	0	اوريولة
+JUNDAYSABUR_485E322N_S	1	0.000936975893933669	0	29	1	1	193	2	5	1	1	Khuzistan_RE	SW_Iran_MR	Ǧundaysābūr	Jundaysabur		capitals	48.53919	32.29866	جنديسابور	جنديسابور	جنديسابور	0	1	جنديسابور
+BAQUBA_446E337N_S	1	0.00187395178786734	0	30	1	1	194	2	5	1	1	Iraq_RE	Iraq_MR	Baʿqūbā	Baquba|Baquba		towns	44.65666	33.76006	بعقوبا	بعقوبا|باقوبة	بعقوبا	0	0	بعقوبا
+KHUWI_449E385N_S	2	0.000994676008914745	14.7704485705507	31	4	1	195	2	5	1	1	Rihab_RE	Qabq_MR	Ḫuwī	Khuwi|Khuwayy|Khuwit		towns	44.99055	38.5865	خوي	خوي|خوي|خويت	خوي	0	0	خوي
+SUHRAWARD_486E364N_S	1	0.00093697589393367	0	32	1	1	196	2	5	1	1	Jibal_RE	NW_Iran_MR	Suhraward	Suhraward		towns	48.63061	36.45828	سهرورد	سهرورد	سهرورد	0	1	سهرورد
+TURTUSHA_006E407N_S	4	0.000249918087860752	6.68181818181818	1	10	1	197	1	7	1	2	Andalus_RE	Andalus_MR	Ṭurṭūšaŧ	Turtusha		towns	0.60933	40.79221	طرطوشة	طرطوشة	طرطوشة	0	1	طرطوشة
+BAYYASA_034W379N_S	1	0.000201148919304847	0	33	10	1	198	1	7	1	2	Andalus_RE	Andalus_MR	Bayyāsaŧ	Bayyasa		towns	-3.45773	37.9998	بياسة	بياسة	بياسة	0	0	بياسة
+NA_Bazaca	1	0.000346661641853029	0	34	6	1	199	3	6	1	1	Sham_RE	Sham_MR				loc	37.51788	36.36994	بزاعة	بزاعة	بزاعة	0	0	بزاعة
+WASHQA_003W421N_S	1	1.88470190064222e-05	0	35	10	1	200	1	7	1	2	Andalus_RE	Andalus_MR	Wašqaŧ	Washqa		towns	-0.35371	42.16109	وشقة	وشقة	وشقة	0	0	وشقة
