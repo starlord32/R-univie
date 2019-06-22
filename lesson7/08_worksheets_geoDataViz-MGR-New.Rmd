@@ -2,6 +2,7 @@
 title: "Visualizing Geographical Data"
 author: "Daniel Stoxreiter"
 output:
+  pdf_document: default
   html_document:
     df_print: paged
 ---

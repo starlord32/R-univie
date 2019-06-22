@@ -1,0 +1,90 @@
+## scripts, All Chapters
+
+The code in the directory 'scripts' is original work by
+the authors and dual licensed under the GPL-2 and Creative
+Commons Share alike. Derivative works may use whichever
+licence is most appropriate.
+
+## data, Chapter 02
+
+Datasets constructed for use in this book; placed in
+public domain by the authors:
+  - fruitData.csv
+  - fruitNutrition.csv
+
+## data, Chapter 03
+
+Derived from the 5-year American Community Survey released
+in 2014 (us.census.gov). Considered public domain as a work
+of the  US Federal Government.
+
+  - geodf.csv
+  - hhIncome.csv
+  - lengthOfCommute.csv
+  - meansOfCommute.csv
+
+## data, Chapter 04
+
+Derived from the 5-year American Community Survey released
+in 2014 (us.census.gov). Considered public domain as a work
+of the  US Federal Government.
+
+  - timeOfCommute.csv
+
+## data, Chapter 05
+
+Dervived from data contained on the State website for the
+Republic of France.
+
+  - france_election_2012.csv
+
+## data, Chapter 06
+
+Data downloaded and cleaned from: .
+
+  - ac.csv
+  - themes.csv
+
+## data, Chapter 07
+
+Shape files from the United States Census Bureau. Released
+into the public domain.
+
+  - State_2010Census_DP1/
+    - State_2010Census_DP1.dbf
+    - State_2010Census_DP1.shp
+    - State_2010Census_DP1.prj
+    - State_2010Census_DP1.shx
+  - berlinBorderCrossing.csv
+  - photoDatasetAllRaw.csv.zip
+
+## data, Chapter 08
+
+Downloaded from wikicommons:
+
+  - vanGogh_selfPortrait.jpg
+
+Downloaded from the Columbia.
+
+  - columbiaImages.zip
+  - photoMetaData.csv
+
+## data, Chapter 09
+
+Raw data from project Gutenberg, parsed and annotated by
+the authors.
+
+  - 01_a_scandal_in_bohemia.txt
+  - holmes_anno.zip
+
+## data, Chapter 10
+
+Raw data from project Gutenberg, parsed and annotated by
+the authors.
+
+  - gutenbergClean_annotations.zip
+
+Raw data from wikipedia, parsed and annotated by
+the authors.
+
+  - wiki_annotations.zip

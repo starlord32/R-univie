@@ -1,0 +1,40 @@
+---
+title: "L11 — Text Analysis (01) - Chapter 9"
+author: 'Daniel Stoxreiter'
+---
+```{r}
+Sys.setenv(JAVA_HOME='C:/Program Files/Java/jre1.8.0_211')
+Sys.getenv("JAVA_HOME")
+options(java.parameters = "-Xmx8182m")
+library(rJava)
+```
+
+
+```{r}
+# creating a one vector of length one
+sIn <- "Mother died today. Or, maybe, yesterday; I can't be sure."
+# splitting the previous vector by empty space = tokenization
+strsplit(sIn, split = " ")
+```
+
+```{r}
+library(coreNLP)
+#downloadCoreNLP()
+initCoreNLP()
+annotation <- annotateString(sIn)
+annotation
+```
+
+```{r}
+getToken(annotation)$token
+```
+
+```{r}
+getToken(annotation)$sentence
+```
+
+```{r}
+anno <- annotateFile("data/ch09/01_a_scandal_in_bohemia.txt")
+anno
+```
+

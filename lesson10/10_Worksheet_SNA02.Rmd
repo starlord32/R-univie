@@ -1,12 +1,14 @@
 ---
-title: "L10 — Social Network Analysis with R (02)"
-author: ''
+title: "L10 â€” Social Network Analysis with R (02)"
+author: "Daniel Stoxreiter"
 output:
+  pdf_document:
+    toc: yes
   html_document:
     df_print: paged
-    toc: true
     highlight: tango
     number_sections: yes
+    toc: yes
 ---
 
 **NB:** The worksheet has beed developed and prepared by Maxim Romanov for the course "R for Historical Research" (U Vienna, Spring 2019); Code snippets, data, and descriptions reused from: 1) <https://kateto.net/network-visualization>; 2) <http://doi.org/10.5281/zenodo.1411479> (modified).
@@ -26,6 +28,7 @@ library(tidyverse)
 library(readr)
 library(stringr)
 library(RColorBrewer)
+library(dplyr)
 
 # SNA Specific
 library(igraph)
@@ -70,13 +73,20 @@ sw_e_prequel <- sw_e_all %>%
   group_by(source, target) %>%
   summarize(weight=sum(weight))
 
+head(sw_e_prequel)
+
 ```
 
 (@) Get edges for the original trilogy.
 
 ```{r}
 
-# your code
+sw_e_original <- sw_e_all %>%
+  filter(episodeD >= 3 & episodeD <= 6) %>%
+  group_by(source, target) %>%
+  summarize(weight=sum(weight))
+
+head(sw_e_original, 50)
 
 ```
 
@@ -84,8 +94,67 @@ sw_e_prequel <- sw_e_all %>%
 (@) Load edges where characters with double personalities are split (three characters: Anakin Skywalker and Darth Vader, Palpatine and Darth Sidious, Count Dooku and Darth Tiranus).
 
 ```{r}
+sw_e_all_copy1 <- sw_e_all
 
-# your code
+# case_when works with mutate to find observations and replace them with another.
+# in this case below it replaces observation from the source and target variable.
+# the final statement TRUE ~ source or TRUE ~ TARGET siply reuses the data from source or target variable 
+
+sw_double_persona <- sw_e_all_copy1 %>%               
+  mutate(sourceSplit = case_when(
+    source == "ANAKIN (DW)" ~ "Darth Vader",
+    source == "COUNT DOOKU (DT)" ~ "Darth Tiranus",
+    TRUE ~ source
+  )) %>%
+  mutate(targetSplit = case_when(
+    target == "PALPATINE (DS)" ~ "Darth Sidious",
+    TRUE ~ target
+  )) %>%
+  select(sourceSplit,targetSplit,episode,episodeD,weight)
+
+sw_double_persona
+
+```
+
+
+```{r}
+
+# less elegeant option without case_when only allows to create three different datasets.
+
+sw_e_all_copy <- sw_e_all
+
+sw_e_split_anakin <- sw_e_all %>%
+  mutate(sourceSplit = as.character(gsub("ANAKIN", "Darth Vader", source))) %>% 
+  mutate(targetSplit = target) %>%
+  group_by(source, sourceSplit, target, targetSplit) %>%
+  summarize(weight=sum(weight))
+
+sw_e_split_dooku <- sw_e_all %>%
+  mutate(sourceSplit = as.character(gsub("COUNT DOOKU", "Darth Tiranus", source))) %>%
+  mutate(targetSplit = target) %>%  
+  group_by(source, sourceSplit, target, targetSplit) %>%
+  summarize(weight=sum(weight))
+
+sw_e_split_palpatine <- sw_e_all %>%
+  mutate(targetSplit = as.character(gsub("PALPATINE", "Darth Sidious", target))) %>%
+  mutate(sourceSplit = source) %>%    
+  group_by(source, sourceSplit, targetSplit, target) %>%
+  summarize(weight=sum(weight))
+
+
+
+sw_e_split_anakin <- sw_e_split_anakin %>%
+  filter(source == "ANAKIN (DW)")
+
+sw_e_split_dooku <- sw_e_split_dooku %>%
+  filter(source == "COUNT DOOKU (DT)")
+
+sw_e_split_palpatine <- sw_e_split_palpatine %>%
+  filter(target == "PALPATINE (DS)")
+
+sw_e_split_anakin
+sw_e_split_dooku
+sw_e_split_palpatine
 
 ```
 
@@ -103,7 +172,12 @@ head(sw_n_prequel)
 
 ```{r}
 
-# your code
+sw_e_original <- sw_e_all %>%
+  filter(episodeD >= 4 & episodeD <= 6)
+
+sw_n_original <- as.data.frame(unique(c(sw_e_original$source, sw_e_original$target)))
+colnames(sw_n_original) <- "ID"
+head(sw_n_original)
 
 ```
 
@@ -114,7 +188,7 @@ sw_n_data <- read_delim("sw_network_nodes_allCharacters.csv", "\t", escape_doubl
 
 sw_n_prequel <- sw_n_prequel %>%
   left_join(sw_n_data, by="ID")
-head(sw_n_prequel)
+head(sw_n_prequel, 50)
 
 ```
 
@@ -122,7 +196,11 @@ head(sw_n_prequel)
 
 ```{r}
 
-# your code
+sw_n_data <- read_delim("sw_network_nodes_allCharacters.csv", "\t", escape_double = FALSE, trim_ws = TRUE)
+
+sw_n_original <- sw_n_original %>%
+  left_join(sw_n_data, by="ID")
+head(sw_n_original)
 
 ```
 
@@ -156,7 +234,7 @@ edge_attr(sw_network_prequel_bare)
 
 ```{r}
 
-# your code
+sw_network_original_bare <- graph_from_data_frame(d=sw_e_original, vertices=sw_n_original, directed=F)
 
 ```
 
@@ -222,9 +300,18 @@ V(sw_network)$color <- "orange"
 
 (@) Generate graph with characters from the Outer Rim territories highlighted with a distinct color.
 
-```{r}
+```{r fig.height=15, fig.width=22}
+aff2 <- data.frame(V(sw_network)$AFFILIATIONS)
+aff2 <- cbind(aff2, V(sw_network)$AFFILIATIONS)
+colnames(aff2) <- c("AFFILIATIONS", "COLORS")
 
-# your code
+library(stringr)
+aff2$COLORS <- ifelse(str_detect(aff2$COLORS, "Outer Rim"), "green", "white")
+
+V(sw_network)$color <-aff2$COLORS
+
+set.seed(2)
+plot(sw_network, layout=layout_with_fr, vertex.size=5)
 
 ```
 
@@ -232,8 +319,21 @@ V(sw_network)$color <- "orange"
 (@) Color nodes for the original trilogy and generate a graph. Explain how you color the nodes.
 
 ```{r}
+# renaming the dataset
+sw_network_o <- sw_network_original_bare
 
-# your code
+#creating a new variable that holds the variable (column) "SIDE" of the vertices (nodes) of the igraph object
+newColors <- V(sw_network_o)$SIDE
+
+#creating new colors by replacing old ones with the "replace" function and saving them as a new variable
+newColors <- replace(newColors, newColors=="light", "gold")
+newColors <- replace(newColors, newColors=="dark", "blue")
+newColors <- replace(newColors, newColors=="neutral", "lightblue")
+newColors <- replace(newColors, newColors=="anakin", "gold")
+
+#assiging the new colors to the igraph object color variable
+V(sw_network_o)$color <- newColors
+V(sw_network_o)$color
 
 ```
 
@@ -260,7 +360,8 @@ sort(deg, decreasing = T)[1:15]
 
 ```{r}
 
-# your code
+deg_o <- degree(sw_network_o, mode="all")
+sort(deg_o, decreasing = T)[1:15]
 
 ```
 
@@ -278,9 +379,17 @@ hist(deg, main="Distribution of Node Degrees")
 
 (@) Generate graph for the original trilogy with nodes sized by their degrees
 
-```{r}
+```{r fig.height=15, fig.width=22}
 
-# your code
+set.seed(1)
+plot(sw_network_o,
+     vertex.size=deg_o/5,
+     vertex.label.cex=0.5,
+     vertex.color="white",
+     layout=layout_with_fr,
+     vertex.label.color="black")
+
+hist(deg_o, main="Distribution of Node Degrees")
 
 ```
 
@@ -304,13 +413,24 @@ sort(eigenCent,decreasing=TRUE)[1:10]
 plot(sort(eigenCent,decreasing=TRUE))
 points(x=7, y=sort(eigenCent,decreasing=TRUE)[7], col="red", pch=19)
 points(x=15, y=sort(eigenCent,decreasing=TRUE)[15], col="red", pch=19)
+
+# ANSWER: ANAKIN
 ```
 
 (@) Who has the highest eigenvector centrality in the original trilogy?
 
 ```{r}
 
-# your code
+sw_network_eigen <- sw_network_o
+
+eigenCent_o <- eigen_centrality(sw_network_eigen)$vector
+sort(eigenCent_o,decreasing=TRUE)[1:10]
+
+plot(sort(eigenCent_o,decreasing=TRUE))
+points(x=7, y=sort(eigenCent_o,decreasing=TRUE)[7], col="red", pch=19)
+points(x=15, y=sort(eigenCent_o,decreasing=TRUE)[15], col="red", pch=19)
+
+# ANSWER: HAN
 
 ```
 
@@ -363,7 +483,7 @@ plot(sw_network_bw,
 
 Nodes that have relatively low eigenvector centrality and relatively high betweenness centrality are often called gate-keepers: connecting [rather] disjoint parts of the graph, these nodes function purely as links, rather than central hubs. (Keep in mind, that such nodes are not necessarily binary and opten depend on cut off values).
 
-```{r}
+```{r fig.height=15, fig.width=22}
 betweenCent <- betweenness(sw_network)
 eigenCent <- evcent(sw_network)$vector
 colorVals <- rep("white", length(betweenCent))
@@ -383,13 +503,29 @@ plot.igraph(sw_network,
 
 (@) Who are the gate-keepers in the prequel?
 
->> your answer
+General Ceel, Nute Gunray, C-3PO, Yoda and Jango Fett
 
 (@) Who are the gate-keepers in the original trilogy?
 
-```{r}
+```{r fig.height=15, fig.width=22}
 
-# your code
+betweenCent <- betweenness(sw_network_o)
+eigenCent <- evcent(sw_network_o)$vector
+colorVals <- rep("white", length(betweenCent))
+# the values are taken experimentally from graphs above. Can you find that?
+colorVals[which(
+  eigenCent <= sort(eigenCent,decreasing=TRUE)[7] &
+    betweenCent > sort(betweenCent,decreasing=TRUE)[11])
+          ] <- "red" # vertices which connect disjoint parts of the graph
+V(sw_network_o)$color <- colorVals
+
+set.seed(1)
+plot.igraph(sw_network_o,
+            layout=layout_with_fr,
+            #vertex.label=NA,
+            vertex.size=5)
+
+# ANSWER: Biggs, Wedge, Admiral Ackbar, Mon Mothma and Anakin (DW)
 
 ```
 
@@ -445,9 +581,24 @@ For more details on cliques, check `?cliques`.
 (@) What are the largest cliques in the original trilogy?
 
 ```{r}
+lCliques <- largest.cliques(sw_network_o)
+lCliques
+c1 <- lCliques[[1]]
 
-# your code
+g1 <- graph.full(length(c1))
+V(g1)$name <- V(sw_network_o)$name[c1]
 
+g1 <- induced_subgraph(sw_network_o, lCliques[[1]])
+
+```
+
+```{r fig.height=15, fig.width=22}
+
+set.seed(78)
+plot(g1, layout=layout_nicely,
+     #vertex.label=NA,
+     vertex.color="orange",      
+     vertex.size=5)
 ```
 
 ## Communities
@@ -524,10 +675,45 @@ title(deparse(substitute(cluster_infomap)), cex.main=2)
 
 ```{r}
 
-# your code
+test2 <- sw_network_o
+
+cluster_walktrap2 = cluster_walktrap(test2)
+cluster_spinglass2 = cluster_spinglass(test2)
+#cluster_leading_eigen2 = cluster_leading_eigen(test2) # this a
+cluster_edge_betweenness2 = cluster_edge_betweenness(test2)
+#cluster_fast_greedy2 = cluster_fast_greedy(test2)
+cluster_louvain2 = cluster_louvain(test2)
+cluster_label_prop2 = cluster_label_prop(test2)
+cluster_infomap2 <- cluster_infomap(test2) # for directed graphs
 
 ```
+```{r fig.height=15, fig.width=22}
+par(mfrow=c(1,2), mar=c(1,1,1,1))
 
+set.seed(1)
+plot(cluster_walktrap2, test2, layout=layout_with_dh, vertex.size=5)
+title(deparse(substitute(cluster_walktrap)), cex.main=2)
+
+set.seed(1)
+plot(cluster_spinglass2, test2, layout=layout_with_dh, vertex.size=5)
+title(deparse(substitute(cluster_spinglass)), cex.main=2)
+
+set.seed(1)
+plot(cluster_edge_betweenness2, test2, layout=layout_with_dh, vertex.size=5)
+title(deparse(substitute(cluster_edge_betweenness)), cex.main=2)
+
+set.seed(1)
+plot(cluster_louvain2, test2, layout=layout_with_dh, vertex.size=5)
+title(deparse(substitute(cluster_louvain)), cex.main=2)
+
+set.seed(1)
+plot(cluster_label_prop2, test2, layout=layout_with_dh, vertex.size=5)
+title(deparse(substitute(cluster_label_prop)), cex.main=2)
+
+set.seed(1)
+plot(cluster_infomap2, test2, layout=layout_with_dh, vertex.size=5)
+title(deparse(substitute(cluster_infomap)), cex.main=2)
+```
 # Alternative visualizations
 
 ## `ggraph`
@@ -562,9 +748,27 @@ swNetworkPlot
 
 (@) Generate a similar graph for the original trilogy, but use a different layout:
 
-```{r}
+```{r fig.height=9, fig.width=15}
 
-# your code
+set.seed(786)
+
+sw_network_ggraph2 <- sw_network_o
+V(sw_network_ggraph2)$cluster_walktrap2 <- as.character(cluster_louvain$membership)
+
+vDegree <- degree(sw_network_ggraph, mode="all")
+V(sw_network_ggraph2)$degree <- vDegree
+
+swNetworkPlot2 <- ggraph(sw_network_ggraph2, 'igraph', algorithm = 'with_fr') +
+  geom_encircle(s_shape=.1, expand=0.01, alpha=.25, col="black", aes(x=x, y=y, group=cluster_walktrap2, fill=cluster_walktrap2))+   geom_edge_link(aes(alpha=weight), width=0.5) +
+  geom_node_point(aes(color=cluster_walktrap2, size=degree), alpha=1) +
+  geom_node_label(aes(label=name), color="black", size=3, repel=TRUE, alpha=0.75) +
+  #ggforce::theme_no_axes() +
+  theme_graph()+
+  scale_size_continuous(range=c(0.1,10), limits=c(1,max(V(sw_network_ggraph)$degree)))
+
+swNetworkPlot2
+
+#ggsave(file=paste0("practiceGraph_swNetwork_TEST.png"),plot=swNetworkPlot,dpi=600,width=15,height=9)
 
 ```
 
@@ -599,9 +803,9 @@ yNudge = 8
 
 swNetworkPlot <- ggraph(sw_network_ggraph, layout="linear") + 
   geom_edge_arc(aes(width = weight, y=y+yNudge, yend=yend+yNudge), alpha = 0.8) + 
-  #geom_node_point(aes(color=cluster_louvain, size=degree)) +
-  geom_node_point(aes(size=degree, y=y+yNudge-1)) +
-  geom_node_point(aes(size=degree, y=y-yNudge), color="white") +
+  geom_node_point(aes(color=cluster_louvain, size=degree)) +
+  #geom_node_point(aes(size=degree, y=y+yNudge-1)) +
+  #geom_node_point(aes(size=degree, y=y-yNudge), color="white") +
   geom_node_text(aes(label = name, y=y+yNudge-1), size=3, hjust=1, nudge_y = -1) +
   scale_edge_width(range = c(0.2, 4)) +
   coord_flip()+
@@ -614,14 +818,32 @@ swNetworkPlot
 
 (@) Analyze the code for the graph above: you can comment/uncomment lines of code to check what they are adding or modifying. Explain each line of code below.
 
->> your answer
+
+geom_edge_arc : this function adds the interactions (lines) between the nodes
+geom_node_point : this function adds the node points that allow to visiualize degrees and culusters
+geom_node_text : this function adds the labels for the nodes
+scale_edge_width: this function scales the interaction lines to a custom level for better visualization
+coord_flip : flips the graph to vertical view instead of horizontal
+the last two function add headers and chooses the theme of the plot
 
 (@) Generate a similar graph for the original trilogy. Add whatever modifications you consider appropriate and valuable.
 
-```{r}
+```{r fig.height=10, fig.width=5}
+yNudge = 8
 
-# your code
+swNetworkPlot2 <- ggraph(sw_network_ggraph2, layout="linear") + 
+  geom_edge_arc(aes(width = weight, y=y+yNudge, yend=yend+yNudge), alpha = 0.8) + 
+  #geom_node_point(aes(color=cluster_louvain, size=degree)) +
+  geom_node_point(aes(size=degree, y=y+yNudge-1)) +
+  geom_node_point(aes(size=degree, y=y-yNudge), color="white") +
+  geom_node_text(aes(label = name, y=y+yNudge-1), size=3, hjust=1, nudge_y = -1) +
+  scale_edge_width(range = c(0.2, 4)) +
+  coord_flip()+
+  labs(edge_width = "Interactions") +
+  theme_graph()
 
+swNetworkPlot2
+#ggsave(file=paste0("practiceGraph_swNetwork_TEST.png"),plot=swNetworkPlot,dpi=600,width=10,height=17)
 ```
 
 For more on layouts, see [this library creator's website]( https://www.data-imaginist.com/2017/ggraph-introduction-layouts/). You can also find examples of how to work with [nodes](https://www.data-imaginist.com/2017/ggraph-introduction-nodes/) and [edges](https://www.data-imaginist.com/2017/ggraph-introduction-edges/).
@@ -680,9 +902,34 @@ For more details on `visNetwork`: <https://datastorm-open.github.io/visNetwork/>
 
 ```{r}
 
-# your code
+data <- toVisNetworkData(sw_network_ggraph2)
+nodes <- data[[1]]
+edges <- data[[2]]
+
+library(RColorBrewer)
+#nodes$color <- brewer.pal(12, "Set3")[as.factor(nodes$cluster_louvain)]
+nodes$color <- brewer.pal(12, "Set3")[as.factor(nodes$SIDE)]
+
+nodes$shape <- "dot" 
+nodes$shadow <- TRUE # Nodes will drop shadow
+nodes$title <- nodes$label # Text on click
+nodes$size <- round(nodes$degree/2, 3) # Node size
+nodes$borderWidth <- 2 # Node border width
+nodes$color.border <- "black"
+
+edges$width <- round(edges$weight/2,3)
+
+set.seed(1)
+visNetwork(nodes, edges, width="100%", height="750px") %>%
+  #visPhysics(stabilization = FALSE) %>% 
+  #visEdges(smooth = FALSE) %>%
+  visIgraphLayout(layout = "layout_with_fr") %>%
+  visOptions(highlightNearest = TRUE,
+             selectedBy = "cluster_louvain",
+             nodesIdSelection = TRUE)
 
 ```
+
 
 # Reference: parameters for plotting with `igraph`
 
